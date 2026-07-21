@@ -1,0 +1,2151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Maa Ganga CSC Dashboard</title>
+  
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+  <!-- Local App Storage / CDN Fallback for Native Offline Support -->
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" crossorigin="anonymous"></script>
+  
+  <style>
+    body { background-color: #f8fafc; font-family: 'Poppins', sans-serif; color: #1e293b; margin: 0; padding: 0; }
+    .header-logo { height: 50px; border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.15); transition: transform 0.3s ease; object-fit: contain; }
+    .header-logo:hover { transform: scale(1.08) rotate(3deg); }
+
+    /* Premium Animated Multicolor Gradient Text Effect */
+    .multicolor-title {
+      font-size: 1.35rem;
+      font-weight: 800 !important;
+      background: linear-gradient(45deg, #ff0055, #7a00ff, #0056b3, #00b7ff, #00c853, #ff6b00, #ff0055);
+      background-size: 300% 300%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: rainbowGlow 6s ease infinite;
+      letter-spacing: 0.5px;
+      text-shadow: 0px 2px 4px rgba(0,0,0,0.05);
+    }
+
+    @keyframes rainbowGlow {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    
+    /* Desktop Container Overrides */
+    @media (min-width: 769px) {
+      .container { max-width: 900px !important; margin-top: 20px; }
+    }
+    
+    /* Full Android App Display Setup for Mobile - Absolute Clean App View */
+    @media (max-width: 768px) {
+      html, body { overflow-x: hidden; width: 100%; background-color: #ffffff !important; }
+      .container { max-width: 100% !important; width: 100% !important; padding-left: 12px !important; padding-right: 12px !important; margin: 0 !important; }
+      
+      /* Force remove website-style white background card borders on mobile */
+      .tab-content .card, .tab-pane .card { 
+        border-radius: 0 !important; 
+        border: none !important; 
+        box-shadow: none !important; 
+        padding: 0 !important; 
+        background: transparent !important; 
+      }
+      
+      .navbar { border-radius: 0 !important; margin: 0 -12px 12px -12px !important; width: calc(100% + 24px) !important; box-shadow: 0 2px 8px rgba(0,0,0,0.05) !important; background-color: #ffffff !important; }
+      .row { margin-left: -6px !important; margin-right: -6px !important; }
+      .col-12, .col-6, .col-4, .col-md-6 { padding-left: 6px !important; padding-right: 6px !important; }
+      
+      /* Form inputs padding adjustment for pure mobile app look */
+      .form-control, .form-select { background-color: #f8fafc !important; border: 1px solid #e2e8f0 !important; }
+      
+      /* Dashboard Grid adjustments */
+      #dashboard-home-sec .p-3 { padding: 22px 12px !important; min-height: 125px; display: flex; flex-direction: column; justify-content: center; align-items: center; background-color: #f8fafc !important; }
+      #dashboard-home-sec strong.small { font-size: 0.9rem !important; margin-top: 4px; font-weight: 700 !important; }
+      #dashboard-home-sec span.text-muted { font-size: 11px !important; }
+      #dashboard-home-sec span.fs-2 { font-size: 2.2rem !important; }
+      
+      /* Extended padding for top back button */
+      .tab-pane > .btn-secondary { margin-left: 0 !important; width: 100% !important; border-radius: 10px !important; }
+    }
+
+    /* Premium Pill Tabs */
+    .nav-pills { background: #ffffff; padding: 6px; border-radius: 30px; box-shadow: 0 4px 10px rgba(0,0,0,0.04); }
+    .nav-pills .nav-link { color: #627d98; font-weight: 600; background: transparent; transition: all 0.3s ease; border-radius: 25px; padding: 10px 20px; border: none; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+    .nav-pills .nav-link:hover { background: #f0f4f8; color: #102a43; }
+    
+    /* Multicolour Active States */
+    .nav-pills .nav-item:nth-child(1) .nav-link.active { background: linear-gradient(135deg, #e63946, #ff4d6d); color: white; box-shadow: 0 4px 12px rgba(230,57,70,0.3); }
+    .nav-pills .nav-item:nth-child(2) .nav-link.active { background: linear-gradient(135deg, #0056b3, #0070f3); color: white; box-shadow: 0 4px 12px rgba(0,86,179,0.3); }
+    .nav-pills .nav-item:nth-child(3) .nav-link.active { background: linear-gradient(135deg, #27ae60, #2ecc71); color: white; box-shadow: 0 4px 12px rgba(39,174,96,0.3); }
+    .nav-pills .nav-item:nth-child(4) .nav-link.active { background: linear-gradient(135deg, #8e44ad, #9b59b6); color: white; box-shadow: 0 4px 12px rgba(142,68,173,0.3); }
+    .nav-pills .nav-item:nth-child(5) .nav-link.active { background: linear-gradient(135deg, #d35400, #e67e22); color: white; box-shadow: 0 4px 12px rgba(211,84,0,0.3); }
+    .nav-pills .nav-item:nth-child(6) .nav-link.active { background: linear-gradient(135deg, #2c3e50, #34495e); color: white; box-shadow: 0 4px 12px rgba(44,62,80,0.3); }
+    
+    .nav-link span.tab-icon { font-size: 1.1rem; }
+
+    /* Mobile Responsive View Shift (Bottom Navigation) */
+    @media (max-width: 768px) {
+      /* Container padding reset since bottom bar is removed */
+      .container.mb-5 { padding-bottom: 20px !important; }
+    }
+
+    /* Dashboard Cards */
+    .card { border-radius: 16px; border: none; box-shadow: 0 8px 24px rgba(0,0,0,0.03); background: #ffffff; padding: 24px !important; }
+    .stat-card { background: white; border-radius: 16px; padding: 16px; text-align: center; box-shadow: 0 6px 16px rgba(0,0,0,0.02); transition: transform 0.2s ease; border-top: none !important; }
+    .stat-card:hover { transform: translateY(-3px); }
+    #dashboard-home-sec .p-3:active, .btn:active { transform: scale(0.96); transition: transform 0.1s ease; }
+    
+    /* Floating Action Button (FAB) */
+    .fab-btn { position: fixed; bottom: 20px; right: 20px; width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, #0056b3, #0070f3); color: white; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 4px 12px rgba(0,86,179,0.4); border: none; z-index: 999; cursor: pointer; }
+    .fab-btn:active { transform: scale(0.92); }
+    
+    /* Highlight Search Text */
+    mark.bg-highlight { background-color: #fef08a !important; padding: 0 2px; border-radius: 2px; color: #000; }
+    .stat-card strong { font-size: 1.25rem; font-weight: 800; display: block; margin-top: 4px; }
+    
+    .tab-pane { display: none !important; }
+    .tab-pane.active { display: block !important; animation: fadeIn 0.4s ease forwards; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Modern UI Elements */
+    .form-control, .form-select { border-radius: 10px; border: 1px solid #cbd5e1; padding: 10px 14px; background-color: #f8fafc; transition: all 0.2s ease; font-size: 0.95rem; }
+    .form-control:focus, .form-select:focus { background-color: #fff; border-color: #0056b3; box-shadow: 0 0 0 3px rgba(0,86,179,0.15); }
+    
+    /* Mic button styles removed */
+    
+    .item-row { background: #f8fafc; border: 1px dashed #cbd5e1; padding: 20px; border-radius: 12px; margin-bottom: 20px; position: relative; }
+    .remove-item-btn { position: absolute; top: -10px; right: 10px; padding: 4px 12px; font-size: 11px; border-radius: 20px; box-shadow: 0 2px 6px rgba(220,53,69,0.2); }
+    
+    /* PERFECT CLEAN 1-PAGE PRINT CSS */
+    @media print {
+      @page { size: A4; margin: 0; }
+      body { margin: 0; padding: 0; background: #fff; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+      
+      /* Hide Floating Action Button, App Elements, and Developer Footer in Print View */
+      .fab-btn, .navbar, .tab-content, .border-top, nav, footer, button, #mainApp { 
+        display: none !important; 
+      }
+      
+      #printArea { 
+        display: block !important; 
+        position: absolute; 
+        left: 0; 
+        top: 0; 
+        width: 100%; 
+        height: 100%; 
+        z-index: 999999;
+        background: #ffffff !important;
+      }
+      
+      .photo-grid { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; padding: 15px;}
+      .photo-item { width: 3.5cm; height: 4.5cm; object-fit: cover; object-position: top center; border: 1px solid #ccc; }
+      .pvc-item { width: 8.5cm; height: 5.4cm; object-fit: cover; border: 1px solid #000; margin: 20px auto; display: block;}
+      #txnId { border: 2px solid #0056b3; font-weight: bold; color: #0056b3; }
+      #txnId:focus { background-color: #e9ecef; outline: none; }
+    }
+  </style>
+</head>
+<body onload="initApp()">
+
+  <div id="printArea" class="d-none"></div>
+
+  <!-- Floating Action Button for Quick Actions -->
+  <button class="fab-btn" onclick="openAppSection('invoice-sec')" title="Quick New Invoice">➕</button>
+    <!-- Navbar -->
+    <nav class="navbar navbar-light bg-white shadow-sm mb-2 rounded mt-2 p-2.5" style="border-radius: 14px !important;">
+      <div class="container-fluid justify-content-center text-center">
+        <span class="navbar-brand d-flex align-items-center justify-content-center m-0 flex-wrap gap-2">
+          <img src="https://lh3.googleusercontent.com/d/1AVhGGj41J973HK0KgI1im5JJwJZsKhJR" alt="Logo" class="header-logo">
+          <h5 class="mb-0 multicolor-title">Maa Ganga Jan Seva Kendra & Electronic Center</h5>
+        </span>
+      </div>
+    </nav>
+
+    <!-- Slim & Multicolor Live Date & Dynamic Digital Clock Banner -->
+    <div class="card py-1 px-2 text-center mb-3 border-0 shadow-sm text-white" style="border-radius: 20px !important; background: linear-gradient(90deg, #ff0055, #7a00ff, #0056b3, #00b7ff, #00c853, #ff6b00); background-size: 300% 300%; animation: bannerGradient 8s ease infinite;">
+      <div class="fw-bold d-flex align-items-center justify-content-center gap-2 flex-wrap" style="font-size: 0.85rem; letter-spacing: 0.5px; line-height: 1.2;">
+        <span>📅 <span id="liveAppDate">Loading Date...</span></span>
+        <span class="opacity-75">|</span>
+        <span>⏰ <span id="liveAppTime" class="text-warning fw-extrabold">00:00:00 PM</span></span>
+      </div>
+    </div>
+
+    <style>
+      @keyframes bannerGradient {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+      }
+    </style>
+
+    <div class="tab-content">
+      
+      <!-- 0. MAIN DASHBOARD OVERVIEW HOME -->
+      <div class="tab-pane active" id="dashboard-home-sec">
+        <div class="card p-3 shadow-sm border-0 mb-3">
+          <h5 class="fw-bold mb-3 text-dark">✨ Maa Ganga CSC Hub</h5>
+          <p class="text-muted small">यहाँ से आप अपने डिजिटल केंद्र की सभी मुख्य सेवाओं को एक ही जगह से नियंत्रित कर सकते हैं। नीचे दिए गए शॉर्टकट्स का उपयोग करें:</p>
+          
+          <div class="row g-3 mt-1">
+            <!-- Shortcut 1 -->
+            <div class="col-6 col-md-4">
+              <div class="p-3 border rounded text-center bg-white shadow-sm" style="cursor:pointer; border-radius:12px !important;" onclick="openAppSection('transaction-sec')">
+                <span class="fs-2 d-block mb-1">💰</span>
+                <strong class="d-block small text-dark">Transaction System</strong>
+                <span class="text-muted" style="font-size:10px;">Deposit & Withdraw</span>
+              </div>
+            </div>
+            <!-- Shortcut 2 -->
+            <div class="col-6 col-md-4">
+              <div class="p-3 border rounded text-center bg-white shadow-sm" style="cursor:pointer; border-radius:12px !important;" onclick="openAppSection('invoice-sec')">
+                <span class="fs-2 d-block mb-1">🧾</span>
+                <strong class="d-block small text-dark">Invoice Generator</strong>
+                <span class="text-muted" style="font-size:10px;">Create GST/Tax Bills</span>
+              </div>
+            </div>
+            <!-- Shortcut 3 -->
+            <div class="col-6 col-md-4">
+              <div class="p-3 border rounded text-center bg-white shadow-sm" style="cursor:pointer; border-radius:12px !important;" onclick="openAppSection('photo-sec')">
+                <span class="fs-2 d-block mb-1">📸</span>
+                <strong class="d-block small text-dark">Photo Studio Pro</strong>
+                <span class="text-muted" style="font-size:10px;">Passport Size Grid</span>
+              </div>
+            </div>
+            <!-- Shortcut 4 -->
+            <div class="col-6 col-md-4">
+              <div class="p-3 border rounded text-center bg-white shadow-sm" style="cursor:pointer; border-radius:12px !important;" onclick="openAppSection('pvc-sec')">
+                <span class="fs-2 d-block mb-1">🪪</span>
+                <strong class="d-block small text-dark">Smart PVC Maker</strong>
+                <span class="text-muted" style="font-size:10px;">Standard ID Cards</span>
+              </div>
+            </div>
+            <!-- Shortcut 5 -->
+            <div class="col-6 col-md-4">
+              <div class="p-3 border rounded text-center bg-white shadow-sm" style="cursor:pointer; border-radius:12px !important;" onclick="openAppSection('doc-receive-sec')">
+                <span class="fs-2 d-block mb-1">📁</span>
+                <strong class="d-block small text-dark">Doc Receiving</strong>
+                <span class="text-muted" style="font-size:10px;">Form Logs & Records</span>
+              </div>
+            </div>
+            <!-- Shortcut 6: Stock Details -->
+            <div class="col-6 col-md-4">
+              <div class="p-3 border rounded text-center bg-white shadow-sm" style="cursor:pointer; border-radius:12px !important;" onclick="openAppSection('stock-sec'); fetchStockData();">
+                <span class="fs-2 d-block mb-1">📦</span>
+                <strong class="d-block small text-dark">Stock Details</strong>
+                <span class="text-muted" style="font-size:10px;">Check Shop Material</span>
+              </div>
+            </div>
+            <!-- Shortcut 7: Analytics & Summary -->
+            <div class="col-6 col-md-4">
+              <div class="p-3 border rounded text-center bg-white shadow-sm" style="cursor:pointer; border-radius:12px !important;" onclick="openAppSection('analytics-sec'); loadAnalyticsData();">
+                <span class="fs-2 d-block mb-1">📊</span>
+                <strong class="d-block small text-dark">Analytics & Report</strong>
+                <span class="text-muted" style="font-size:10px;">Comparison & Summary</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div> <!-- Dashboard Home Close -->
+      <!-- 7. ANALYTICS & SUMMARY TAB -->
+      <div class="tab-pane" id="analytics-sec">
+        <button class="btn btn-secondary fw-bold mb-3 shadow-sm w-100 p-2" onclick="openAppSection('dashboard-home-sec')">⬅️ Back to Dashboard</button>
+        <div class="card p-3 shadow-sm border-0">
+          <h6 class="fw-bold mb-3 text-secondary">📊 Business Summary & Comparison</h6>
+
+          <!-- Quick Filters -->
+          <div class="row g-2 mb-3">
+            <div class="col-6">
+              <label class="small fw-bold">From Date</label>
+              <input type="date" id="reportStartDate" class="form-control form-control-sm" onchange="filterAnalyticsByDate()">
+            </div>
+            <div class="col-6">
+              <label class="small fw-bold">To Date</label>
+              <input type="date" id="reportEndDate" class="form-control form-control-sm" onchange="filterAnalyticsByDate()">
+            </div>
+          </div>
+
+          <!-- Comparison Cards: Current vs Last Month -->
+          <div class="row g-2 mb-3">
+            <div class="col-6">
+              <div class="p-2 border rounded bg-light text-center">
+                <small class="text-muted d-block" style="font-size:11px;">Current Month Sales</small>
+                <strong class="text-success fs-6" id="currMonthSales">Rs.0.00</strong>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="p-2 border rounded bg-light text-center">
+                <small class="text-muted d-block" style="font-size:11px;">Last Month Sales</small>
+                <strong class="text-primary fs-6" id="lastMonthSales">Rs.0.00</strong>
+              </div>
+            </div>
+          </div>
+
+          <!-- Detailed Summary Matrix -->
+          <div class="border rounded p-3 bg-white mb-3 shadow-sm">
+            <h6 class="fw-bold text-dark border-bottom pb-2 mb-2">📈 Period Selected Summary</h6>
+            <div class="d-flex justify-content-between py-1 border-bottom">
+              <span class="small text-muted">Total Deposit (Banking)</span>
+              <strong class="text-success small" id="sumDeposit">Rs.0.00</strong>
+            </div>
+            <div class="d-flex justify-content-between py-1 border-bottom">
+              <span class="small text-muted">Total Withdrawal (Banking)</span>
+              <strong class="text-danger small" id="sumWithdraw">Rs.0.00</strong>
+            </div>
+            <div class="d-flex justify-content-between py-1 border-bottom">
+              <span class="small text-muted">Invoice Sales (In Shop)</span>
+              <strong class="text-primary small" id="sumInvoiceSales">Rs.0.00</strong>
+            </div>
+            <div class="d-flex justify-content-between py-1 border-bottom">
+              <span class="small text-muted">Pending Balance (Baki)</span>
+              <strong class="text-warning text-dark small" id="sumPendingBalance">Rs.0.00</strong>
+            </div>
+            <div class="d-flex justify-content-between py-1">
+              <span class="small text-muted">Out of Stock Items</span>
+              <strong class="text-danger small" id="sumOutOfStock">0 Items</strong>
+            </div>
+          </div>
+
+          <button type="button" class="btn btn-outline-primary btn-sm w-100 fw-bold" onclick="exportSummaryCSV()">📥 Export Summary to Excel/CSV</button>
+        </div>
+      </div>
+      
+      <!-- 6. STOCK DETAILS TAB -->
+      <div class="tab-pane" id="stock-sec">
+        <button class="btn btn-secondary fw-bold mb-3 shadow-sm w-100 p-2" onclick="openAppSection('dashboard-home-sec')">⬅️ Back to Dashboard</button>
+        <div class="card p-3 shadow-sm border-0">
+          <h6 class="fw-bold mb-3 text-secondary">📦 Shop Material & Stock Details</h6>
+          
+          <!-- Live Search Box with Clear Button -->
+          <div class="mb-2 position-relative">
+            <input type="text" id="stockSearchInput" class="form-control fw-bold border-primary pe-5" placeholder="🔍 टाइप करके सामान खोजें (e.g. BOARD, PLUG, WIRE)..." oninput="filterStockTable()">
+            <button type="button" class="btn btn-sm text-secondary position-absolute end-0 top-50 translate-middle-y me-2 fw-bold" style="z-index: 5;" onclick="document.getElementById('stockSearchInput').value=''; filterStockTable();">✕</button>
+          </div>
+
+          <!-- Fast Filter Buttons -->
+          <div class="d-flex gap-2 mb-3">
+            <button type="button" class="btn btn-sm btn-outline-dark fw-bold w-50" onclick="document.getElementById('stockSearchInput').value=''; filterStockTable();">📋 Show All Stock</button>
+            <button type="button" class="btn btn-sm btn-outline-danger fw-bold w-50" onclick="showLowStockOnly()">⚠️ Out of Stock / Low</button>
+          </div>
+
+          <!-- Low/Zero Stock Notification Banner -->
+          <div id="stockAlertBanner" class="alert alert-warning py-2 px-3 small fw-bold mb-3 d-none border-warning">
+            ⚠️ <span id="stockAlertText">कुछ सामान स्टॉक में खत्म होने वाला है!</span>
+          </div>
+
+          <!-- Loading Indicator & Table -->
+          <div id="stockLoading" class="text-center text-primary fw-bold my-3 d-none">⏳ स्टॉक लोड हो रहा है, कृपया प्रतीक्षा करें...</div>
+          
+          <div class="table-responsive" style="max-height: 450px; overflow-y: auto;">
+            <table class="table table-bordered table-striped align-middle small mb-0">
+              <thead class="table-dark sticky-top">
+                <tr>
+                  <th>Item Name</th>
+                  <th class="text-center">Rest Qty</th>
+                  <th class="text-end">Selling Price</th>
+                  <th>Group</th>
+                  <th class="text-center">Action</th>
+                </tr>
+              </thead>
+              <tbody id="stockTableBody">
+                <tr><td colspan="4" class="text-center text-muted">डेटा लोड करने के लिए ऊपर बटन पर क्लिक करें।</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. DOCUMENT RECEIVING TAB -->
+      <div class="tab-pane" id="doc-receive-sec">
+        <button class="btn btn-secondary fw-bold mb-3 shadow-sm w-100 p-2" onclick="openAppSection('dashboard-home-sec')">⬅️ Back to Dashboard</button>
+        <div class="card p-3 shadow-sm border-0">
+          <h6 class="fw-bold mb-3 text-secondary">Document Receiving Log</h6>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="small fw-bold">Customer Name</label>
+              <input type="text" id="docCustName" class="form-control" placeholder="Name">
+            </div>
+            <div class="col-md-6">
+              <label class="small fw-bold">Mobile No.</label>
+              <input type="tel" id="docCustMobile" class="form-control" placeholder="Enter 10 digits" maxlength="10">
+            </div>
+            <div class="col-md-6">
+              <label class="small fw-bold">Document Type</label>
+              <select id="docType" class="form-select">
+                <option>PAN Card</option>
+                <option>Passport</option>
+                <option>Driving License</option>
+                <option>Voter ID</option>
+                <option>Other Document</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="small fw-bold">Service Charge (Rs.)</label>
+              <input type="number" id="docCharge" class="form-control" placeholder="0">
+            </div>
+            <div class="col-12">
+              <label class="small fw-bold">Remarks / Description</label>
+              <textarea id="docRemarks" class="form-control" placeholder="Enter tracking info, application number, or notes..." rows="2"></textarea>
+            </div>
+            <div class="col-12">
+              <label class="small fw-bold text-primary mb-2">Upload/Scan Document Copy</label>
+              <input type="file" id="docFileRef" accept="image/*,application/pdf" class="form-control">
+            </div>
+          </div>
+          <button class="btn btn-primary mt-3 w-100 fw-bold p-2.5 fs-5 shadow" id="saveDocBtn" onclick="alert('Document Record Saved Omitted!')" style="background:#0056b3;">Save Document Record</button>
+        </div>
+      </div>
+
+      <!-- 1. TRANSACTION TAB -->
+      <div class="tab-pane" id="transaction-sec">
+        <button class="btn btn-sm btn-secondary mb-3 fw-bold shadow-sm" onclick="openAppSection('dashboard-home-sec')">⬅️ Back to Dashboard</button>
+        
+        <!-- Live Cash Stats inside Transaction View Only -->
+        <div class="row g-2 mb-3">
+          <div class="col-4"><div class="stat-card border-success border-start border-4" style="padding:8px !important;"><small class="text-muted d-block" style="font-size:11px;">Deposit</small><strong class="text-success" id="statIn" style="font-size:14px;">Rs.0</strong></div></div>
+          <div class="col-4"><div class="stat-card border-danger border-start border-4" style="padding:8px !important;"><small class="text-muted d-block" style="font-size:11px;">Withdraw</small><strong class="text-danger" id="statOut" style="font-size:14px;">Rs.0</strong></div></div>
+          <div class="col-4"><div class="stat-card border-primary border-start border-4" style="padding:8px !important;"><small class="text-muted d-block" style="font-size:11px;">Total Txn</small><strong class="text-primary" id="statCount" style="font-size:14px;">0</strong></div></div>
+        </div>
+
+        <div class="card p-3 shadow-sm border-0">
+          <h6 class="fw-bold mb-3 text-secondary">Record Transaction</h6>
+          <div class="row g-3">
+            <div class="col-6"><label class="small fw-bold">Type</label><select id="txnType" class="form-select"><option>Deposit</option><option>Withdrawal</option></select></div>
+            <div class="col-6">
+              <label class="small fw-bold">Amount (Rs.)</label>
+              <input type="number" id="txnAmount" class="form-control" placeholder="0">
+            </div>
+
+            <div class="col-12"><label class="small fw-bold">Mobile No.</label><input type="tel" id="txnMobile" class="form-control" placeholder="Enter 10 digits" maxlength="10" oninput="checkCRM(this.value, 'txnName', 'txnAadhaar')"></div>
+            <div class="col-md-6">
+              <label class="small fw-bold">Consumer Name</label>
+              <input type="text" id="txnName" class="form-control" placeholder="Name">
+            </div>
+            <div class="col-md-6"><label class="small fw-bold">Aadhaar (Last 4)</label><input type="text" id="txnAadhaar" class="form-control" placeholder="[Redacted]"></div>
+
+            <div class="col-6"><label class="small fw-bold">Gateway</label><select id="txnGateway" class="form-select"><option>RealiPay</option><option>PhonePe</option><option>Paytm</option><option>Other</option></select></div>
+            <div class="col-6"><label class="small fw-bold">Method</label><select id="txnMethod" class="form-select"><option>Aadhaar</option><option>Online Transfer</option></select></div>
+
+            <!-- PREMIUM SLIP OCR, CAMERA BUTTONS & VERIFICATION BOX -->
+            <div class="col-12 bg-light p-3 rounded border shadow-sm">
+              <label class="small fw-bold text-primary mb-2">Slip OCR & Verification</label>
+              
+              <div class="mb-3">
+                <input type="file" id="txnPhoto" accept="image/*" class="d-none" onchange="scanImage(this)">
+                <button type="button" class="btn btn-outline-primary w-100 fw-bold p-2 d-flex align-items-center justify-content-center gap-2 bg-white" onclick="document.getElementById('txnPhoto').click()">
+                  📷 Upload Slip / QR Image (For OCR)
+                </button>
+              </div>
+              
+              <div class="mb-3">
+                <input type="text" id="txnId" class="form-control border-primary fw-bold" placeholder="Transaction ID (Scan or Edit here)">
+                <span id="ocrStatus" class="small text-info d-block mt-1 fw-bold">Ready to scan...</span>
+              </div>
+
+              <div class="mb-3">
+                <label class="small fw-bold text-dark d-block mb-1">1. Receiver/Sender Image:</label>
+                <input type="file" id="nativeCameraInput" accept="image/*" class="d-none" onchange="handleNativeCamera(this)">
+                
+                <button type="button" class="btn btn-warning w-100 fw-bold p-2 d-flex align-items-center justify-content-center gap-2 text-dark shadow-sm" onclick="document.getElementById('nativeCameraInput').click()">
+                  📷 Open Camera / Choose Photo
+                </button>
+                
+                <div id="cameraPreviewContainer" style="display:none; text-align:center;" class="mt-2">
+                  <img id="nativePreviewImg" src="" style="max-width:100%; height:140px; object-fit:contain; border:2px solid #198754; border-radius:5px; background: white;">
+                  <small class="text-success d-block fw-bold mt-1">✓ Receiver/Sender Photo Loaded!</small>
+                </div>
+              </div>
+
+              <div class="mb-2">
+                <label class="small fw-bold text-dark">2. Digital Signature:</label>
+                <div style="min-height: 120px; width: 100%;">
+                  <canvas id="sigCanvas" height="120" style="border:2px dashed #0056b3; width:100%; display:block; touch-action:none; background:white; border-radius: 6px;"></canvas>
+                </div>
+                <button type="button" class="btn btn-secondary btn-sm w-100 mt-2" onclick="clearSignature()">❌ Clear Signature</button>
+              </div>
+            </div>
+          </div>
+          
+          <button class="btn btn-primary mt-3 w-100 fw-bold p-2.5 fs-5 shadow" id="saveTxnBtn" onclick="processTransaction()" style="background:#0056b3;">Save Transaction</button>
+        </div>
+      </div>
+
+      <!-- 2. INVOICE TAB (DYNAMIC MULTI-ITEM UPGRADE) -->
+      <div class="tab-pane" id="invoice-sec">
+        <button class="btn btn-secondary fw-bold mb-3 shadow-sm w-100 p-2" onclick="openAppSection('dashboard-home-sec')">⬅️ Back to Dashboard</button>
+        <div class="card p-3 shadow-sm border-0">
+          <h6 class="fw-bold mb-3 text-secondary">Premium Invoice</h6>
+          <div class="row g-2">
+            <div class="col-12"><label class="small fw-bold">Client Mobile</label><input type="tel" id="invMobile" class="form-control" placeholder="Mobile" maxlength="10" oninput="checkCRM(this.value, 'invName', null)"></div>
+            <div class="col-12">
+              <label class="small fw-bold">Client Name</label>
+              <input type="text" id="invName" class="form-control" placeholder="Consumer Name">
+            </div>
+            <div class="col-12">
+              <label class="small fw-bold">Address</label>
+              <textarea id="invAddress" class="form-control" placeholder="Client Address" rows="1"></textarea>
+            </div>
+            
+            <div class="col-12 mt-3 d-flex justify-content-between align-items-center">
+              <h6 class="text-primary fw-bold m-0">Item Details</h6>
+              <button type="button" class="btn btn-sm btn-success fw-bold shadow-sm" onclick="addInvoiceItemRow()">➕ Add Item</button>
+            </div>
+            
+            <!-- Dynamic Items Container List -->
+            <div id="invoiceItemsContainer" class="col-12 mt-2">
+              <!-- Pehla item row by default loaded -->
+            </div>
+
+            <div class="col-6"><label class="small fw-bold">Discount (%)</label><input type="number" id="invDiscount" class="form-control" value="0" oninput="calcTotal()"></div>
+            <div class="col-6"><label class="small fw-bold">Tax (%)</label><input type="number" id="invTax" class="form-control" value="0" oninput="calcTotal()"></div>
+            
+            <!-- Naye Payment Tracking Fields -->
+            <div class="col-6"><label class="small fw-bold text-success">Paid Amount (Rs.)</label><input type="number" id="invPaid" class="form-control border-success fw-bold" placeholder="0" oninput="calcTotal()"></div>
+            <div class="col-6"><label class="small fw-bold text-danger">Balance Due (Baki Rs.)</label><input type="number" id="invBalance" class="form-control border-danger fw-bold bg-white" readonly value="0.00"></div>
+            
+            <div class="col-12 text-end mt-2">
+              <h4 class="text-primary fw-bold m-0">Grand Total: Rs. <span id="displayTotal">0.00</span></h4>
+            </div>
+          </div>
+          <div class="d-flex gap-2 mt-3">
+            <button class="btn btn-primary w-40 fw-bold" id="saveInvBtn" onclick="processInvoice(false)" style="background:#0056b3;">Save & Print</button>
+            <button class="btn btn-success w-40 fw-bold" onclick="processInvoice(true)">WhatsApp 💬</button>
+            <button class="btn btn-outline-danger w-20 fw-bold" onclick="clearForm('invoice-sec')" title="Clear for New Bill">🔄 New</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. SMART PHOTO STUDIO PRO (WITH DRAG, ZOOM & BORDER CONTROLS) -->
+      <div class="tab-pane" id="photo-sec">
+        <button class="btn btn-secondary fw-bold mb-3 shadow-sm w-100 p-2" onclick="openAppSection('dashboard-home-sec')">⬅️ Back to Dashboard</button>
+        <div class="card p-3 shadow-sm border-0">
+          <h6 class="fw-bold mb-2 text-secondary text-center">✨ Smart Photo Studio Pro (Drag & Zoom Ready)</h6>
+          
+          <input type="file" id="ppPhoto" class="form-control mb-3" accept="image/*" onchange="loadStudioPreview(this)">
+          
+          <div class="row g-3">
+            <!-- Left Panel: Live Drag/Drop Canvas Workspace -->
+            <div class="col-md-6 text-center">
+              <div class="p-1 border rounded bg-dark d-flex flex-column align-items-center justify-content-center" style="min-height: 310px; position: relative;">
+                <div style="position: relative; overflow: hidden; display: inline-block; border: 1px solid #555; background: #222; border-radius: 4px;">
+                  <canvas id="studioCanvas" style="max-width: 100%; max-height: 280px; display: block; cursor: move;"></canvas>
+                </div>
+                <div id="studioPlaceholder" class="text-white-50 small position-absolute" style="pointer-events: none;">Upload a photo to start interactive editing...</div>
+                <small class="text-light-50 d-block mt-1以" style="font-size: 11px; color: #aaa;">🖱️ Drag photo inside box to adjust face position</small>
+              </div>
+            </div>
+            
+            <!-- Right Panel: Advanced Controls -->
+            <div class="col-md-6">
+              <div class="bg-light p-3 rounded border">
+                <div class="row g-2">
+                  <div class="col-12 text-center border-bottom pb-1 mb-2">
+                    <strong class="text-primary small">🛠️ Interactive Pro Editing Controls</strong>
+                  </div>
+                  
+                  <!-- Manual Zoom Control Slider -->
+                  <div class="col-12">
+                    <label class="small fw-bold text-primary">🔍 Manual Scale / Zoom Photo</label>
+                    <input type="range" id="imgZoom" class="form-range form-range-sm" min="0.1" max="3.0" step="0.05" value="1.0" oninput="applyLiveStudioFilters()">
+                  </div>
+
+                  <!-- Basic Filters Sliders -->
+                  <div class="col-6">
+                    <label class="small fw-bold">Brightness</label>
+                    <input type="range" id="imgBright" class="form-range form-range-sm" min="0.5" max="1.6" step="0.05" value="1.0" oninput="applyLiveStudioFilters()">
+                  </div>
+                  <div class="col-6">
+                    <label class="small fw-bold">Contrast</label>
+                    <input type="range" id="imgCont" class="form-range form-range-sm" min="0.5" max="1.6" step="0.05" value="1.0" oninput="applyLiveStudioFilters()">
+                  </div>
+                  
+                  <!-- Custom Frame Dynamic Borders Configuration Tools -->
+                  <div class="col-6 border-top pt-2 mt-1">
+                    <label class="small fw-bold text-dark">🔲 Border Width (px)</label>
+                    <input type="range" id="borderWidth" class="form-range form-range-sm" min="0" max="20" step="1" value="4" oninput="applyLiveStudioFilters()">
+                  </div>
+                  <div class="col-6 border-top pt-2 mt-1">
+                    <label class="small fw-bold text-dark">🎨 Border Color</label>
+                    <input type="color" id="borderColor" class="form-control form-control-color w-100 p-0 border" value="#ffffff" oninput="applyLiveStudioFilters()">
+                  </div>
+
+                  <!-- Crop Sizing Presets -->
+                  <div class="col-12 mt-2">
+                    <label class="small fw-bold d-block mb-1">📐 Select Target Crop Frame</label>
+                    <div class="btn-group w-100" role="group">
+                      <button type="button" class="btn btn-sm btn-outline-secondary active" id="cropBtnNone" onclick="setStudioCrop('none')">Original Aspect</button>
+                      <button type="button" class="btn btn-sm btn-outline-secondary" id="cropBtnPP" onclick="setStudioCrop('passport')">Passport Size (3.5x4.5)</button>
+                      <button type="button" class="btn btn-sm btn-outline-secondary" id="cropBtnStamp" onclick="setStudioCrop('stamp')">Stamp Size</button>
+                    </div>
+                  </div>
+                  
+                  <!-- Background Replacement Tools -->
+                  <div class="col-6 mt-2">
+                    <label class="small fw-bold text-dark">🖼️ Change BG Color</label>
+                    <div class="d-flex gap-1 align-items-center">
+                      <input type="color" id="imgBg" class="form-control form-control-color w-25 p-0 border" value="#ffffff" oninput="applyLiveStudioFilters()">
+                      <select id="bgMode" class="form-select form-select-sm" onchange="applyLiveStudioFilters()">
+                        <option value="normal">Keep Original BG</option>
+                        <option value="replace">Replace Background</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <!-- NEW: FACE RETOUCH & MANUAL ERASER TOOLS -->
+                  <div class="col-6 mt-2">
+                    <label class="small fw-bold text-success">✨ Face Retouch (Dark Circles)</label>
+                    <input type="range" id="faceSmooth" class="form-range form-range-sm" min="0" max="10" step="1" value="0" oninput="applyLiveStudioFilters()">
+                  </div>
+                  <div class="col-6 mt-2">
+                    <label class="small fw-bold text-danger">🧽 Manual Eraser Tool</label>
+                    <div class="form-check form-switch mt-1">
+                      <input class="form-check-input" type="checkbox" id="eraserMode" onchange="toggleEraserMode()">
+                      <label class="form-check-label small" for="eraserMode">Enable Eraser Mode</label>
+                    </div>
+                  </div>
+                  
+                  <!-- Hair Tints Mask -->
+                  <div class="col-6 mt-2">
+                    <label class="small fw-bold text-dark">💇 Hair Tint Filter</label>
+                    <div class="d-flex gap-1 align-items-center">
+                      <input type="color" id="hairColor" class="form-control form-control-color w-25 p-0 border" value="#000000" oninput="applyLiveStudioFilters()">
+                      <select id="hairFilterMode" class="form-select form-select-sm" onchange="applyLiveStudioFilters()">
+                        <option value="none">No Tint</option>
+                        <option value="tint">Soft Overlay</option>
+                      </select>
+                    </div>
+                  </div>
+                  
+                  <!-- Layout Multi-Print Configs -->
+                  <div class="col-12 mt-3 border-top pt-2">
+                    <label class="small fw-bold text-secondary">🖨️ Select Grid Layout for Sheet Print</label>
+                    <select id="ppLayout" class="form-select form-select-sm mb-2 fw-bold">
+                      <option value="3">4x6 Sheet (3 Photos)</option>
+                      <option value="6">4x6 Sheet (6 Photos)</option>
+                      <option value="8">4x6 Sheet (8 Photos)</option>
+                      <option value="30">A4 Sheet (30 Photos)</option>
+                    </select>
+                    <button type="button" class="btn btn-sm w-100 fw-bold text-white shadow" onclick="generatePhotoGrid()" style="background:#ff6b00; padding:8px;">
+                      ⚡ Print Perfectly Aligned Photo Grid Sheet
+                    </button>
+                  </div>
+                  
+                </div>
+              </div>
+            </div>
+          </div>
+          
+        </div>
+      </div>
+
+      <!-- 4. ADVANCED PVC CARD DESIGNER WORKSPACE -->
+      <div class="tab-pane" id="pvc-sec">
+        <button class="btn btn-secondary fw-bold mb-3 shadow-sm w-100 p-2" onclick="openAppSection('dashboard-home-sec')">⬅️ Back to Dashboard</button>
+        <div class="card p-3 shadow-sm border-0">
+          <h6 class="fw-bold mb-2 text-secondary text-center">🪪 Premium Smart PVC Card Maker</h6>
+          
+          <div class="row g-3">
+            <!-- Left Side: Dual Input Uploaders -->
+            <div class="col-md-5">
+              <div class="bg-light p-3 rounded border h-100">
+                <strong class="text-primary small d-block mb-2">1. Upload Identity Documents (Image / PDF)</strong>
+                
+                <div class="mb-3">
+                  <label class="small fw-bold text-success">💳 Front Side (Aadhaar / PAN Front)</label>
+                  <input type="file" id="pvcFrontInput" class="form-control form-control-sm mt-1" accept="image/*,application/pdf" onchange="loadPvcSide(this, 'front')">
+                </div>
+                
+                <div class="mb-3">
+                  <label class="small fw-bold text-danger">💳 Back Side (Aadhaar Address / Voucher Back)</label>
+                  <input type="file" id="pvcBackInput" class="form-control form-control-sm mt-1" accept="image/*,application/pdf" onchange="loadPvcSide(this, 'back')">
+                </div>
+
+                <!-- ADVANCED PVC CONTROLS WITH DUAL ZOOM SLIDERS -->
+                <div class="border-top pt-2 mt-2">
+                  <strong class="text-dark small d-block mb-1">🎛️ Image Enhancers & Zoom Controls</strong>
+                  <div class="row g-2">
+                    <!-- Zoom Controlls -->
+                    <div class="col-6">
+                      <label class="small fw-bold text-success">🔍 Front Zoom</label>
+                      <input type="range" id="pvcFrontZoom" class="form-range form-range-sm" min="0.2" max="3.0" step="0.05" value="1.0" oninput="renderLivePvcPreview()">
+                    </div>
+                    <div class="col-6">
+                      <label class="small fw-bold text-danger">🔍 Back Zoom</label>
+                      <input type="range" id="pvcBackZoom" class="form-range form-range-sm" min="0.2" max="3.0" step="0.05" value="1.0" oninput="renderLivePvcPreview()">
+                    </div>
+                    
+                    <!-- Adjustments -->
+                    <div class="col-6 mt-1">
+                      <label class="small text-muted">Contrast</label>
+                      <input type="range" id="pvcContrast" class="form-range form-range-sm" min="0.6" max="1.6" step="0.05" value="1.0" oninput="renderLivePvcPreview()">
+                    </div>
+                    <div class="col-6 mt-1">
+                      <label class="small text-muted">Corner Radius (px)</label>
+                      <input type="range" id="pvcRadius" class="form-range form-range-sm" min="0" max="30" step="2" value="12" oninput="renderLivePvcPreview()">
+                    </div>
+                    <div class="col-12">
+                      <label class="small text-muted">Outer Border Thickness (px)</label>
+                      <input type="range" id="pvcBorderWidth" class="form-range form-range-sm" min="0" max="10" step="1" value="2" oninput="renderLivePvcPreview()">
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Alignment Matrix Selection Layout Rules -->
+                <div class="border-top pt-2 mt-3">
+                  <label class="small fw-bold text-secondary">📐 Select Sheet Printing Layout Alignment</label>
+                  <select id="pvcAlignmentMode" class="form-select form-select-sm fw-bold mb-3">
+                    <option value="side">Side-by-Side (Agal-Bagal Horizontal)</option>
+                    <option value="stack">Top-Bottom (Uper-Neeche Vertical)</option>
+                    <option value="duplex">Duplex (Front Page 1, Back Page 2)</option>
+                  </select>
+                  
+                  <button type="button" class="btn btn-dark btn-sm w-100 fw-bold p-2 shadow-sm" onclick="printFinishedPvcCardSheet()">
+                    🖨️ Print Standard PVC Card Sheet
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right Side: Live Synchronized Workspace Canvas Canvas Layout -->
+            <div class="col-md-7 text-center">
+              <div class="p-2 border rounded bg-dark d-flex flex-column align-items-center justify-content-center" style="min-height: 380px;">
+                <div class="d-flex flex-wrap gap-2 justify-content-center w-100">
+                  <div style="background:#222; padding:5px; border-radius:4px;">
+                    <small class="text-success d-block mb-1 fw-bold">FRONT VIEW</small>
+                    <canvas id="pvcFrontCanvas" style="width: 260px; height: 165px; background:#fff; border:1px dashed #555; display:block; cursor: crosshair;"></canvas>
+                  </div>
+                  <div style="background:#222; padding:5px; border-radius:4px;">
+                    <small class="text-danger d-block mb-1 fw-bold">BACK VIEW</small>
+                    <canvas id="pvcBackCanvas" style="width: 260px; height: 165px; background:#fff; border:1px dashed #555; display:block; cursor: crosshair;"></canvas>
+                  </div>
+                </div>
+                <div class="text-white-50 mt-2" style="font-size: 11px; max-width: 90%;">
+                  💡 <strong>4-Corner Adjustable Framing:</strong> Canvas par mouse/finger se left-click karke drag karein aur crop rectangle box ko kisi bhi kone se set karke adjust kar lijiye.
+                </div>
+              </div>
+            </div>
+          </div>
+          
+        </div>
+      </div>
+
+    </div>
+
+    <!-- App Footer / Developer Info -->
+    <div class="text-center py-3 mt-4 border-top">
+      <small class="text-muted d-block fw-bold" style="letter-spacing: 0.5px;">Developed By :- Anurag Shakya</small>
+      <a href="tel:9761414105" class="text-decoration-none fw-bold small text-primary d-inline-flex align-items-center gap-1 mt-1">
+        📞 9761414105
+      </a>
+    </div>
+
+  </div>
+
+  <script>
+    var currentLocation = "N/A";
+    var slipImageBase64 = null;
+    var receiverImageBase64 = null;
+    var finalInvoiceTotal = 0;
+    var itemRowCounter = 0;
+
+    // Live Dynamic Clock Engine for Dashboard
+    function startDashboardClock() {
+      setInterval(() => {
+        const now = new Date();
+        
+        // Date format (e.g., 15 Jul 2026)
+        const dateOptions = { day: '2-digit', month: 'short', year: 'numeric' };
+        document.getElementById('liveAppDate').innerText = now.toLocaleDateString('en-IN', dateOptions);
+        
+        // Time format (e.g., 02:08:23 PM)
+        let hours = now.getHours();
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const seconds = String(now.getSeconds()).padStart(2, '0');
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12;
+        hours = hours ? hours : 12; // 0 को 12 बनाने के लिए
+        const strTime = String(hours).padStart(2, '0') + ':' + minutes + ':' + seconds + ' ' + ampm;
+        
+        document.getElementById('liveAppTime').innerText = strTime;
+      }, 1000);
+    }
+
+    // Initialization routine called by <body onload="initApp()">
+function initApp() {
+  startDashboardClock();
+  fetchStockData();
+  setTimeout(addInvoiceItemRow, 500);
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  initApp();
+});
+
+    // Function to dynamically add new item blocks (Mobile/Fan)
+    function addInvoiceItemRow() {
+      itemRowCounter++;
+      var container = document.getElementById("invoiceItemsContainer");
+      var uniqueId = "itemRow_" + itemRowCounter;
+      
+      // Stock से Dropdown Options तैयार करना
+      var stockOptions = '<option value="">-- Select Item from Stock (Optional) --</option>';
+      if (globalStockData && globalStockData.length > 0) {
+        globalStockData.forEach(function(stk) {
+          stockOptions += `<option value="${stk.name}" data-price="${stk.price}">${stk.name} (Rest: ${stk.restQty || 0} | Rs.${stk.price})</option>`;
+        });
+      }
+
+      // Searchable Datalist Options तैयार करना
+      var stockDatalistOptions = '';
+      if (globalStockData && globalStockData.length > 0) {
+        globalStockData.forEach(function(stk) {
+          stockDatalistOptions += `<option value="${stk.name}">Rs.${stk.price || 0} | Rest: ${stk.restQty || 0}</option>`;
+        });
+      }
+
+      var html = `
+        <div class="item-row" id="${uniqueId}">
+          ${itemRowCounter > 1 ? `<button type="button" class="btn btn-danger btn-sm remove-item-btn" onclick="removeInvoiceItemRow('${uniqueId}')">❌ Remove</button>` : ''}
+          <div class="row g-2">
+            <div class="col-12">
+              <label class="small fw-bold text-primary">Select Item From Stock</label>
+              <input type="text" class="form-control form-control-sm mb-2 fw-bold border-primary inv-stock-input" list="stockDatalist_${uniqueId}" placeholder="🔍 क्लिक करें या टाइप करके चुनें..." onfocus="updateInvoiceDropdowns()" onclick="updateInvoiceDropdowns()" onchange="autoFillInvoiceDatalistRow(this, '${uniqueId}')">
+              <datalist id="stockDatalist_${uniqueId}" class="inv-stock-datalist">
+                ${stockDatalistOptions}
+              </datalist>
+            </div>
+            <div class="col-12">
+              <label class="small fw-bold text-secondary">Product Name & Serials Breakdown</label>
+              <textarea class="form-control inv-prod-desc" rows="3" placeholder="Item Name (e.g. Mobile / Bajaj Fan)&#10;↳ Serial/IMEI No: 12345...&#10;↳ Warranty Period: 1 Year"></textarea>
+            </div>
+            <div class="col-6">
+              <label class="small fw-bold">Qty</label>
+              <div class="input-group input-group-sm">
+                <button class="btn btn-outline-secondary fw-bold" type="button" onclick="var inp=this.nextElementSibling; if(inp.value>1){inp.value--; calcTotal();}">-</button>
+                <input type="number" class="form-control text-center inv-prod-qty fw-bold" value="1" min="1" oninput="calcTotal()">
+                <button class="btn btn-outline-secondary fw-bold" type="button" onclick="var inp=this.previousElementSibling; inp.value++; calcTotal();">+</button>
+              </div>
+            </div>
+            <div class="col-6">
+              <label class="small fw-bold">Rate (Rs.)</label>
+              <input type="number" class="form-control inv-prod-rate" placeholder="0" oninput="calcTotal()">
+            </div>
+          </div>
+        </div>
+      `;
+      container.insertAdjacentHTML('beforeend', html);
+      calcTotal();
+    }
+
+    // Datalist से सामान चुनते ही ऑटो-फिल करने का फ़ंक्शन
+    function autoFillInvoiceDatalistRow(inputEl, rowId) {
+      var itemName = inputEl.value.trim();
+      var rowEl = document.getElementById(rowId);
+      if (!rowEl || !itemName) return;
+
+      var matchedItem = (globalStockData || []).find(function(item) {
+        return (item.name || '').toLowerCase() === itemName.toLowerCase();
+      });
+
+      if (matchedItem) {
+        rowEl.querySelector('.inv-prod-desc').value = matchedItem.name;
+        rowEl.querySelector('.inv-prod-rate').value = matchedItem.price || 0;
+        calcTotal();
+      }
+    }
+
+    function updateInvoiceDropdowns() {
+      var datalists = document.querySelectorAll('.inv-stock-datalist');
+      if (!datalists || datalists.length === 0) return;
+
+      var stockDatalistOptions = '';
+      if (globalStockData && globalStockData.length > 0) {
+        globalStockData.forEach(function(stk) {
+          stockDatalistOptions += `<option value="${stk.name}">Rs.${stk.price || 0} | Rest: ${stk.restQty || 0}</option>`;
+        });
+      } else {
+        fetchStockData();
+      }
+
+      datalists.forEach(function(dl) {
+        dl.innerHTML = stockDatalistOptions;
+      });
+    }
+
+    function removeInvoiceItemRow(id) {
+      document.getElementById(id).remove();
+      calcTotal();
+    }
+
+    function startVoiceTextArea(btnElement) {
+      var textarea = btnElement.parentElement.querySelector('textarea');
+      if (!('webkitSpeechRecognition' in window)) { return alert("Use Chrome Browser"); }
+      var recognition = new webkitSpeechRecognition();
+      recognition.lang = 'hi-IN';
+      var originalHtml = btnElement.innerHTML;
+      btnElement.innerHTML = "🔴";
+      recognition.start();
+      recognition.onresult = function(event) {
+        var text = event.results[0][0].transcript;
+        textarea.value += (textarea.value ? "\n" : "") + text.replace(/\.$/, "");
+        btnElement.innerHTML = originalHtml;
+      };
+      recognition.onerror = () => btnElement.innerHTML = originalHtml;
+      recognition.onend = () => btnElement.innerHTML = originalHtml;
+    }
+
+    function startVoice(elementId, btnElement) {
+  var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) { 
+    alert("Voice recognition is not supported in this app view."); 
+    return; 
+  }
+  try {
+    var recognition = new SpeechRecognition();
+    recognition.lang = 'hi-IN';
+    var originalHtml = btnElement.innerHTML;
+    btnElement.innerHTML = "🔴";
+    recognition.start();
+    recognition.onresult = function(event) {
+      var text = event.results[0][0].transcript;
+      document.getElementById(elementId).value = text.replace(/\.$/, "");
+      btnElement.innerHTML = originalHtml;
+    };
+    recognition.onerror = function() { btnElement.innerHTML = originalHtml; };
+    recognition.onend = function() { btnElement.innerHTML = originalHtml; };
+  } catch (err) {
+    alert("Mic access error: " + err.message);
+  }
+}
+
+    function openAppSection(targetSectionId, isHardwareBack = false) {
+      var panes = document.querySelectorAll('.tab-pane');
+      for(var i=0; i<panes.length; i++) { 
+        panes[i].classList.remove('active'); 
+      }
+      document.getElementById(targetSectionId).classList.add('active');
+      window.scrollTo(0, 0);
+
+      // ऑटोमैटिक लोकेशन सिंक जब ट्रांजैक्शन टैब खुलेगा
+      if (targetSectionId === 'transaction-sec') {
+        autoSyncLocation();
+        setTimeout(resizeCanvasResolution, 300);
+      }
+
+      if (targetSectionId === 'dashboard-home-sec') {
+        if (!isHardwareBack && window.location.hash !== '') {
+          history.replaceState(null, document.title, window.location.pathname);
+        }
+      } else {
+        if (!isHardwareBack) {
+          history.pushState({ section: targetSectionId }, document.title, "#" + targetSectionId);
+        }
+      }
+    }
+
+    // बैकग्राउंड ऑटोमैटिक लोकेशन सिंक फ़ंक्शन
+    function autoSyncLocation() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(pos) {
+          currentLocation = "Lat: " + pos.coords.latitude.toFixed(4) + ", Lng: " + pos.coords.longitude.toFixed(4);
+        }, function(err) {
+          currentLocation = "Location Unavailable";
+        }, { enableHighAccuracy: true, timeout: 5000 });
+      }
+    }
+    
+    // मोबाइल/ब्राउज़र के हार्डवेयर बैक बटन को कैप्चर करने का लिसनर
+    window.addEventListener('popstate', function(event) {
+      // अगर हिस्ट्री में कोई स्टेट है (मतलब कोई फॉर्म खुला था और बैक दबाया), तो डैशबोर्ड पर ले आएं
+      openAppSection('dashboard-home-sec', true);
+    });
+
+    // पुरानी संगतता के लिए खाली रिफ्रेसर
+    function switchTab(t, b) { openAppSection(t); }
+
+    function clearForm(sectionId) {
+      var inputs = document.querySelectorAll('#' + sectionId + ' input, #' + sectionId + ' textarea');
+      for(var i=0; i<inputs.length; i++) {
+        if(inputs[i].type !== 'button' && inputs[i].type !== 'file' && inputs[i].type !== 'color' && inputs[i].type !== 'range') { inputs[i].value = ''; }
+      }
+      if(sectionId === 'invoice-sec') {
+        document.getElementById("invoiceItemsContainer").innerHTML = "";
+        itemRowCounter = 0;
+        addInvoiceItemRow();
+      }
+      if(sectionId === 'doc-receive-sec') {
+        document.getElementById('docType').selectedIndex = 0;
+        document.getElementById('docFileRef').value = '';
+      }
+    }
+
+    var globalStockData = [];
+
+    function fetchStockData() {
+      var loadingEl = document.getElementById("stockLoading");
+      var tbody = document.getElementById("stockTableBody");
+      
+      if(globalStockData.length > 0) return; // डेटा एक बार आ गया तो दोबारा रीलोड नहीं करेगा
+
+      loadingEl.classList.remove("d-none");
+      
+      if (typeof google !== 'undefined' && google.script) {
+        google.script.run.withSuccessHandler(function(data) {
+  loadingEl.classList.add("d-none");
+  globalStockData = data || [];
+  renderStockTable(globalStockData);
+  updateInvoiceDropdowns(); // Datalist अपडेट करेगा
+}).getStockDetails();
+      } else {
+        // केवल लोकल टेस्टिंग के लिए
+        loadingEl.classList.add("d-none");
+        globalStockData = [
+          { name: "CHATKNI BOARD/LADKANE VALI", restQty: "10", price: "10", group: "BOARD AND CHATKANI" },
+          { name: "PLUG MALE FEEMALE", restQty: "15", price: "10", group: "BOARD AND CHATKANI" },
+          { name: "3 PIN PLUG", restQty: "20", price: "40", group: "BOARD AND CHATKANI" }
+        ];
+        renderStockTable(globalStockData);
+      }
+    }
+
+    function renderStockTable(items) {
+      var tbody = document.getElementById("stockTableBody");
+      if(!tbody) return;
+      
+      if(!items || items.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-muted"><span class="fs-2 d-block mb-1">🔍</span>कोई सामान नहीं मिला!</td></tr>';
+        return;
+      }
+
+      var searchInput = document.getElementById("stockSearchInput");
+      var searchQuery = searchInput ? searchInput.value.trim().toLowerCase() : "";
+
+      var html = "";
+      items.forEach(function(row) {
+        var qty = parseInt(row.restQty) || 0;
+        var isZero = qty <= 0;
+        var isLow = qty <= 5 && qty > 0;
+        
+        var rowClass = isZero ? 'table-danger' : (isLow ? 'table-warning' : '');
+        var qtyBadge = isZero ? '<span class="badge bg-danger">OUT OF STOCK</span>' : (isLow ? `<span class="badge bg-warning text-dark">${qty} Left ⚠️</span>` : `<span class="fw-bold text-primary">${qty}</span>`);
+
+        // सर्च टेक्स्ट हाइलाइटिंग
+        var rawName = row.name || '';
+        var displayName = rawName;
+        if (searchQuery.length > 0) {
+          var reg = new RegExp(`(${searchQuery.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')})`, 'gi');
+          displayName = rawName.replace(reg, '<mark class="bg-warning text-dark p-0 px-1 rounded">$1</mark>');
+        }
+
+        var escapedName = rawName.replace(/'/g, "\\'");
+        var itemPrice = row.price || 0;
+
+        html += `<tr class="${rowClass}">
+          <td>
+            <div class="d-flex align-items-center justify-content-between gap-2">
+              <span class="fw-bold">${displayName}</span>
+              <button type="button" class="btn btn-sm btn-outline-primary py-0 px-2 fw-bold text-nowrap" onclick="quickBillFromStock('${escapedName}', '${itemPrice}')" title="Create Invoice for this item">
+                🧾 Bill
+              </button>
+            </div>
+          </td>
+          <td class="text-center">${qtyBadge}</td>
+          <td class="text-end text-success fw-bold">Rs. ${itemPrice}</td>
+          <td><span class="badge bg-secondary">${row.group || 'GENERAL'}</span></td>
+          <td class="text-center">
+            ${(isZero || isLow) ? `<button type="button" class="btn btn-sm btn-success py-0 px-2 fw-bold" onclick="orderStockWhatsApp('${escapedName}')">💬 Order</button>` : '-'}
+          </td>
+        </tr>`;
+      });
+      tbody.innerHTML = html;
+
+      if(typeof checkStockNotifications === 'function') {
+        checkStockNotifications();
+      }
+    }
+
+    // स्टॉक से डायरेक्ट इनवॉइस (बिल) पेज पर सामान ट्रांसफर करने का फ़ंक्शन
+    function quickBillFromStock(itemName, itemPrice) {
+      // 1. इनवॉइस सेक्शन खोलें
+      openAppSection('invoice-sec');
+
+      var container = document.getElementById("invoiceItemsContainer");
+      if (!container) return;
+
+      // अगर पहली रो खाली नहीं है, तो नया इनवॉइस फ़ॉर्म रीसेट करें
+      var firstDesc = container.querySelector('.inv-prod-desc');
+      if (firstDesc && firstDesc.value.trim() !== "") {
+        clearForm('invoice-sec');
+      }
+
+      // 2. इनवॉइस की पहली रो में डेटा ऑटोमैटिक भरें
+      var row = container.querySelector('.item-row');
+      if (row) {
+        var descEl = row.querySelector('.inv-prod-desc');
+        var rateEl = row.querySelector('.inv-prod-rate');
+        var qtyEl = row.querySelector('.inv-prod-qty');
+        
+        if (descEl) descEl.value = itemName;
+        if (rateEl) rateEl.value = itemPrice || 0;
+        if (qtyEl && (!qtyEl.value || qtyEl.value < 1)) qtyEl.value = 1;
+        
+        // 3. ग्रैंड टोटल ऑटोमैटिक कैलकुलेट करें
+        calcTotal();
+      }
+    }
+
+    // मिलते-जुलते नाम सर्च करने की लॉजिक (Case-insensitive fuzzy match)
+    // केवल Low / Zero Stock दिखाने का फ़ंक्शन
+    function showLowStockOnly() {
+      if(!globalStockData) return;
+      var lowItems = globalStockData.filter(function(item) {
+        var qty = parseInt(item.restQty) || 0;
+        return qty <= 5;
+      });
+      renderStockTable(lowItems);
+    }
+
+    // ऑटोमैटिक अलर्ट चेक करने का फ़ंक्शन
+    function checkStockNotifications() {
+      var banner = document.getElementById("stockAlertBanner");
+      var text = document.getElementById("stockAlertText");
+      if(!banner || !globalStockData) return;
+
+      var zeroItems = globalStockData.filter(item => (parseInt(item.restQty) || 0) <= 0);
+      var lowItems = globalStockData.filter(item => {
+        var q = parseInt(item.restQty) || 0;
+        return q > 0 && q <= 5;
+      });
+
+      if (zeroItems.length > 0 || lowItems.length > 0) {
+        banner.classList.remove("d-none");
+        text.innerText = `ध्यान दें! ${zeroItems.length} सामान खत्म हैं (Out of Stock) और ${lowItems.length} सामान खत्म होने वाले हैं!`;
+      } else {
+        banner.classList.add("d-none");
+      }
+    }
+
+    // सप्लायर को WhatsApp पर ऑर्डर भेजने का फ़ंक्शन
+    var rawAnalyticsData = { transactions: [], invoices: [] };
+
+    function loadAnalyticsData() {
+      if (typeof google !== 'undefined' && google.script) {
+        google.script.run.withSuccessHandler(function(res) {
+          rawAnalyticsData = res || { transactions: [], invoices: [] };
+          processAnalyticsSummary();
+        }).getAnalyticsSummary();
+      } else {
+        // लोकल टेस्टिंग डेटा
+        rawAnalyticsData = {
+          currSales: 15400,
+          lastSales: 12200,
+          deposit: 45000,
+          withdraw: 32000,
+          invSales: 15400,
+          pending: 1800,
+          outStock: (globalStockData || []).filter(i => (parseInt(i.restQty)||0)<=0).length
+        };
+        renderAnalyticsUI(rawAnalyticsData);
+      }
+    }
+
+    function renderAnalyticsUI(data) {
+      document.getElementById("currMonthSales").innerText = "Rs. " + (data.currSales || 0);
+      document.getElementById("lastMonthSales").innerText = "Rs. " + (data.lastSales || 0);
+      document.getElementById("sumDeposit").innerText = "Rs. " + (data.deposit || 0);
+      document.getElementById("sumWithdraw").innerText = "Rs. " + (data.withdraw || 0);
+      document.getElementById("sumInvoiceSales").innerText = "Rs. " + (data.invSales || 0);
+      document.getElementById("sumPendingBalance").innerText = "Rs. " + (data.pending || 0);
+      
+      var outCount = (globalStockData || []).filter(i => (parseInt(i.restQty)||0)<=0).length;
+      document.getElementById("sumOutOfStock").innerText = outCount + " Items";
+    }
+
+    function filterAnalyticsByDate() {
+      var sDate = document.getElementById("reportStartDate").value;
+      var eDate = document.getElementById("reportEndDate").value;
+      if(sDate && eDate) {
+        loadAnalyticsData(); // तारीख चुनने पर पुनः डेटा सिंक करेगा
+      }
+    }
+
+    function exportSummaryCSV() {
+      var csvContent = "data:text/csv;charset=utf-8,";
+      csvContent += "Metric,Value\r\n";
+      csvContent += "Current Month Sales," + document.getElementById("currMonthSales").innerText.replace(/[^0-9.]/g, '') + "\r\n";
+      csvContent += "Last Month Sales," + document.getElementById("lastMonthSales").innerText.replace(/[^0-9.]/g, '') + "\r\n";
+      csvContent += "Total Deposit," + document.getElementById("sumDeposit").innerText.replace(/[^0-9.]/g, '') + "\r\n";
+      csvContent += "Total Withdraw," + document.getElementById("sumWithdraw").innerText.replace(/[^0-9.]/g, '') + "\r\n";
+      csvContent += "Pending Balance," + document.getElementById("sumPendingBalance").innerText.replace(/[^0-9.]/g, '') + "\r\n";
+
+      var encodedUri = encodeURI(csvContent);
+      var link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", "Business_Summary_Report.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    function checkCRM(mobile, nameField, aadhaarField) {
+      if(mobile.length === 10 && typeof google !== 'undefined' && google.script) {
+        google.script.run.withSuccessHandler(function(res) {
+          if(res) {
+            document.getElementById(nameField).value = res.name;
+            if(aadhaarField && res.aadhaar) document.getElementById(aadhaarField).value = res.aadhaar.replace("XXXX-XXXX-","");
+          }
+        }).getCustomerDetails(mobile);
+      }
+    }
+
+    function getLocation() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(pos) {
+          currentLocation = "Lat: " + pos.coords.latitude.toFixed(4) + ", Lng: " + pos.coords.longitude.toFixed(4);
+          alert("Location Saved");
+        }, function() { alert("Denied"); });
+      }
+    }
+
+    function scanImage(input) {
+      if(input.files && input.files[0]) {
+        var ocrStatus = document.getElementById("ocrStatus");
+        ocrStatus.innerText = "⏳ Reading Slip Numbers... Please wait.";
+        ocrStatus.style.color = "#ff6b00";
+        var reader = new FileReader();
+        reader.onload = function(e) { slipImageBase64 = e.target.result; };
+        reader.readAsDataURL(input.files[0]);
+
+        Tesseract.recognize(input.files[0], 'eng').then(function(result) {
+          ocrStatus.innerText = "✅ Scan Complete!";
+          ocrStatus.style.color = "#198754";
+          var fullText = result.data.text;
+          var upiMatch = fullText.match(/\b\d{12}\b/);
+          var txnMatch = fullText.match(/(?:TXN|TRN|ID|Ref|UTR)[:\s#]*([A-Z0-9]{8,22})/i); 
+          var idField = document.getElementById("txnId");
+          if(upiMatch) idField.value = upiMatch[0];
+          else if(txnMatch) idField.value = txnMatch[1];
+          else {
+            idField.value = "UTR" + Math.floor(100000000000 + Math.random() * 900000000000);
+            ocrStatus.innerText = "⚠️ Number unclear. Generated Auto-UTR.";
+          }
+          idField.focus();
+        }).catch(function() { 
+          ocrStatus.innerText = "❌ Scan Failed. Enter UTR manually.";
+          document.getElementById("txnId").focus();
+        });
+      }
+    }
+
+    function handleNativeCamera(input) {
+      if (input.files && input.files[0]) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+          var img = new Image();
+          img.onload = function() {
+            var tempCanvas = document.createElement('canvas');
+            var ctx = tempCanvas.getContext('2d');
+            tempCanvas.width = img.width;
+            tempCanvas.height = img.height;
+            ctx.drawImage(img, 0, 0);
+            ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
+            ctx.fillRect(20, img.height - 120, 600, 100);
+            ctx.fillStyle = "black";
+            ctx.font = "bold 24px Arial";
+            ctx.fillText("Date: " + new Date().toLocaleString(), 40, img.height - 80);
+            ctx.fillText("Loc: " + (currentLocation || "Location Not Synced"), 40, img.height - 40);
+            receiverImageBase64 = tempCanvas.toDataURL('image/jpeg', 0.8);
+            document.getElementById("nativePreviewImg").src = receiverImageBase64;
+            document.getElementById("cameraPreviewContainer").style.display = 'block';
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(input.files[0]);
+      }
+    }
+
+    // --- Signature Canvas Setup ---
+    const sigCanvas = document.getElementById('sigCanvas');
+    const sigCtx = sigCanvas.getContext('2d');
+    let drawing = false;
+
+    function resizeCanvasResolution() {
+        if (!sigCanvas) return;
+        const rect = sigCanvas.getBoundingClientRect();
+        if (rect.width > 0 && rect.height > 0) {
+            // केवल तभी रिसाइज़ करें जब कैनवास की चौड़ाई/ऊंचाई वास्तव में बदल गई हो
+            if (sigCanvas.width !== rect.width || sigCanvas.height !== rect.height) {
+                sigCanvas.width = rect.width;
+                sigCanvas.height = rect.height;
+                sigCtx.lineWidth = 3;
+                sigCtx.lineCap = 'round';
+                sigCtx.lineJoin = 'round';
+                sigCtx.strokeStyle = '#0056b3';
+            }
+        }
+    }
+    function getCanvasPos(e) {
+        const rect = sigCanvas.getBoundingClientRect();
+        if (e.touches && e.touches.length > 0) {
+            return { x: e.touches[0].pageX - (rect.left + window.scrollX), y: e.touches[0].pageY - (rect.top + window.scrollY) };
+        }
+        return { x: e.offsetX !== undefined ? e.offsetX : e.clientX - rect.left, y: e.offsetY !== undefined ? e.offsetY : e.clientY - rect.top };
+    }
+    // mousedown और touchstart से resizeCanvasResolution() हटा दिया गया है ताकि बीच में उंगली उठाने पर कैनवास ब्लैंक न हो
+    sigCanvas.onmousedown = (e) => { drawing = true; const pos = getCanvasPos(e); sigCtx.beginPath(); sigCtx.moveTo(pos.x, pos.y); };
+    sigCanvas.onmouseup = () => drawing = false;
+    sigCanvas.onmouseleave = () => drawing = false;
+    sigCanvas.onmousemove = (e) => { if (!drawing) return; const pos = getCanvasPos(e); sigCtx.lineTo(pos.x, pos.y); sigCtx.stroke(); };
+    sigCanvas.addEventListener('touchstart', (e) => { drawing = true; const pos = getCanvasPos(e); sigCtx.beginPath(); sigCtx.moveTo(pos.x, pos.y); if (e.target == sigCanvas) { e.preventDefault(); } }, { passive: false });
+    sigCanvas.addEventListener('touchmove', (e) => { if (!drawing) return; const pos = getCanvasPos(e); sigCtx.lineTo(pos.x, pos.y); sigCtx.stroke(); if (e.target == sigCanvas) { e.preventDefault(); } }, { passive: false });
+    sigCanvas.addEventListener('touchend', () => { drawing = false; }, { passive: false });
+    function clearSignature() { sigCtx.clearRect(0, 0, sigCanvas.width, sigCanvas.height); sigCtx.beginPath(); }
+    setTimeout(resizeCanvasResolution, 500);
+
+    function processTransaction() {
+      var sigCanvas = document.getElementById('sigCanvas');
+      var signatureData = sigCanvas ? sigCanvas.toDataURL() : "";
+      var data = {
+        type: document.getElementById('txnType').value, amount: document.getElementById('txnAmount').value,
+        gateway: document.getElementById('txnGateway').value, method: document.getElementById('txnMethod').value,
+        name: document.getElementById('txnName').value, mobile: document.getElementById('txnMobile').value,
+        aadhaar: document.getElementById('txnAadhaar').value, txnId: document.getElementById('txnId').value,
+        location: currentLocation || "N/A", slipPhoto: slipImageBase64 || "", receiverPhoto: receiverImageBase64 || "", signature: signatureData || ""
+      };
+      if(!data.amount || !data.name) { alert("Fill Name and Amount"); return; }
+      if (typeof google !== 'undefined' && google.script) {
+        var btn = document.getElementById("saveTxnBtn");
+        btn.innerText = "Saving Transaction...";
+        btn.disabled = true;
+
+        // बटन को नॉर्मल करने का फ़ंक्शन
+        var resetTxnBtn = function() {
+          btn.innerText = "Save Transaction";
+          btn.disabled = false;
+        };
+
+        google.script.run
+        .withSuccessHandler(function(res) {
+          resetTxnBtn();
+          alert(res || "Transaction Saved Successfully!"); 
+          initApp();
+          if(confirm("Send WhatsApp slip?")) {
+            var msg = "*Maa Ganga Jan Seva Kendra*\n\nHello " + data.name + ",\nYour " + data.type + " of Rs." + data.amount + " was successful.\nTxn ID: " + data.txnId;
+            window.open("https://wa.me/91" + data.mobile + "?text=" + encodeURIComponent(msg), "_blank");
+          }
+          clearForm('transaction-sec'); clearSignature(); slipImageBase64 = null; receiverImageBase64 = null;
+          document.getElementById("cameraPreviewContainer").style.display = "none";
+          document.getElementById("ocrStatus").innerText = "Ready to scan...";
+        })
+        .withFailureHandler(function(err) {
+          resetTxnBtn();
+          alert("❌ डेटा सेव नहीं हो पाया: " + (err.message || err));
+        })
+        .saveTransaction(data);
+      } else {
+        alert("लोकल मोड: डेटा सेव सिम्युलेट हुआ।");
+        document.getElementById("saveTxnBtn").innerText = "Save Transaction";
+        document.getElementById("saveTxnBtn").disabled = false;
+      }
+    }
+
+    // Advanced dynamic multiple rows invoice total calculator
+    // Upgraded Total Calculator with Paid & Balance Due logic
+    function calcTotal() {
+      var subtotal = 0;
+      var rows = document.querySelectorAll(".item-row");
+      
+      rows.forEach(function(row) {
+        var qty = parseFloat(row.querySelector(".inv-prod-qty").value) || 0;
+        var rate = parseFloat(row.querySelector(".inv-prod-rate").value) || 0;
+        subtotal += (qty * rate);
+      });
+
+      var discPerc = parseFloat(document.getElementById('invDiscount').value) || 0;
+      var taxPerc = parseFloat(document.getElementById('invTax').value) || 0;
+
+      var discAmount = subtotal * (discPerc / 100);
+      var afterDisc = subtotal - discAmount;
+      var taxAmount = afterDisc * (taxPerc / 100);
+      
+      finalInvoiceTotal = afterDisc + taxAmount;
+      document.getElementById('displayTotal').innerText = finalInvoiceTotal.toFixed(2);
+      
+      // Paid aur Balance automatic calculation math
+      var paidInput = document.getElementById('invPaid').value;
+      var paidAmount = paidInput === "" ? finalInvoiceTotal : parseFloat(paidInput) || 0;
+      var balanceDue = finalInvoiceTotal - paidAmount;
+      
+      document.getElementById('invBalance').value = balanceDue.toFixed(2);
+      
+      return { 
+        amount: subtotal.toFixed(2), 
+        discAmount: discAmount.toFixed(2), 
+        taxAmount: taxAmount.toFixed(2), 
+        total: finalInvoiceTotal.toFixed(2),
+        paid: paidAmount.toFixed(2),
+        balance: balanceDue.toFixed(2)
+      };
+    }
+
+    function processInvoice(sendWhatsAppMode) {
+      var calc = calcTotal();
+      var itemsArray = [];
+      var rows = document.querySelectorAll(".item-row");
+      
+      rows.forEach(function(row) {
+        var desc = row.querySelector(".inv-prod-desc").value;
+        var qty = row.querySelector(".inv-prod-qty").value;
+        var rate = row.querySelector(".inv-prod-rate").value;
+        if(desc.trim() !== "") {
+          itemsArray.push({ desc: desc, qty: qty, rate: rate });
+        }
+      });
+
+      if(itemsArray.length === 0) { alert("Kam se kam ek Item Details bharein!"); return; }
+
+      var data = {
+        name: document.getElementById('invName').value, 
+        mobile: document.getElementById('invMobile').value,
+        address: document.getElementById('invAddress').value || "N/A", 
+        items: itemsArray, 
+        discount: document.getElementById('invDiscount').value, 
+        tax: document.getElementById('invTax').value,
+        subtotal: calc.amount, 
+        discAmount: calc.discAmount, 
+        taxAmount: calc.taxAmount, 
+        total: calc.total,
+        paid: calc.paid,
+        balance: calc.balance,
+        invNo: "INV-" + Math.floor(1000 + Math.random() * 9000)
+      };
+
+      if(!data.name) { alert("Client Name is required!"); return; }
+
+      if (typeof google !== 'undefined' && google.script) {
+        document.getElementById("saveInvBtn").innerText = "Saving Invoice...";
+        google.script.run.withSuccessHandler(function() {
+          executeInvoiceAction(data, sendWhatsAppMode);
+          // clearForm('invoice-sec'); -> Hata diya gaya hai taaki data screen par bana rahe
+        }).saveInvoice(data);
+      } else { executeInvoiceAction(data, sendWhatsAppMode); }
+    }
+
+    function executeInvoiceAction(data, sendWhatsAppMode) {
+      if(sendWhatsAppMode) {
+        var cleanTextForWa = data.product ? data.product.replace(/\n/g, " | ") : "Items List";
+        var msg = "*Maa Ganga Jan Seva Kendra & Electronic Center*\n\n📄 *INVOICE NO:* " + data.invNo + "\n👤 *Customer:* " + data.name + "\n------------------------------\n💰 *Total Amount:* Rs. " + data.total + "\n✅ *Paid Amount:* Rs. " + data.paid + "\n⚠️ *Balance Due:* Rs. " + data.balance + "\n------------------------------\nधन्यवाद! कृपया बाकी भुगतान समय पर करें।";
+        window.open("https://wa.me/91" + data.mobile + "?text=" + encodeURIComponent(msg), "_blank");
+      } else {
+        if (typeof google !== 'undefined' && google.script) {
+          document.getElementById("saveInvBtn").innerText = "Generating QR & Printing...";
+          
+          google.script.run.withSuccessHandler(function(settings) {
+            var finalUPI = settings ? settings.upiId : "9761414105@upi";
+            var finalName = settings ? settings.acName : "Anurag Shakya";
+            var finalBank = settings ? settings.bankName : "Indian Bank";
+            var finalNo = settings ? settings.acNo : "[Account No]";
+            var finalIfsc = settings ? settings.ifsc : "[IFSC]";
+            
+            var printDiv = document.getElementById('printArea');
+            
+            // Baki bacha hua ya paid amount jo customer ko scan karna hai
+            var scanAmount = parseFloat(data.balance) > 0 ? data.paid : data.total;
+            var upiString = "upi://pay?pa=" + finalUPI + "&pn=" + encodeURIComponent(finalName) + "&am=" + scanAmount + "&cu=INR";
+
+            // Live Payment Badge Calculation
+            var isFullyPaid = parseFloat(data.balance) <= 0;
+            var badgeHtml = isFullyPaid 
+              ? '<span style="border:2px solid #198754; color:#198754; font-size:12px; font-weight:800; padding:3px 10px; border-radius:6px; letter-spacing:1px; display:inline-block; margin-top:8px; background:#e8f5e9; white-space:nowrap;">✓ FULLY PAID</span>'
+              : '<span style="border:2px solid #dc3545; color:#dc3545; font-size:12px; font-weight:800; padding:3px 10px; border-radius:6px; letter-spacing:1px; display:inline-block; margin-top:8px; background:#ffebee; white-space:nowrap;">⚠️ BALANCE DUE: Rs. ' + data.balance + '</span>';
+
+            var formattedName = (data.name || '').toUpperCase();
+
+            var html = '<div style="padding:30px 40px; font-family:\'Poppins\', sans-serif; position:relative; min-height:100vh; max-width:210mm; margin:auto; background:#fff; box-sizing:border-box;">';
+            
+            // 1. Slim & Stylish Header
+            html += '<div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1.5px solid #0056b3; padding-bottom:10px; margin-bottom:15px;">';
+            html += '<div><img src="https://lh3.googleusercontent.com/d/1AVhGGj41J973HK0KgI1im5JJwJZsKhJR" style="height:60px; width:60px; object-fit:contain; border-radius:50%;"></div>';
+            html += '<div style="text-align:right;">';
+            html += '<h2 style="margin:0; color:#0056b3; font-weight:600; font-size:17px; letter-spacing:0.3px;">Maa Ganga Jan Seva Kendra & Electronic Center</h2>';
+            html += '<p style="margin:2px 0 0 0; font-size:12px; font-weight:400; color:#64748b;">Kairawali, Mainpuri, Uttar Pradesh</p>';
+            html += '<p style="margin:2px 0 0 0; font-size:12px; font-weight:600; color:#0056b3;">📞 +91 9761414105</p>';
+            html += '</div>';
+            html += '</div>';
+            
+            html += '<h3 style="text-align:center; letter-spacing:4px; margin:0 0 20px 0; font-weight:800; color:#222; font-size:18px;">TAX INVOICE</h3>';
+            
+            // 2. Bill To & Invoice Info Box
+            html += '<div style="display:flex; justify-content:space-between; margin-bottom:20px; font-size:13px; line-height:1.5;">';
+            html += '<div style="background:#f4f8fd; padding:12px 15px; border-radius:8px; width:48%; border:1px solid #cce0ff; box-sizing:border-box;">';
+            html += '<strong style="color:#0056b3; font-size:14px;">BILL TO:</strong><br><strong style="font-size:15px; color:#222;">' + formattedName + '</strong><br>' + data.address + '<br><strong>Mobile:</strong> ' + data.mobile + '</div>';
+            
+            html += '<div style="background:#f4f8fd; padding:12px 15px; border-radius:8px; width:48%; border:1px solid #cce0ff; text-align:right; box-sizing:border-box;">';
+            html += '<strong>Invoice No:</strong> <span style="color:#ff6b00; font-weight:bold;">' + data.invNo + '</span><br>';
+            html += '<strong>Invoice Date:</strong> ' + new Date().toLocaleDateString() + '<br>';
+            html += '</div>';
+            html += '</div>';
+
+            // 3. Items Table
+            var itemRowsHtml = '';
+            var serialCounter = 0;
+            data.items.forEach(function(item) {
+              serialCounter++;
+              var lines = item.desc.split('\n');
+              var mainTotalRowPrice = (parseFloat(item.qty) * parseFloat(item.rate)).toFixed(2);
+              
+              lines.forEach(function(line, lineIndex) {
+                if(line.trim() !== "") {
+                  if(lineIndex === 0) {
+                    itemRowsHtml += '<tr><td style="padding:8px; border:1px solid #dee2e6; text-align:center;">'+serialCounter+'</td><td style="padding:8px; border:1px solid #dee2e6;"><strong>'+line+'</strong></td><td style="padding:8px; border:1px solid #dee2e6; text-align:center;">'+item.qty+'</td><td style="padding:8px; border:1px solid #dee2e6; text-align:right;">'+item.rate+'</td><td style="padding:8px; border:1px solid #dee2e6; text-align:right;">'+mainTotalRowPrice+'</td></tr>';
+                  } else {
+                    itemRowsHtml += '<tr><td style="padding:4px 8px; border:1px solid #dee2e6;"></td><td style="padding:4px 8px; border:1px solid #dee2e6; color:#555; font-size:12px; font-style:italic;" colspan="4">↳ '+line+'</td></tr>';
+                  }
+                }
+              });
+            });
+
+            html += '<table style="width:100%; border-collapse:collapse; margin-bottom:20px; font-size:13px;">';
+            html += '<tr style="background:#0056b3; color:#fff; text-align:left;"><th style="padding:10px; border:1px solid #004085; text-align:center; width:8%;">Sl.</th><th style="padding:10px; border:1px solid #004085;">Item Description & Serial Breakdown</th><th style="padding:10px; border:1px solid #004085; text-align:center; width:10%;">Qty</th><th style="padding:10px; border:1px solid #004085; text-align:right; width:15%;">Rate</th><th style="padding:10px; border:1px solid #004085; text-align:right; width:15%;">Amount</th></tr>';
+            html += itemRowsHtml;
+            html += '</table>';
+
+            // 4. Summary Calculation Table
+            html += '<div style="display:flex; justify-content:flex-end; margin-bottom:20px;">';
+            html += '<table style="width:300px; font-size:13px; line-height:1.6;">';
+            html += '<tr><td><strong>Subtotal:</strong></td><td style="text-align:right;">Rs. ' + data.subtotal + '</td></tr>';
+            html += '<tr><td style="color:#e74c3c;"><strong>Discount (' + data.discount + '%):</strong></td><td style="text-align:right; color:#e74c3c;">- Rs. ' + data.discAmount + '</td></tr>';
+            html += '<tr><td style="color:#27ae60;"><strong>Tax (' + data.tax + '%):</strong></td><td style="text-align:right; color:#27ae60;">+ Rs. ' + data.taxAmount + '</td></tr>';
+            html += '<tr><td colspan="2"><hr style="border-top:1px solid #ccc; margin:4px 0;"></td></tr>';
+            html += '<tr><td><strong style="font-size:14px; color:#0056b3;">Grand Total:</strong></td><td style="text-align:right; font-size:16px; color:#0056b3; font-weight:800;">Rs. ' + data.total + '</td></tr>';
+            html += '<tr><td><strong style="font-size:14px; color:#198754;">Amount Paid:</strong></td><td style="text-align:right; font-size:16px; color:#198754; font-weight:800;">Rs. ' + data.paid + '</td></tr>';
+            html += '<tr><td><strong style="font-size:14px; color:#dc3545;">Balance Due (Baki):</strong></td><td style="text-align:right; font-size:16px; color:#dc3545; font-weight:800;">Rs. ' + data.balance + '</td></tr>';
+            html += '</table></div>';
+
+            // 5. Bank Details with Local QR Code Box
+            html += '<div style="display:flex; justify-content:space-between; align-items:center; border:1px solid #cce0ff; border-radius:8px; padding:12px 15px; background:#f4f8fd; margin-bottom:20px; box-sizing:border-box;">';
+            html += '<div>';
+            html += '<h6 style="margin:0 0 6px 0; color:#0056b3; font-weight:800; font-size:14px;">Bank Details</h6>';
+            html += '<p style="margin:2px 0; font-size:12px;"><strong>Bank:</strong> ' + finalBank + '</p>';
+            html += '<p style="margin:2px 0; font-size:12px;"><strong>A/C Name:</strong> ' + finalName + '</p>';
+            html += '<p style="margin:2px 0; font-size:12px;"><strong>A/C No:</strong> ' + finalNo + '</p>';
+            html += '<p style="margin:2px 0; font-size:12px;"><strong>IFSC Code:</strong> ' + finalIfsc + '</p>';
+            html += badgeHtml;
+            html += '</div>';
+            
+            html += '<div style="text-align:center; min-width:120px;">';
+            html += '<div id="qrcodeTableTarget" style="display:inline-block; padding:4px; border:2px solid #0056b3; border-radius:8px; background:#fff;"></div>';
+            html += '<p style="margin:4px 0 0 0; font-size:11px; font-weight:800; color:#ff6b00;">Scan & Pay</p>';
+            html += '</div>';
+            html += '</div>';
+
+            // 6. Terms & Signature Footer
+            html += '<div style="display:flex; justify-content:space-between; align-items:flex-end; padding-top:10px;">';
+            html += '<div>';
+            html += '<p style="font-weight:600; color:#555; font-style:italic; margin-bottom:4px; font-size:12px;">Thank you for Shopping With Us!</p>';
+            html += '<p style="font-size:10px; color:#777; margin:0; line-height:1.4;">• Goods once sold cannot be returned without bill.<br>• Subject to Mainpuri Jurisdiction.</p>';
+            html += '</div>';
+            html += '<div style="text-align:center;"><p style="margin-bottom:5px; color:#aaa;">___________________________</p><p style="margin:0; font-weight:800; color:#0056b3; font-size:13px;">Authorized Signatory</p><p style="margin:0; color:#555; font-size:12px;">Anurag Shakya</p></div>';
+            html += '</div>';
+            html += '</div>';
+
+            printDiv.innerHTML = html;
+            printDiv.classList.remove('d-none');
+            
+            // Offline QR Execution Logic Trigger
+            new QRCode(document.getElementById("qrcodeTableTarget"), {
+              text: upiString,
+              width: 110,
+              height: 110,
+              colorDark : "#000000",
+              colorLight : "#ffffff",
+              correctLevel : QRCode.CorrectLevel.H
+            });
+
+            // Delay buffer to allow local canvas conversion before screen print
+            setTimeout(function() {
+  if (window.print) {
+    window.print();
+  } else {
+    alert("Use 'Save PDF' option in your browser menu to save this bill.");
+  }
+  printDiv.classList.add('d-none');
+  document.getElementById("saveInvBtn").innerText = "Save & Print";
+}, 450);
+          }).getInvoiceSettings();
+        }
+      }
+    }
+
+    // Global references for smart photo engine matrix manipulation
+    // Global position trackers for real-time interactive coordinate engine
+    var studioImageObj = null;
+    var currentCropMode = 'none';
+    var imgOffsetX = 0;
+    var imgOffsetY = 0;
+    var isDraggingPhoto = false;
+    var startDragX = 0;
+    var startDragY = 0;
+    
+    // Eraser drawing paths repository array
+    var erasedPaths = []; 
+    var isErasingNow = false;
+
+    function toggleEraserMode() {
+      var isEraserOn = document.getElementById("eraserMode").checked;
+      var canvas = document.getElementById("studioCanvas");
+      if(isEraserOn) {
+        canvas.style.cursor = "crosshair"; // Change pointer to brush mode
+        isDraggingPhoto = false;
+      } else {
+        canvas.style.cursor = "move";
+      }
+    }
+
+    // Image load coordinates hard center resets initialization module
+    function loadStudioPreview(input) {
+      if (input.files && input.files[0]) {
+        document.getElementById("studioPlaceholder").style.display = "none";
+        var reader = new FileReader();
+        reader.onload = function(e) {
+          studioImageObj = new Image();
+          studioImageObj.onload = function() {
+            // Reset state positions whenever new photo uploads
+            imgOffsetX = 0;
+            imgOffsetY = 0;
+            document.getElementById("imgZoom").value = "1.0";
+            applyLiveStudioFilters();
+          };
+          studioImageObj.src = e.target.result;
+        };
+        reader.readAsDataURL(input.files[0]);
+      }
+    }
+
+    // Dynamic framing trigger configuration loop matrix
+    function setStudioCrop(mode) {
+      currentCropMode = mode;
+      document.getElementById('cropBtnNone').classList.remove('active');
+      document.getElementById('cropBtnPP').classList.remove('active');
+      document.getElementById('cropBtnStamp').classList.remove('active');
+      
+      if(mode === 'none') document.getElementById('cropBtnNone').classList.add('active');
+      if(mode === 'passport') document.getElementById('cropBtnPP').classList.add('active');
+      if(mode === 'stamp') document.getElementById('cropBtnStamp').classList.add('active');
+      
+      applyLiveStudioFilters();
+    }
+
+    // Interactive Drag and Drop pointer event listener registry routines
+    const liveStudioCanvasRef = document.getElementById("studioCanvas");
+
+    function getPointerEventPos(e) {
+      if (e.touches && e.touches.length > 0) {
+        return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+      }
+      return { x: e.clientX, y: e.clientY };
+    }
+
+    function startPhotoDragLogic(e) {
+      if (!studioImageObj) return;
+      var isEraserOn = document.getElementById("eraserMode").checked;
+      var pos = getPointerEventPos(e);
+      var rect = liveStudioCanvasRef.getBoundingClientRect();
+      
+      // Calculate active canvas inner relative coordinates click points
+      var canvasX = (pos.x - rect.left) * (liveStudioCanvasRef.width / rect.width);
+      var canvasY = (pos.y - rect.top) * (liveStudioCanvasRef.height / rect.height);
+
+      if (isEraserOn) {
+        isErasingNow = true;
+        erasedPaths.push([{x: canvasX, y: canvasY}]);
+      } else {
+        isDraggingPhoto = true;
+        startDragX = pos.x - imgOffsetX;
+        startDragY = pos.y - imgOffsetY;
+      }
+      e.preventDefault();
+    }
+
+    function movePhotoDragLogic(e) {
+      var isEraserOn = document.getElementById("eraserMode").checked;
+      var pos = getPointerEventPos(e);
+      
+      if (isEraserOn && isErasingNow) {
+        var rect = liveStudioCanvasRef.getBoundingClientRect();
+        var canvasX = (pos.x - rect.left) * (liveStudioCanvasRef.width / rect.width);
+        var canvasY = (pos.y - rect.top) * (liveStudioCanvasRef.height / rect.height);
+        
+        erasedPaths[erasedPaths.length - 1].push({x: canvasX, y: canvasY});
+        applyLiveStudioFilters();
+        e.preventDefault();
+      } else if (isDraggingPhoto) {
+        imgOffsetX = pos.x - startDragX;
+        imgOffsetY = pos.y - startDragY;
+        applyLiveStudioFilters();
+        e.preventDefault();
+      }
+    }
+
+    function endPhotoDragLogic() {
+      isDraggingPhoto = false;
+      isErasingNow = false;
+    }
+
+    // Desktop Mouse Event Registries
+    liveStudioCanvasRef.addEventListener('mousedown', startPhotoDragLogic);
+    window.addEventListener('mousemove', movePhotoDragLogic);
+    window.addEventListener('mouseup', endPhotoDragLogic);
+
+    // Mobile Touch Event Registries (Anti-Scroll Lockdown mechanism inside workspace)
+    liveStudioCanvasRef.addEventListener('touchstart', startPhotoDragLogic, { passive: false });
+    liveStudioCanvasRef.addEventListener('touchmove', movePhotoDragLogic, { passive: false });
+    liveStudioCanvasRef.addEventListener('touchend', endPhotoDragLogic);
+
+    // Real-time canvas matrix frame blending engine execution logic
+    // Real-time canvas matrix frame blending engine execution logic (BG Fixed)
+    // Advanced Shadow Balancing & High-Definition Chroma Replacement Engine
+    function applyLiveStudioFilters() {
+      if (!studioImageObj) return;
+
+      var canvas = document.getElementById("studioCanvas");
+      var ctx = canvas.getContext("2d");
+
+      var zoomScale = parseFloat(document.getElementById("imgZoom").value) || 1.0;
+      var bVal = parseFloat(document.getElementById("imgBright").value) || 1.0;
+      var cVal = parseFloat(document.getElementById("imgCont").value) || 1.0;
+      var bgColor = document.getElementById("imgBg").value;
+      var bgMode = document.getElementById("bgMode").value;
+      var borderPx = parseInt(document.getElementById("borderWidth").value) || 0;
+      var borderColorStr = document.getElementById("borderColor").value;
+      var hairColor = document.getElementById("hairColor").value;
+      var hairMode = document.getElementById("hairFilterMode").value;
+      
+      // READ NEW RETOUCH SMOOTH VALUE
+      var smoothVal = parseInt(document.getElementById("faceSmooth").value) || 0;
+
+      var targetW = 300, targetH = 300;
+      if (currentCropMode === 'passport') { targetW = 350; targetH = 450; }
+      else if (currentCropMode === 'stamp') { targetW = 250; targetH = 300; }
+
+      canvas.width = targetW;
+      canvas.height = targetH;
+      ctx.clearRect(0, 0, targetW, targetH);
+
+      var renderW = targetW * zoomScale;
+      var renderH = targetW * (studioImageObj.height / studioImageObj.width) * zoomScale;
+      var startX = (targetW - renderW) / 2 + imgOffsetX;
+      var startY = (targetH - renderH) / 2 + imgOffsetY;
+
+      // 1. Background Base Layer Injection
+      if (bgMode === 'replace') {
+        ctx.fillStyle = bgColor;
+        ctx.fillRect(0, 0, targetW, targetH);
+      }
+
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(borderPx, borderPx, targetW - (borderPx * 2), targetH - (borderPx * 2));
+      ctx.clip();
+
+      // 2. RETOUCH / DARK CIRCLES SMOOTHING FILTER CHAIN
+      var filterStr = `brightness(${bVal * 1.05}) contrast(${cVal * 0.95}) saturate(1.03)`;
+      if (smoothVal > 0) {
+        // Soft gaussian blur filter engine to diminish fine dark circles lines
+        filterStr += ` blur(${smoothVal * 0.25}px)`; 
+      }
+      ctx.filter = filterStr;
+      
+      ctx.drawImage(studioImageObj, startX, startY, renderW, renderH);
+      ctx.restore();
+
+      // Overlap sharpening details loop overlay technique if smooth blur is applied
+      if(smoothVal > 0) {
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(borderPx, borderPx, targetW - (borderPx * 2), targetH - (borderPx * 2));
+        ctx.clip();
+        ctx.globalAlpha = 0.35; // Sharp focus details restoration percentage match
+        ctx.filter = `brightness(${bVal * 1.05}) contrast(${cVal * 1.1})`; 
+        ctx.drawImage(studioImageObj, startX, startY, renderW, renderH);
+        ctx.restore();
+      }
+
+      // 3. HARD LAYER ERASER INJECTIONS SUBTRACTIONS
+      if (erasedPaths.length > 0) {
+        ctx.save();
+        // destination-out removes drawn pixels from photo layers instantly
+        ctx.globalCompositeOperation = 'destination-out';
+        ctx.lineWidth = 14; // Default medium brush size thickness for accurate touch ups
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.strokeStyle = 'rgba(0,0,0,1)';
+        
+        erasedPaths.forEach(function(path) {
+          if (path.length > 0) {
+            ctx.beginPath();
+            ctx.moveTo(path[0].x, path[0].y);
+            for (var i = 1; i < path.length; i++) {
+              ctx.lineTo(path[i].x, path[i].y);
+            }
+            ctx.stroke();
+          }
+        });
+        ctx.restore();
+      }
+
+      // 4. Optional Hair Tint Mask Execution
+      if (hairMode !== 'none') {
+        ctx.save();
+        ctx.globalCompositeOperation = 'multiply';
+        ctx.fillStyle = hairColor;
+        ctx.beginPath();
+        ctx.arc(targetW / 2, targetH * 0.25, targetW * 0.45, 0, Math.PI, true);
+        ctx.closePath();
+        ctx.globalAlpha = 0.22;
+        ctx.fill();
+        ctx.restore();
+      }
+
+      // 5. Border Render
+      if (borderPx > 0) {
+        ctx.lineWidth = borderPx * 2;
+        ctx.strokeStyle = borderColorStr;
+        ctx.strokeRect(0, 0, targetW, targetH);
+      }
+    }
+
+    // Dynamic Sheet Size Print Layout Engine (4x6 vs A4 Perfectly Fixed)
+    function generatePhotoGrid() {
+      var canvas = document.getElementById("studioCanvas");
+      var layoutSelect = document.getElementById('ppLayout');
+      var count = parseInt(layoutSelect.value);
+      
+      if (!studioImageObj) { return alert("Please load an image first!"); }
+
+      var processedBase64 = canvas.toDataURL("image/jpeg", 0.98);
+      var printDiv = document.getElementById('printArea'); 
+      
+      // Dynamic page setup rules injections based on layout select value
+      var isA4 = (count === 30);
+      var pageSizeStyle = isA4 ? "width: 210mm; min-height: 297mm; padding: 10mm;" : "width: 4in; height: 6in; padding: 5mm;";
+      
+      var html = `<style>
+        @media print {
+          @page { size: ${isA4 ? 'A4 portrait' : '4in 6in'}; margin: 0; }
+          body { background: #fff; }
+          #mainApp { display: none !important; }
+          #printArea { display: block !important; background: #fff; width: 100%; height: 100%; }
+        }
+      </style>`;
+
+      // Flex matrix design grids system for balanced layouts gaps mapping
+      html += `<div style="display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; align-content: flex-start; margin: auto; background:#fff; box-sizing: border-box; ${pageSizeStyle}">`;
+      
+      for(var i = 0; i < count; i++) { 
+        html += `<img src="${processedBase64}" style="width: 3.5cm; height: 4.5cm; object-fit: cover; border: 1px solid #ddd; background:#fff; margin: 2px; box-shadow: 0 0 2px rgba(0,0,0,0.1);">`; 
+      }
+      html += '</div>';
+      
+      printDiv.innerHTML = html; 
+      printDiv.classList.remove('d-none'); 
+      
+      // Delay to ensure rendering thread captures canvas frame completely
+      setTimeout(function() {
+        window.print(); 
+        printDiv.classList.add('d-none');
+      }, 400);
+    }
+
+    // Global Data Holders for Dual PVC Card Manipulation Systems
+    var pvcFrontImageObj = null;
+    var pvcBackImageObj = null;
+
+    // Interactive 4-Corner Multi-Box Coordinates Rectangles
+    var pvcFrontCropBox = { x: 10, y: 10, w: 200, h: 130 };
+    var pvcBackCropBox = { x: 10, y: 10, w: 200, h: 130 };
+    
+    var activePvcDraggingCanvas = null;
+    var isPvcResizingOrDragging = false;
+    var pvcDragAnchorType = ""; // "box", "tl", "tr", "bl", "br" corner handles
+
+    // Dual load handler to decode input streams safely (Support images instantly)
+    function loadPvcSide(input, side) {
+      if (input.files && input.files[0]) {
+        var file = input.files[0];
+        
+        // Dynamic handler checking if format type corresponds to plain PDF
+        if (file.type === "application/pdf") {
+          alert("PDF format selected! For premium high-speed local processing, convert PDF pages into Images or take screenshots, then upload directly.");
+          return;
+        }
+
+        var reader = new FileReader();
+        reader.onload = function(e) {
+          var img = new Image();
+          img.onload = function() {
+            if (side === 'front') {
+              pvcFrontImageObj = img;
+              pvcFrontCropBox = { x: img.width*0.1, y: img.height*0.1, w: img.width*0.8, h: img.width*0.8*(5.4/8.5) };
+            } else {
+              pvcBackImageObj = img;
+              pvcBackCropBox = { x: img.width*0.1, y: img.height*0.1, w: img.width*0.8, h: img.width*0.8*(5.4/8.5) };
+            }
+            renderLivePvcPreview();
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    // Interactive Cropper Rectangles Core Coordinate Trackers Listeners Loop
+    function setupPvcCropperEventListeners(canvasId, side) {
+      var canvas = document.getElementById(canvasId);
+      
+      function getCanvasRelativeMousePos(e) {
+        var rect = canvas.getBoundingClientRect();
+        var clientX = e.touches && e.touches.length > 0 ? e.touches[0].clientX : e.clientX;
+        var clientY = e.touches && e.touches.length > 0 ? e.touches[0].clientY : e.clientY;
+        return {
+          x: (clientX - rect.left) * (canvas.width / rect.width),
+          y: (clientY - rect.top) * (canvas.height / rect.height)
+        };
+      }
+
+      function checkAnchorHitTest(mousePos, box) {
+        var handlePx = 15; // Target grab handle radius sensitivity area bounds
+        if (Math.abs(mousePos.x - box.x) < handlePx && Math.abs(mousePos.y - box.y) < handlePx) return "tl";
+        if (Math.abs(mousePos.x - (box.x + box.w)) < handlePx && Math.abs(mousePos.y - box.y) < handlePx) return "tr";
+        if (Math.abs(mousePos.x - box.x) < handlePx && Math.abs(mousePos.y - (box.y + box.h)) < handlePx) return "bl";
+        if (Math.abs(mousePos.x - (box.x + box.w)) < handlePx && Math.abs(mousePos.y - (box.y + box.h)) < handlePx) return "br";
+        if (mousePos.x > box.x && mousePos.x < box.x + box.w && mousePos.y > box.y && mousePos.y < box.y + box.h) return "box";
+        return null;
+      }
+
+      canvas.addEventListener('mousedown', function(e) {
+        var imgObj = (side === 'front') ? pvcFrontImageObj : pvcBackImageObj;
+        if (!imgObj) return;
+        var box = (side === 'front') ? pvcFrontCropBox : pvcBackCropBox;
+        var pos = getCanvasRelativeMousePos(e);
+        
+        pvcDragAnchorType = checkAnchorHitTest(pos, box);
+        if (pvcDragAnchorType) {
+          isPvcResizingOrDragging = true;
+          activePvcDraggingCanvas = side;
+        }
+      });
+
+      window.addEventListener('mousemove', function(e) {
+        if (!isPvcResizingOrDragging || activePvcDraggingCanvas !== side) return;
+        var box = (side === 'front') ? pvcFrontCropBox : pvcBackCropBox;
+        var imgObj = (side === 'front') ? pvcFrontImageObj : pvcBackImageObj;
+        var pos = getCanvasRelativeMousePos(e);
+
+        // Constraining coordinates modifications based on anchor hit points types profiles mapping
+        if (pvcDragAnchorType === "box") {
+          box.x = pos.x - box.w / 2;
+          box.y = pos.y - box.h / 2;
+        } else if (pvcDragAnchorType === "br") {
+          box.w = Math.max(30, pos.x - box.x);
+          box.h = box.w * (5.4 / 8.5); // Hold lock aspect ratio configuration rule for standard CR80 physical PVC layouts
+        } else if (pvcDragAnchorType === "tr") {
+          box.w = Math.max(30, pos.x - box.x);
+          box.y = pos.y;
+          box.h = box.w * (5.4 / 8.5);
+        } else if (pvcDragAnchorType === "tl") {
+          var oldRight = box.x + box.w;
+          box.x = pos.x;
+          box.w = Math.max(30, oldRight - box.x);
+          box.y = pos.y;
+          box.h = box.w * (5.4 / 8.5);
+        } else if (pvcDragAnchorType === "bl") {
+          var oldRight = box.x + box.w;
+          box.x = pos.x;
+          box.w = Math.max(30, oldRight - box.x);
+          box.h = box.w * (5.4 / 8.5);
+        }
+        renderLivePvcPreview();
+      });
+
+      window.addEventListener('mouseup', function() {
+        isPvcResizingOrDragging = false;
+        activePvcDraggingCanvas = null;
+      });
+    }
+
+    // Core Canvas Frame Builders pipeline compiler routines mapping configuration
+    function drawSinglePvcWorkspace(canvasId, imgObj, box) {
+      var canvas = document.getElementById(canvasId);
+      var ctx = canvas.getContext("2d");
+      
+      // Fixed aspect configuration matching legal dimensions structure profile
+      canvas.width = 850;
+      canvas.height = 540;
+      ctx.clearRect(0, 0, 850, 540);
+
+      var contrastVal = document.getElementById("pvcContrast").value;
+      var radiusPx = parseInt(document.getElementById("pvcRadius").value) || 0;
+      var strokePx = parseInt(document.getElementById("pvcBorderWidth").value) || 0;
+
+      if (imgObj) {
+        ctx.save();
+        
+        // Rounded corner container clip setup logic mapping profile module
+        if (radiusPx > 0) {
+          ctx.beginPath();
+          ctx.moveTo(radiusPx, 0);
+          ctx.lineTo(850 - radiusPx, 0);
+          ctx.quadraticCurveTo(850, 0, 850, radiusPx);
+          ctx.lineTo(850, 540 - radiusPx);
+          ctx.quadraticCurveTo(850, 540, 850 - radiusPx, 540);
+          ctx.lineTo(radiusPx, 540);
+          ctx.quadraticCurveTo(0, 540, 0, 540 - radiusPx);
+          ctx.lineTo(0, radiusPx);
+          ctx.quadraticCurveTo(0, 0, radiusPx, 0);
+          ctx.closePath();
+          ctx.clip();
+        }
+
+        // Apply dynamic processing filters parameters matrix channel mapping configuration
+        ctx.filter = `contrast(${contrastVal})`;
+        ctx.drawImage(imgObj, box.x, box.y, box.w, box.h, 0, 0, 850, 540);
+        ctx.restore();
+
+        // Overlay stroke outline boundaries mapping configuration logic
+        if (strokePx > 0) {
+          ctx.lineWidth = strokePx * 4;
+          ctx.strokeStyle = "#333333";
+          ctx.strokeRect(0, 0, 850, 540);
+        }
+
+        // 5. Draw 4 Interactive Circle Handles Controls Overlay on preview inside working desktop loops
+        ctx.fillStyle = "#ff6b00";
+        ctx.strokeStyle = "#ffffff";
+        ctx.lineWidth = 4;
+        var handles = [
+          {x: box.x, y: box.y},
+          {x: box.x + box.w, y: box.y},
+          {x: box.x, y: box.y + box.h},
+          {x: box.x + box.w, y: box.y + box.h}
+        ];
+        
+        // Draw dashed bounding bounding lines representation for clear visible frames mappings
+        ctx.save();
+        ctx.setLineDash([8, 8]);
+        ctx.strokeStyle = "#ff6b00";
+        ctx.lineWidth = 3;
+        ctx.strokeRect(box.x, box.y, box.w, box.h);
+        ctx.restore();
+      } else {
+        // Flat placeholder layout render
+        ctx.fillStyle = "#fafafa";
+        ctx.fillRect(0, 0, 850, 540);
+        ctx.fillStyle = "#999999";
+        ctx.font = "bold 32px Arial";
+        ctx.textAlign = "center";
+        ctx.fillText("No File Loaded (Upload stream blank)", 425, 270);
+      }
+    }
+
+    function renderLivePvcPreview() {
+      // Dynamic rendering engine triggers running automatically down channels pipelines maps profiles
+      drawSinglePvcWorkspace("pvcFrontCanvas", pvcFrontImageObj, pvcFrontCropBox);
+      drawSinglePvcWorkspace("pvcBackCanvas", pvcBackImageObj, pvcBackCropBox);
+    }
+
+    // Master Sheet Print compiler loop configuration module sequence mapping
+    function printFinishedPvcCardSheet() {
+      if (!pvcFrontImageObj && !pvcBackImageObj) { return alert("Kam se kam ek Side file load karna zaroori hai!"); }
+
+      // Core canvas capture extraction logic sequence values
+      // Temporary duplicate canvases arrays to strip away interaction dots lines vectors handles
+      function getCleanPvcBase64DataUrl(imgObj, box) {
+        if(!imgObj) return "";
+        var tempCanvas = document.createElement("canvas");
+        tempCanvas.width = 850; tempCanvas.height = 540;
+        var tCtx = tempCanvas.getContext("2d");
+        
+        var contrastVal = document.getElementById("pvcContrast").value;
+        var radiusPx = parseInt(document.getElementById("pvcRadius").value) || 0;
+        var strokePx = parseInt(document.getElementById("pvcBorderWidth").value) || 0;
+
+        tCtx.save();
+        if (radiusPx > 0) {
+          tCtx.beginPath();
+          tCtx.moveTo(radiusPx, 0); tCtx.lineTo(850 - radiusPx, 0); tCtx.quadraticCurveTo(850, 0, 850, radiusPx);
+          tCtx.lineTo(850, 540 - radiusPx); tCtx.quadraticCurveTo(850, 540, 850 - radiusPx, 540);
+          tCtx.lineTo(radiusPx, 540); tCtx.quadraticCurveTo(0, 540, 0, 540 - radiusPx);
+          tCtx.lineTo(0, radiusPx); tCtx.quadraticCurveTo(0, 0, radiusPx, 0);
+          tCtx.closePath(); tCtx.clip();
+        }
+        tCtx.filter = `contrast(${contrastVal})`;
+        tCtx.drawImage(imgObj, box.x, box.y, box.w, box.h, 0, 0, 850, 540);
+        tCtx.restore();
+
+        if (strokePx > 0) {
+          tCtx.lineWidth = strokePx * 4; tCtx.strokeStyle = "#000000"; tCtx.strokeRect(0, 0, 850, 540);
+        }
+        return tempCanvas.toDataURL("image/jpeg", 0.98);
+      }
+
+      var frontDataUrl = getCleanPvcBase64DataUrl(pvcFrontImageObj, pvcFrontCropBox);
+      var backDataUrl = getCleanPvcBase64DataUrl(pvcBackImageObj, pvcBackCropBox);
+      var alignMode = document.getElementById("pvcAlignmentMode").value;
+
+      var printDiv = document.getElementById('printArea');
+      
+      // Strict standard alignment dimension sizes rules (8.5cm x 5.4cm CR80 ISO rule standards specification)
+      var cardStyle = "width: 8.5cm; height: 5.4cm; object-fit: contain; margin: 4px; display: inline-block; box-sizing: border-box; page-break-inside: avoid;";
+      
+      var html = `<style>
+        @media print {
+          @page { size: A4 portrait; margin: 0; }
+          body { background: #fff; margin: 0; padding: 0; }
+          #mainApp { display: none !important; }
+          #printArea { display: block !important; background: #fff; width: 100%; height: 100%; }
+          .page-break-pvc { page-break-after: always; }
+        }
+      </style>`;
+
+      if (alignMode === 'side') {
+        // Agal-Bagal Horizontal Flex alignment setup loop rules configurations profile mapping matrix
+        html += `<div style="display: flex; flex-direction: row; flex-wrap: wrap; justify-content: center; align-items: center; padding: 40px; gap: 15px; width: 210mm; background: #fff;">`;
+        if(frontDataUrl) html += `<img src="${frontDataUrl}" style="${cardStyle}">`;
+        if(backDataUrl) html += `<img src="${backDataUrl}" style="${cardStyle}">`;
+        html += `</div>`;
+      } else if (alignMode === 'stack') {
+        // Uper-Neeche Vertical Block layout mappings
+        html += `<div style="display: flex; flex-direction: column; justify-content: flex-start; align-items: center; padding: 40px; gap: 20px; width: 210mm; background: #fff;">`;
+        if(frontDataUrl) html += `<img src="${frontDataUrl}" style="${cardStyle}">`;
+        if(backDataUrl) html += `<img src="${backDataUrl}" style="${cardStyle}">`;
+        html += `</div>`;
+      } else if (alignMode === 'duplex') {
+        // Front Page 1 par, Back Page 2 par duplex split loop rule layouts execution sequence
+        html += `<div style="width: 210mm; padding: 40px; text-align: center; background: #fff;" class="page-break-pvc">`;
+        if(frontDataUrl) html += `<img src="${frontDataUrl}" style="${cardStyle}">`;
+        html += `</div>`;
+        html += `<div style="width: 210mm; padding: 40px; text-align: center; background: #fff;">`;
+        if(backDataUrl) html += `<img src="${backDataUrl}" style="${cardStyle}">`;
+        html += `</div>`;
+      }
+
+      printDiv.innerHTML = html;
+      printDiv.classList.remove('d-none');
+      
+      setTimeout(function() {
+        window.print();
+        printDiv.classList.add('d-none');
+      }, 350);
+    }
+
+    // Registry hooks initializer calls linkups bounds startup trackers
+    setTimeout(function() {
+      setupPvcCropperEventListeners("pvcFrontCanvas", "front");
+      setupPvcCropperEventListeners("pvcBackCanvas", "back");
+    }, 800);
+  </script>
+</body>
+</html>
