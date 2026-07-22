@@ -856,9 +856,11 @@
       
       // Container khali karke strictly 1 hi row add karega
       var container = document.getElementById("invoiceItemsContainer");
-      if (container) container.innerHTML = "";
-      itemRowCounter = 0;
-      addInvoiceItemRow();
+      if (container) {
+        container.innerHTML = "";
+        itemRowCounter = 0;
+        addInvoiceItemRow();
+      }
     }
 
     window.addEventListener('DOMContentLoaded', function() {
