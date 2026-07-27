@@ -367,10 +367,20 @@
     }
 
     @media print {
-      @page { size: A4; margin: 0; }
-      body { background: #fff !important; }
-      .app-mobile-frame, .app-bottom-nav, .fab-btn, .app-header { display: none !important; }
-      #printArea { display: block !important; position: absolute; left: 0; top: 0; width: 100%; height: 100%; z-index: 999999; background: #fff !important; }
+      @page { size: A4 portrait; margin: 5mm; }
+      body { background: #ffffff !important; color: #000000 !important; }
+      .app-mobile-frame, .app-bottom-nav, .fab-btn, .app-header, #addNewStockFormCard, .modal { display: none !important; }
+      #pdfPrintArea { 
+        display: block !important; 
+        position: absolute !important; 
+        left: 0 !important; 
+        top: 0 !important; 
+        width: 100% !important; 
+        max-width: 100% !important; 
+        margin: 0 !important; 
+        padding: 10px !important; 
+        box-sizing: border-box !important; 
+      }
     }
   </style>
 </head>
@@ -724,9 +734,40 @@
 
         <!-- 3. STOCK DETAILS TAB -->
         <div class="tab-pane" id="stock-sec">
-          <div class="d-flex align-items-center mb-2">
+          <div class="d-flex align-items-center justify-content-between mb-2">
             <button class="btn app-back-btn py-1 px-3 fw-bold" onclick="openAppSection('dashboard-home-sec')" style="font-size: 11px;">⬅️ Dashboard</button>
+            <button type="button" class="btn btn-sm btn-success fw-bold py-1 px-3" style="font-size: 11px; border-radius: 10px;" onclick="toggleAddStockForm()">➕ नया आइटम जोड़ें</button>
           </div>
+
+          <!-- Naya Item Add Karne Ka Form -->
+          <div id="addNewStockFormCard" class="card p-3 mb-3 border-0 shadow-sm bg-light d-none">
+            <h6 class="fw-bold text-primary mb-2" style="font-size: 12px;">📦 नया सामान/स्टॉक जोड़ें</h6>
+            <div class="row g-2">
+              <div class="col-12">
+                <input type="text" id="newStockName" class="form-control form-control-sm" placeholder="सामान का नाम (Item Name)">
+              </div>
+              <div class="col-6">
+                <input type="number" id="newStockTotalQty" class="form-control form-control-sm" placeholder="कुल मात्रा (Total Qty)">
+              </div>
+              <div class="col-6">
+                <input type="number" id="newStockRestQty" class="form-control form-control-sm" placeholder="बचा स्टॉक (Rest Qty)">
+              </div>
+              <div class="col-6">
+                <input type="number" id="newStockActPrice" class="form-control form-control-sm" placeholder="खरीद रेट (Act. ₹)">
+              </div>
+              <div class="col-6">
+                <input type="number" id="newStockSellPrice" class="form-control form-control-sm" placeholder="बिक्री रेट (Sell ₹)">
+              </div>
+              <div class="col-12">
+                <input type="text" id="newStockDetails" class="form-control form-control-sm" placeholder="विवरण / ब्रांड (Details)">
+              </div>
+              <div class="col-12 d-flex gap-2 mt-2">
+                <button type="button" class="btn btn-sm btn-primary w-50 fw-bold" onclick="saveNewStockItem()">💾 Save Item</button>
+                <button type="button" class="btn btn-sm btn-secondary w-50 fw-bold" onclick="toggleAddStockForm()">❌ Cancel</button>
+              </div>
+            </div>
+          </div>
+
           <div class="card p-3 shadow-sm border-0">
             <h6 class="fw-bold mb-2 text-dark">📦 Shop Stock & Material Details</h6>
             <div class="mb-2 position-relative">
@@ -744,13 +785,14 @@
               <table class="table table-sm table-bordered table-striped align-middle mb-0" style="font-size: 8.5px; width: 100%; table-layout: fixed;">
                 <thead class="table-dark sticky-top">
                   <tr>
-                    <th style="width: 22%; padding: 4px 2px;">ITEM</th>
-                    <th class="text-center" style="width: 10%; padding: 4px 1px;">TOT</th>
-                    <th class="text-center" style="width: 10%; padding: 4px 1px;">SELL</th>
-                    <th class="text-center" style="width: 10%; padding: 4px 1px;">REST</th>
-                    <th class="text-end" style="width: 12%; padding: 4px 1px;">ACT.₹</th>
-                    <th class="text-end" style="width: 12%; padding: 4px 1px;">SELL.₹</th>
-                    <th style="width: 14%; padding: 4px 2px;">DETAILS</th>
+                    <th class="text-center" style="width: 10%; padding: 4px 1px;">IMG</th>
+                    <th style="width: 20%; padding: 4px 2px;">ITEM</th>
+                    <th class="text-center" style="width: 9%; padding: 4px 1px;">TOT</th>
+                    <th class="text-center" style="width: 9%; padding: 4px 1px;">SELL</th>
+                    <th class="text-center" style="width: 9%; padding: 4px 1px;">REST</th>
+                    <th class="text-end" style="width: 11%; padding: 4px 1px;">ACT.₹</th>
+                    <th class="text-end" style="width: 11%; padding: 4px 1px;">SELL.₹</th>
+                    <th style="width: 11%; padding: 4px 2px;">DETAILS</th>
                     <th class="text-center" style="width: 10%; padding: 4px 1px;">ACT</th>
                   </tr>
                 </thead>
@@ -878,7 +920,7 @@
       <!-- Developer Info Footer -->
       <div class="text-center py-2 mt-2 border-top">
         <small class="text-muted d-block fw-bold" style="font-size: 10px;">Developed By :- Anurag Shakya</small>
-        <small class="text-secondary d-block fw-bold" style="font-size: 9px;">Version:-2.0.1</small>
+        <small class="text-secondary d-block fw-bold" style="font-size: 9px;">Version:-2.0.2</small>
         <a href="tel:9761414105" class="text-decoration-none fw-bold text-primary" style="font-size: 10px;">📞 9761414105</a>
       </div>
     </div>
@@ -960,7 +1002,18 @@ function fixDriveImageUrl(url) {
     return url;
 }
 
-    function renderTxnHistoryTable() {
+    // XSS सुरक्षित करने के लिए टेक्स्ट एस्केप helper
+function escapeHtml(text) {
+  if (!text) return '-';
+  return String(text)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+function renderTxnHistoryTable() {
     var tbody = document.getElementById("txnHistoryTableBody");
     if(!tbody) return;
     if(globalTxnHistory.length === 0) {
@@ -969,17 +1022,16 @@ function fixDriveImageUrl(url) {
     }
     var html = "";
     globalTxnHistory.forEach(function(row, idx) {
-      // Direct Drive Link Fix Applied Here
       var userImg = fixDriveImageUrl(row.receiverPhoto);
 
       html += '<tr onclick="openTxnDetailsModal(' + idx + ')" style="cursor:pointer;" title="Click for Full Details">' +
         '<td class="text-center" style="padding:2px;"><img src="' + userImg + '" style="width:28px; height:28px; border-radius:50%; object-fit:cover; border:1px solid #cbd5e1;" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/847/847969.png\'"></td>' +
-        '<td>' + (row.date || new Date().toLocaleDateString()) + '</td>' +
-        '<td>' + (row.name || '-') + '</td>' +
-        '<td><span class="badge ' + (row.type==='Deposit'?'bg-success':'bg-danger') + '">' + row.type + '</span></td>' +
-        '<td class="fw-bold">Rs.' + (row.amount || 0) + '</td>' +
-        '<td>' + (row.method || '-') + '</td>' +
-        '<td>' + (row.txnId || '-') + '</td>' +
+        '<td>' + escapeHtml(row.date || new Date().toLocaleDateString()) + '</td>' +
+        '<td>' + escapeHtml(row.name) + '</td>' +
+        '<td><span class="badge ' + (row.type==='Deposit'?'bg-success':'bg-danger') + '">' + escapeHtml(row.type) + '</span></td>' +
+        '<td class="fw-bold">Rs.' + escapeHtml(row.amount || 0) + '</td>' +
+        '<td>' + escapeHtml(row.method) + '</td>' +
+        '<td>' + escapeHtml(row.txnId) + '</td>' +
       '</tr>';
     });
     tbody.innerHTML = html;
@@ -1578,6 +1630,15 @@ function fixDriveImageUrl(url) {
       '</div>';
       
       container.insertAdjacentHTML('beforeend', html);
+      
+      // Newly added inputs event binding for auto calculation
+      var newRow = document.getElementById(uniqueId);
+      if (newRow) {
+        var qtyInp = newRow.querySelector('.inv-prod-qty');
+        var rateInp = newRow.querySelector('.inv-prod-rate');
+        if (qtyInp) qtyInp.addEventListener('input', calcTotal);
+        if (rateInp) rateInp.addEventListener('input', calcTotal);
+      }
       calcTotal();
     }
 
@@ -1656,7 +1717,7 @@ function fixDriveImageUrl(url) {
       var tbody = document.getElementById("stockTableBody");
       if(!tbody) return;
       if(!items || items.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="8" class="text-center py-3 text-muted">कोई सामान नहीं मिला!</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="9" class="text-center py-3 text-muted">कोई सामान नहीं मिला!</td></tr>';
         return;
       }
 
@@ -1669,7 +1730,14 @@ function fixDriveImageUrl(url) {
         var safeName = (row.name || '').replace(/"/g, '&quot;');
         var safePrice = row.sellingPrice || row.price || 0;
 
+        var itemImg = fixDriveImageUrl(row.photoUrl || row.imageUrl || row.img);
+
         html += '<tr class="' + rowClass + '">' +
+          '<td class="text-center position-relative" style="padding:2px;">' +
+            '<img id="stockImg_' + safeName.replace(/[^a-zA-Z0-9]/g, '_') + '" src="' + itemImg + '" style="width:32px; height:32px; border-radius:6px; object-fit:cover; border:1px solid #cbd5e1;" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/1524/1524855.png\'">' +
+            '<!-- Hidden Input for Direct Camera Capture -->' +
+            '<input type="file" id="camInput_' + safeName.replace(/[^a-zA-Z0-9]/g, '_') + '" accept="image/*" capture="environment" class="d-none" onchange="captureAndUploadStockPhoto(this, \'' + safeName + '\')">' +
+          '</td>' +
           '<td class="fw-bold" style="padding:4px 2px; word-break:break-word;">' + (row.name || '') + '</td>' +
           '<td class="text-center" style="padding:4px 1px;">' + (row.totalQty || '-') + '</td>' +
           '<td class="text-center" style="padding:4px 1px;">' + (row.sellQty || '-') + '</td>' +
@@ -1678,12 +1746,58 @@ function fixDriveImageUrl(url) {
           '<td class="text-end text-success fw-bold" style="padding:4px 1px;">' + (row.sellingPrice || row.price || '-') + '</td>' +
           '<td style="padding:4px 2px; word-break:break-word;">' + (row.otherDetails || row.group || '-') + '</td>' +
           '<td class="text-center" style="padding:4px 1px;">' +
-            '<button type="button" class="btn btn-sm btn-outline-primary p-0 fw-bold" style="font-size:8px; width:100%; border-radius:6px;" data-name="' + safeName + '" data-price="' + safePrice + '" onclick="quickBillFromStockBtn(this)">🧾 Bill</button>' +
+            '<div class="d-flex flex-column gap-1">' +
+              '<button type="button" class="btn btn-sm btn-outline-primary p-0 fw-bold" style="font-size:8px; border-radius:4px;" data-name="' + safeName + '" data-price="' + safePrice + '" onclick="quickBillFromStockBtn(this)">🧾 Bill</button>' +
+              '<button type="button" class="btn btn-sm btn-outline-success p-0 fw-bold" style="font-size:8px; border-radius:4px;" onclick="document.getElementById(\'camInput_' + safeName.replace(/[^a-zA-Z0-9]/g, '_') + '\').click()">📷 Photo</button>' +
+            '</div>' +
           '</td>' +
         '</tr>';
       });
       tbody.innerHTML = html;
     }
+    // कैमरे से फोटो खींचकर सीधे अपलोड करने का फ़ंक्शन
+function captureAndUploadStockPhoto(inputEl, itemName) {
+  if (inputEl.files && inputEl.files[0]) {
+    var file = inputEl.files[0];
+    var reader = new FileReader();
+
+    reader.onload = function(e) {
+      var base64Data = e.target.result;
+      var safeId = itemName.replace(/[^a-zA-Z0-9]/g, '_');
+      
+      // तुरंत स्क्रीन पर खींची गई फोटो दिखाएँ
+      var imgEl = document.getElementById('stockImg_' + safeId);
+      if(imgEl) imgEl.src = base64Data;
+
+      // Google Sheet / Drive में अपलोड करें
+      if (typeof google !== 'undefined' && google.script && google.script.run) {
+        google.script.run.withSuccessHandler(function(res) {
+          if (res && res.status === "success") {
+            alert("✅ " + itemName + " की फोटो अपलोड और सेव हो गई है!");
+            fetchStockData(); // रिफ्रेश डेटा
+          } else {
+            alert("❌ अपलोड एरर: " + (res.message || "Unknown Error"));
+          }
+        }).uploadStockPhoto(itemName, base64Data);
+      } else if (SCRIPT_WEB_APP_URL) {
+        // Android APK Mode Fallback
+        fetch(SCRIPT_WEB_APP_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain" },
+          body: JSON.stringify({ action: "uploadStockPhoto", data: { itemName: itemName, base64Photo: base64Data } })
+        })
+        .then(function(r){ return r.json(); })
+        .then(function(res){
+          alert("✅ " + itemName + " की फोटो अपलोड हो गई है!");
+          fetchStockData();
+        })
+        .catch(function(err){ alert("Upload error: " + err); });
+      }
+    };
+
+    reader.readAsDataURL(file);
+  }
+}
 
     function quickBillFromStockBtn(btn) {
       var name = btn.getAttribute('data-name');
@@ -1741,25 +1855,23 @@ function fixDriveImageUrl(url) {
     function filterAnalyticsByDate() { loadAnalyticsData(); }
 
     function exportSummaryCSV() {
-      var csvContent = "data:text/csv;charset=utf-8,Metric,Value\r\nCurrent Month Sales," + document.getElementById("currMonthSales").innerText + "\r\nLast Month Sales," + document.getElementById("lastMonthSales").innerText;
-      var encodedUri = encodeURI(csvContent);
+      // Added UTF-8 BOM (\uFEFF) so Excel handles Indian Currency symbols and Hindi properly
+      var csvContent = "\uFEFFMetric,Value\r\n" +
+        "Current Month Sales," + document.getElementById("currMonthSales").innerText.replace(/,/g, '') + "\r\n" +
+        "Last Month Sales," + document.getElementById("lastMonthSales").innerText.replace(/,/g, '') + "\r\n" +
+        "Total Deposit," + document.getElementById("sumDeposit").innerText.replace(/,/g, '') + "\r\n" +
+        "Total Withdrawal," + document.getElementById("sumWithdraw").innerText.replace(/,/g, '') + "\r\n" +
+        "Invoice Sales," + document.getElementById("sumInvoiceSales").innerText.replace(/,/g, '') + "\r\n" +
+        "Pending Balance," + document.getElementById("sumPendingBalance").innerText.replace(/,/g, '');
+
+      var blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
       var link = document.createElement("a");
-      link.setAttribute("href", encodedUri);
-      link.setAttribute("download", "Summary_Report.csv");
+      var url = URL.createObjectURL(blob);
+      link.setAttribute("href", url);
+      link.setAttribute("download", "Summary_Report_" + new Date().toLocaleDateString().replace(/\//g, '-') + ".csv");
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-    }
-
-    function checkCRM(mobile, nameField, aadhaarField) {
-      if(mobile.length === 10 && typeof google !== 'undefined' && google.script) {
-        google.script.run.withSuccessHandler(function(res) {
-          if(res) {
-            document.getElementById(nameField).value = res.name;
-            if(aadhaarField && res.aadhaar) document.getElementById(aadhaarField).value = res.aadhaar.replace("XXXX-XXXX-","");
-          }
-        }).getCustomerDetails(mobile);
-      }
     }
 
     function scanImage(input) {
@@ -1828,10 +1940,56 @@ function fixDriveImageUrl(url) {
     }
 
     if(sigCanvas) {
-      sigCanvas.onmousedown = function(e) { drawing = true; if (sigCtx) { sigCtx.beginPath(); sigCtx.moveTo(e.offsetX, e.offsetY); } };
-      sigCanvas.onmouseup = function() { drawing = false; };
-      sigCanvas.onmousemove = function(e) { if (drawing && sigCtx) { sigCtx.lineTo(e.offsetX, e.offsetY); sigCtx.stroke(); } };
+  // Helper to get touch/mouse coordinates
+  function getPos(e) {
+    var rect = sigCanvas.getBoundingClientRect();
+    var clientX = e.touches && e.touches.length > 0 ? e.touches[0].clientX : e.clientX;
+    var clientY = e.touches && e.touches.length > 0 ? e.touches[0].clientY : e.clientY;
+    
+    // Canvas scaling and scroll resolution adjustment
+    var scaleX = sigCanvas.width / rect.width;
+    var scaleY = sigCanvas.height / rect.height;
+
+    return { 
+      x: (clientX - rect.left) * scaleX, 
+      y: (clientY - rect.top) * scaleY 
+    };
+  }
+
+  function startDrawing(e) {
+    e.preventDefault();
+    drawing = true;
+    if (sigCtx) {
+      var pos = getPos(e);
+      sigCtx.beginPath();
+      sigCtx.moveTo(pos.x, pos.y);
     }
+  }
+
+  function draw(e) {
+    e.preventDefault();
+    if (drawing && sigCtx) {
+      var pos = getPos(e);
+      sigCtx.lineTo(pos.x, pos.y);
+      sigCtx.stroke();
+    }
+  }
+
+  function stopDrawing(e) {
+    e.preventDefault();
+    drawing = false;
+  }
+
+  // Mouse Events
+  sigCanvas.onmousedown = startDrawing;
+  sigCanvas.onmousemove = draw;
+  sigCanvas.onmouseup = stopDrawing;
+
+  // Touch Events (For Mobile/Android)
+  sigCanvas.addEventListener("touchstart", startDrawing, { passive: false });
+  sigCanvas.addEventListener("touchmove", draw, { passive: false });
+  sigCanvas.addEventListener("touchend", stopDrawing, { passive: false });
+}
 
     function clearSignature() { if(sigCtx && sigCanvas) sigCtx.clearRect(0, 0, sigCanvas.width, sigCanvas.height); }
 
@@ -1903,6 +2061,16 @@ function fixDriveImageUrl(url) {
           alert("Save Error in App Mode: " + err);
         });
       } else {
+        // इंटरनेट बंद होने पर LocalStorage में सेव करें
+        try {
+          var offlineTxns = JSON.parse(localStorage.getItem("offline_txns") || "[]");
+          offlineTxns.push(data);
+          localStorage.setItem("offline_txns", JSON.stringify(offlineTxns));
+          
+          alert("⚠️ इंटरनेट बंद है! ट्रांजैक्शन आपके फ़ोन में ऑफ़लाइन सेव हो गया है। इंटरनेट कनेक्ट होते ही सिंक हो जाएगा।");
+        } catch(e) {
+          console.error("Local storage error:", e);
+        }
         resetTxnUI();
       }
     }
@@ -1929,23 +2097,6 @@ function fixDriveImageUrl(url) {
       
       return { total: total.toFixed(2), paid: paid.toFixed(2), balance: (total - paid).toFixed(2) };
     }
-
-    var globalShopSettings = {
-  upiId: "anuragkumarshakya@ptaxis",
-  acName: "Anurag Kumar Shakya",
-  bankName: "Indian Bank",
-  acNo: "50135796528",
-  ifsc: "IDIB000M568"
-};
-
-// Google Sheet se Settings fetch karne ka function
-function fetchShopSettings() {
-  if (typeof google !== 'undefined' && google.script && google.script.run) {
-    google.script.run.withSuccessHandler(function(res) {
-      if (res) globalShopSettings = res;
-    }).getShopSettings();
-  }
-}
 
 function generateInvoicePDF(data, callback) {
       document.getElementById("pdfClientName").innerText = data.name;
@@ -2020,19 +2171,25 @@ function generateInvoicePDF(data, callback) {
         pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
       };
 
-      if (typeof html2pdf !== 'undefined') {
-        html2pdf().set(opt).from(pdfElement).save().then(function() {
+      // Small Delay (300ms) ताकि QR Code और इमेजेस DOM में ठीक से Render हो सकें
+      setTimeout(function() {
+        if (typeof html2pdf !== 'undefined' && !window.matchMedia('only screen and (max-width: 768px)').matches) {
+          // PC / Laptop Desktop Browser के लिए Direct Download
+          html2pdf().set(opt).from(pdfElement).save().then(function() {
+            pdfElement.style.display = "none";
+            if(callback) callback();
+          }).catch(function(err) {
+            pdfElement.style.display = "none";
+            window.print();
+            if(callback) callback();
+          });
+        } else {
+          // Android APK & Mobile Browsers के लिए Native System Print Dialogue
+          window.print();
           pdfElement.style.display = "none";
           if(callback) callback();
-        }).catch(function(err) {
-          pdfElement.style.display = "none";
-          if(callback) callback();
-        });
-      } else {
-        pdfElement.style.display = "none";
-        alert("⚠️ PDF Library Load Nahi Huyi! Keval Sheet Me Save Ho Raha Hai.");
-        if(callback) callback();
-      }
+        }
+      }, 300); // 300ms Rendering Buffer
     }
 
     function processInvoice(sendWhatsApp) {
@@ -2067,7 +2224,7 @@ function generateInvoicePDF(data, callback) {
         invNo: "INV-" + Math.floor(1000 + Math.random() * 9000) 
       };
 
-      // 1. Mandatory Compulsory Validation Check
+      // 1. Validation Checks
       if (!data.name || !data.mobile) {
         return alert("⚠️ Client Name aur Mobile Number dono bharna compulsory hai!");
       }
@@ -2079,51 +2236,165 @@ function generateInvoicePDF(data, callback) {
       }
 
       var btn = document.getElementById("saveInvBtn");
-      if(btn) { btn.innerText = "Generating PDF & Saving..."; btn.disabled = true; }
+      if(btn) { btn.innerText = "Saving Invoice..."; btn.disabled = true; }
 
-      // 2. Generate PDF First, then Save to Sheet
-      generateInvoicePDF(data, function() {
-        if (typeof google !== 'undefined' && google.script) {
-          google.script.run
-          .withSuccessHandler(function(res) {
-            if(btn) { btn.innerText = "Save & Print"; btn.disabled = false; }
-            alert("Invoice Saved Successfully & PDF Downloaded!");
+      // Helper function: Google Sheet me Data Save karne ke liye
+      function saveToSheetAndFinish() {
+        var resetInvUI = function() {
+          if(btn) { btn.innerText = "Save & Print"; btn.disabled = false; }
+          alert("✅ Invoice Saved Successfully!");
 
-            // Local History Table Auto-Update
-            globalInvoiceHistory.unshift(data);
-            renderInvoiceHistoryTable();
+          globalInvoiceHistory.unshift(data);
+          renderInvoiceHistoryTable();
+          triggerAutoStockDeduct(data.items);
+          fetchTodayLiveSales();
+
+          if(sendWhatsApp) {
+            var msg = "*Maa Ganga Jan Seva Kendra*\n\n📄 *INVOICE NO:* " + data.invNo + "\n👤 *Customer:* " + data.name + "\n💰 *Total:* Rs. " + data.total + "\n✅ *Paid:* Rs. " + data.paid + "\n⚠️ *Balance:* Rs. " + data.balance + "\n\nDhanyawad!";
             
-            // Auto Stock Deduct & Live Sales Refresh
-            triggerAutoStockDeduct(data.items);
-            fetchTodayLiveSales();
-
-            // WhatsApp Trigger Mode
-            if(sendWhatsApp) {
-              var msg = "*Maa Ganga Jan Seva Kendra*\n\n📄 *INVOICE NO:* " + data.invNo + "\n👤 *Customer:* " + data.name + "\n💰 *Total:* Rs. " + data.total + "\n✅ *Paid:* Rs. " + data.paid + "\n⚠️ *Balance:* Rs. " + data.balance + "\n\nDhanyawad!";
+            // Check if running inside Android APK with Native Bridge
+            if (window.AndroidApp && typeof window.AndroidApp.sharePdfToWhatsApp === "function") {
+              generateInvoicePDFBase64(data, function(base64Pdf) {
+                window.AndroidApp.sharePdfToWhatsApp(base64Pdf, data.mobile, msg);
+              });
+            } else {
+              // Browser Fallback (Text + Web Link)
               window.open("https://wa.me/91" + data.mobile + "?text=" + encodeURIComponent(msg), "_blank");
             }
+          }
 
-            clearForm('invoice-sec');
-          })
+          clearForm('invoice-sec');
+        };
+
+        // 1. Web / Apps Script Environment Check
+        if (typeof google !== 'undefined' && google.script && google.script.run) {
+          google.script.run
+          .withSuccessHandler(function(res) { resetInvUI(); })
           .withFailureHandler(function(err) {
             if(btn) { btn.innerText = "Save & Print"; btn.disabled = false; }
             alert("Error saving invoice: " + (err.message || err));
           })
           .saveInvoice(data);
-        } else {
-          if(btn) { btn.innerText = "Save & Print"; btn.disabled = false; }
-          alert("Saved in Local Mode & PDF Downloaded!");
-          globalInvoiceHistory.unshift(data);
-          renderInvoiceHistoryTable();
-          
-          if(sendWhatsApp) {
-            var msg = "*Maa Ganga Jan Seva Kendra*\nInvoice: " + data.invNo + "\nTotal: Rs." + data.total + "\nPaid: Rs." + data.paid + "\nBalance: Rs." + data.balance;
-            window.open("https://wa.me/91" + data.mobile + "?text=" + encodeURIComponent(msg), "_blank");
-          }
-          clearForm('invoice-sec');
+        } 
+        // 2. Android APK REST API Fallback Check
+        else if (SCRIPT_WEB_APP_URL && SCRIPT_WEB_APP_URL.indexOf("http") === 0) {
+          fetch(SCRIPT_WEB_APP_URL, {
+            method: "POST",
+            headers: { "Content-Type": "text/plain" },
+            body: JSON.stringify({ action: "saveInvoice", data: data })
+          })
+          .then(function(r){ return r.json(); })
+          .then(function(res){ resetInvUI(); })
+          .catch(function(err){
+            if(btn) { btn.innerText = "Save & Print"; btn.disabled = false; }
+            alert("Save Error in App Mode: " + err);
+          });
+        } 
+        else {
+          resetInvUI();
         }
-      });
+      }
+
+      // PDF try karega, lekin bina ruke Sheet me Data bheje-ga
+      try {
+        generateInvoicePDF(data, function() {
+          saveToSheetAndFinish();
+        });
+      } catch(e) {
+        console.error("PDF generation failed, saving data directly:", e);
+        saveToSheetAndFinish();
+      }
     }
+    // Add Stock Form Toggle Function
+function toggleAddStockForm() {
+  var formCard = document.getElementById("addNewStockFormCard");
+  if (formCard) {
+    formCard.classList.toggle("d-none");
+  }
+}
+
+// New Stock Item Save Function
+function saveNewStockItem() {
+  var name = document.getElementById("newStockName").value.trim();
+  var totalQty = document.getElementById("newStockTotalQty").value || 0;
+  var restQty = document.getElementById("newStockRestQty").value || totalQty;
+  var actPrice = document.getElementById("newStockActPrice").value || 0;
+  var sellPrice = document.getElementById("newStockSellPrice").value || 0;
+  var details = document.getElementById("newStockDetails").value.trim() || "-";
+
+  if (!name) {
+    return alert("⚠️ कृपया सामान का नाम जरूर लिखें!");
+  }
+
+  var newItemData = {
+    name: name,
+    totalQty: totalQty,
+    sellQty: 0,
+    restQty: restQty,
+    actualPrice: actPrice,
+    sellingPrice: sellPrice,
+    price: sellPrice,
+    otherDetails: details,
+    group: "GENERAL"
+  };
+
+  // 1. App UI Table update
+  globalStockData.unshift(newItemData);
+  renderStockTable(globalStockData);
+
+  // Clear Form
+  document.getElementById("newStockName").value = "";
+  document.getElementById("newStockTotalQty").value = "";
+  document.getElementById("newStockRestQty").value = "";
+  document.getElementById("newStockActPrice").value = "";
+  document.getElementById("newStockSellPrice").value = "";
+  document.getElementById("newStockDetails").value = "";
+  toggleAddStockForm();
+
+  // 2. Google Sheet / Backend Save
+  if (typeof google !== 'undefined' && google.script && google.script.run) {
+    google.script.run.addNewStockToSheet(newItemData);
+    alert("✅ नया आइटम सफलतापूर्वक जुड़ गया है!");
+  } else if (SCRIPT_WEB_APP_URL) {
+    fetch(SCRIPT_WEB_APP_URL, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain" },
+      body: JSON.stringify({ action: "addNewStock", data: newItemData })
+    })
+    .then(function(r){ return r.json(); })
+    .then(function(){ alert("✅ नया आइटम APK मोड में जुड़ गया है!"); })
+    .catch(function(err){ alert("Save Error: " + err); });
+  } else {
+    alert("✅ नया आइटम लोकल मोड में जुड़ गया है!");
+  }
+}
+// Base64 PDF Generator for Android Native WhatsApp Attachment
+function generateInvoicePDFBase64(data, callback) {
+  var pdfElement = document.getElementById("pdfPrintArea");
+  if (!pdfElement) return;
+
+  pdfElement.style.display = "block";
+
+  var opt = {
+    margin:       0,
+    filename:     'Invoice_' + data.invNo + '.pdf',
+    image:        { type: 'jpeg', quality: 0.98 },
+    html2canvas:  { scale: 2, useCORS: true },
+    jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+  };
+
+  if (typeof html2pdf !== 'undefined') {
+    html2pdf().set(opt).from(pdfElement).outputPdf('datauristring').then(function(pdfBase64) {
+      pdfElement.style.display = "none";
+      if (callback) callback(pdfBase64);
+    }).catch(function(err) {
+      pdfElement.style.display = "none";
+      console.error("Base64 PDF Error:", err);
+    });
+  } else {
+    pdfElement.style.display = "none";
+  }
+}
   </script>
 
  <!-- Full Page Fitted Printable Invoice Layout with Round Logo & Sheet Bank Settings -->
@@ -2272,5 +2543,27 @@ function generateInvoicePDF(data, callback) {
     </div>
 
   </div>
+
+  <!-- Offline Sync Handler Tag Fix -->
+  <script>
+    window.addEventListener('online', function() {
+      var offlineTxns = JSON.parse(localStorage.getItem("offline_txns") || "[]");
+      
+      if (offlineTxns.length > 0 && typeof google !== 'undefined' && google.script && google.script.run) {
+        console.log("Syncing offline transactions...");
+        
+        var pendingTxns = [...offlineTxns];
+        pendingTxns.forEach(function(txnData, index) {
+          google.script.run.withSuccessHandler(function() {
+            var currentStorage = JSON.parse(localStorage.getItem("offline_txns") || "[]");
+            currentStorage.shift();
+            localStorage.setItem("offline_txns", JSON.stringify(currentStorage));
+          }).saveTransaction(txnData);
+        });
+        
+        alert("✅ इंटरनेट कनेक्ट हो गया है! आपका ऑफ़लाइन डेटा Google Sheet में बैकअप हो गया है।");
+      }
+    });
+  </script>
 </body>
 </html>
