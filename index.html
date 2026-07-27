@@ -3,6 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<!-- Chrome Mobile Full Screen & Theme Color Fix -->
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0f172a">
   <title>Maa Ganga CSC Dashboard</title>
   
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -15,12 +19,20 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" crossorigin="anonymous"></script>
   
   <style>
+    /* === Signature Canvas Touch Fix (Android App Ke Liye) === */
+    canvas {
+      touch-action: none !important;
+      -ms-touch-action: none;
+    }
+
     :root {
-      --navy-dark: #0b132b;
-      --navy-header: #1c2541;
-      --crimson-accent: #7a0016;
-      --gold-card: #fef3c7;
-      --bg-slate: #f1f5f9;
+      --primary-blue: #2563eb;
+      --navy-header: #0f172a;
+      --accent-emerald: #10b981;
+      --accent-coral: #ef4444;
+      --bg-slate: #f8fafc;
+      --card-border: #e2e8f0;
+      --text-dark: #0f172a;
     }
 
     html, body {
@@ -30,64 +42,111 @@
       margin: 0 !important;
       padding: 0 !important;
       overflow-x: hidden !important;
-      background-color: var(--navy-dark) !important;
+      background-color: #0f172a !important;
       font-family: 'Poppins', sans-serif;
-      color: #1f1f1f;
+      color: var(--text-dark);
       -webkit-tap-highlight-color: transparent;
     }
 
-    /* Desktop View Centering */
+    /* Responsive View: Desktop par Frame aur Mobile par Complete Full Screen */
+    * {
+      box-sizing: border-box !important;
+    }
+
+    html, body {
+      width: 100% !important;
+      max-width: 100% !important;
+      min-height: 100vh !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      overflow-x: hidden !important;
+      background-color: #f8fafc !important; /* ऐप की अपनी बैकग्राउंड थीम */
+    }
+
+    .app-mobile-frame {
+      background-color: #f8fafc;
+      min-height: 100vh !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      padding-bottom: 80px;
+      position: relative;
+      margin: 0 !important;
+      border: none !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+    }
+
+    /* Desktop View Centering (केवल 769px से बड़ी स्क्रीन के लिए) */
     @media (min-width: 769px) {
       body {
         padding: 20px 0 !important;
+        background-color: #0f172a !important; /* डेस्कटॉप में बाहर डार्क ब्लू दिखेगा */
       }
       .app-mobile-frame {
         max-width: 430px !important;
-        width: 100% !important;
         margin: 0 auto !important;
         border-radius: 32px !important;
-        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6), 0 0 0 10px #1c2541 !important;
-        position: relative;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important;
         overflow: hidden !important;
       }
     }
 
     .app-mobile-frame {
       background-color: var(--bg-slate);
-      min-height: 100vh;
-      padding-bottom: 75px;
+      min-height: 100vh !important;
+      width: 100vw !important;
+      max-width: 100vw !important;
+      padding-bottom: 80px;
       position: relative;
+      margin: 0 !important;
+      box-sizing: border-box !important;
     }
 
-    /* Deep Navy Blue Header */
+    /* Desktop View Centering (Keval Computer/Laptop Screen Ke Liye) */
+    @media (min-width: 769px) {
+      body {
+        padding: 20px 0 !important;
+        background-color: #0f172a !important;
+      }
+      .app-mobile-frame {
+        max-width: 430px !important;
+        margin: 0 auto !important;
+        border-radius: 32px !important;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 10px #1e293b !important;
+        overflow: hidden !important;
+      }
+    }
+
+    /* Modern Royal Navy Blue Header */
     .app-header {
-      background: linear-gradient(180deg, #0b132b 0%, #1c2541 100%);
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
       color: #ffffff;
-      padding: 14px 16px;
-      border-bottom-left-radius: 18px;
-      border-bottom-right-radius: 18px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      padding: 16px;
+      border-bottom-left-radius: 20px;
+      border-bottom-right-radius: 20px;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
     }
 
     .header-logo {
-      height: 38px;
-      width: 38px;
+      height: 40px;
+      width: 40px;
       border-radius: 50%;
-      border: 2px solid #fde047;
+      border: 2px solid #38bdf8;
       object-fit: contain;
+      background: #ffffff;
     }
 
     .header-title {
-      color: #fde047;
-      font-weight: 800;
-      font-size: 1.05rem;
-      letter-spacing: 0.5px;
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 1.1rem;
+      letter-spacing: 0.3px;
       margin: 0;
     }
 
     .header-subtitle {
-      color: #cbd5e1;
-      font-size: 0.7rem;
+      color: #94a3b8;
+      font-size: 0.72rem;
       margin: 0;
     }
 
@@ -99,19 +158,20 @@
       transform: translateX(-50%);
       width: 100%;
       max-width: 430px;
-      background: var(--crimson-accent);
+      background: #ffffff;
       display: flex;
       justify-content: space-around;
       align-items: center;
-      padding: 8px 0;
+      padding: 10px 0;
       z-index: 9999;
-      border-top-left-radius: 18px;
-      border-top-right-radius: 18px;
-      box-shadow: 0 -4px 20px rgba(0,0,0,0.25);
+      border-top-left-radius: 20px;
+      border-top-right-radius: 20px;
+      box-shadow: 0 -10px 25px -5px rgba(0, 0, 0, 0.08);
+      border-top: 1px solid #f1f5f9;
     }
 
     .nav-btn {
-      color: rgba(255, 255, 255, 0.65);
+      color: #64748b;
       text-decoration: none;
       display: flex;
       flex-direction: column;
@@ -121,161 +181,168 @@
       border: none;
       background: transparent;
       width: 20%;
+      transition: all 0.2s ease;
     }
 
     .nav-btn.active {
-      color: #ffffff !important;
-      font-weight: 800;
+      color: var(--primary-blue) !important;
+      font-weight: 700;
     }
 
     .nav-btn .nav-icon {
-      font-size: 18px;
+      font-size: 20px;
       line-height: 1.2;
     }
 
-    /* Profile Welcome Banner */
+    /* User Welcome Card */
     .user-welcome-card {
-      background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-      border: 1px solid #f59e0b;
-      border-radius: 16px;
-      padding: 12px;
-      color: #78350f;
+      background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+      border: 1px solid #bfdbfe;
+      border-radius: 18px;
+      padding: 14px;
+      color: #1e40af;
     }
 
-    /* Crimson Action Button */
+    /* Modern Clean Action Buttons */
     .action-card-red {
-      background: linear-gradient(135deg, #7a0016 0%, #991b1b 100%);
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
       color: #ffffff !important;
-      border-radius: 14px;
-      padding: 12px 6px;
+      border-radius: 16px;
+      padding: 14px 6px;
       text-align: center;
-      box-shadow: 0 4px 12px rgba(122, 0, 22, 0.25);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
       cursor: pointer;
+      transition: transform 0.15s ease;
     }
 
     .action-card-gold {
       background: #ffffff;
-      border: 1.5px solid #f59e0b;
-      border-radius: 14px;
-      padding: 12px 6px;
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 14px 6px;
       text-align: center;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.03);
       cursor: pointer;
+      transition: transform 0.15s ease;
     }
 
-    /* Cards & Form Styles */
+    .action-card-red:active, .action-card-gold:active {
+      transform: scale(0.97);
+    }
+
+    /* Modern Cards & Form Styles */
     .card {
-      border-radius: 18px !important;
-      border: none !important;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.05) !important;
+      border-radius: 20px !important;
+      border: 1px solid var(--card-border) !important;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03), 0 2px 4px -1px rgba(0, 0, 0, 0.02) !important;
       background: #ffffff !important;
       padding: 16px !important;
-      margin-bottom: 12px !important;
+      margin-bottom: 14px !important;
     }
 
     .form-control, .form-select {
       border-radius: 12px !important;
-      border: 1.5px solid #cbd5e1 !important;
+      border: 1px solid #cbd5e1 !important;
       background-color: #f8fafc !important;
-      padding: 10px 12px !important;
+      padding: 10px 14px !important;
       font-size: 0.88rem !important;
       font-weight: 500;
     }
 
     .form-control:focus, .form-select:focus {
       background-color: #ffffff !important;
-      border-color: #0b57d0 !important;
-      box-shadow: 0 0 0 3px rgba(11, 87, 208, 0.15) !important;
+      border-color: var(--primary-blue) !important;
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12) !important;
     }
 
     .fab-btn {
       position: fixed;
-      bottom: 80px;
+      bottom: 82px;
       right: 20px;
       width: 54px;
       height: 54px;
       border-radius: 18px !important;
-      background: linear-gradient(135deg, #0b57d0, #0056b3);
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
       color: white;
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 22px;
-      box-shadow: 0 6px 16px rgba(11, 87, 208, 0.35);
+      box-shadow: 0 8px 20px rgba(37, 99, 235, 0.35);
       border: none;
       z-index: 999;
     }
 
-    /* Native App Bar Top Back Button */
+    /* Back Button */
     .app-back-btn {
-      border-radius: 14px !important;
+      border-radius: 12px !important;
       background: #ffffff !important;
-      color: #0f172a !important;
+      color: #334155 !important;
       border: 1px solid #cbd5e1 !important;
-      font-weight: 700 !important;
+      font-weight: 600 !important;
       padding: 8px 14px !important;
-      font-size: 0.85rem !important;
+      font-size: 0.82rem !important;
     }
 
     .tab-pane { display: none !important; }
     .tab-pane.active { display: block !important; animation: fadeIn 0.25s ease forwards; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* Clean White Invoice Input Fields Styling */
+    /* Clean Input Fields */
     .inv-dark-input {
       background-color: #ffffff !important;
-      color: #000000 !important;
-      border: 1.5px solid #cbd5e1 !important;
+      color: #0f172a !important;
+      border: 1px solid #cbd5e1 !important;
       border-radius: 12px !important;
       padding: 10px 14px !important;
-      font-weight: 600 !important;
+      font-weight: 500 !important;
     }
     .inv-dark-input::placeholder {
-      color: #64748b !important;
-      font-weight: 400 !important;
+      color: #94a3b8 !important;
     }
     .inv-dark-input:focus {
       background-color: #ffffff !important;
-      color: #000000 !important;
-      border-color: #0b57d0 !important;
-      box-shadow: 0 0 0 3px rgba(11, 87, 208, 0.15) !important;
-    }
-    .inv-item-card {
-      border: 1.5px dashed #2563eb !important;
-      background: #f8fafc !important;
-      border-radius: 16px !important;
-      padding: 14px !important;
+      border-color: var(--primary-blue) !important;
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12) !important;
     }
     .btn-navy-add {
-      background-color: #161b3d !important;
-      color: #d4af37 !important;
-      border: 1px solid #d4af37 !important;
+      background-color: #eff6ff !important;
+      color: var(--primary-blue) !important;
+      border: 1px solid #bfdbfe !important;
       border-radius: 10px !important;
       font-size: 11px !important;
-      padding: 5px 12px !important;
+      padding: 6px 12px !important;
     }
     .btn-gold-grad {
-      background: linear-gradient(135deg, #d4af37 0%, #fef08a 50%, #b8860b 100%) !important;
-      color: #0f172a !important;
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+      color: #ffffff !important;
       border: none !important;
-      font-weight: 800 !important;
-      box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3) !important;
+      font-weight: 600 !important;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25) !important;
     }
     .btn-navy-wa {
-      background-color: #161b3d !important;
+      background-color: #10b981 !important;
       color: #ffffff !important;
-      border: 1px solid #283063 !important;
-      font-weight: 700 !important;
+      border: none !important;
+      font-weight: 600 !important;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25) !important;
     }
     .inv-grand-total {
-      color: #c59b27 !important;
+      color: var(--primary-blue) !important;
       font-weight: 800 !important;
       font-size: 1.15rem !important;
     }
-    .item-row { background: #f8fafc; border: 1.5px dashed #2563eb; padding: 12px; border-radius: 14px; margin-bottom: 12px; position: relative; }
+    .item-row { 
+      background: #f8fafc; 
+      border: 1px dashed #93c5fd; 
+      padding: 12px; 
+      border-radius: 14px; 
+      margin-bottom: 12px; 
+      position: relative; 
+    }
     .remove-item-btn { position: absolute; top: -8px; right: 8px; padding: 2px 10px; font-size: 10px; border-radius: 20px; }
 
-    /* Modal Screen Responsive Mobile Fit Fix */
+    /* Modal Screen Fit */
     #detailsModal .modal-dialog {
       max-width: 380px !important;
       width: 92% !important;
@@ -287,7 +354,7 @@
       height: 70px;
       border-radius: 50%;
       object-fit: cover;
-      border: 2px solid #0b57d0;
+      border: 2px solid var(--primary-blue);
     }
 
     .modal-doc-img {
@@ -352,24 +419,35 @@
             </div>
           </div>
 
-          <!-- Top Quick Actions Grid -->
+          <!-- Live Low Stock Alert Banner -->
+          <div id="homeLowStockAlert" class="alert alert-danger py-2 px-3 small fw-bold mb-3 d-none shadow-sm" style="border-radius: 12px; font-size: 11px;">
+            ⚠️ <span id="homeLowStockText">3 आइटम्स का स्टॉक खत्म होने वाला है!</span>
+          </div>
+
+          <!-- Top Quick Actions Grid (4 Cards Included) -->
           <div class="row g-2 mb-3">
-            <div class="col-4">
+            <div class="col-3">
               <div class="action-card-red" onclick="openAppSection('transaction-sec')">
-                <span class="fs-3 d-block mb-1">💸</span>
-                <strong class="d-block small text-white" style="font-size:11px;">New Txn</strong>
+                <span class="fs-4 d-block mb-1">💸</span>
+                <strong class="d-block small text-white" style="font-size:10px;">New Txn</strong>
               </div>
             </div>
-            <div class="col-4">
-              <div class="action-card-gold" onclick="openAppSection('stock-sec'); fetchStockData();">
-                <span class="fs-3 d-block mb-1">📦</span>
-                <strong class="d-block small text-dark" style="font-size:11px;">View Stock</strong>
-              </div>
-            </div>
-            <div class="col-4">
+            <div class="col-3">
               <div class="action-card-gold" onclick="openAppSection('invoice-sec')">
-                <span class="fs-3 d-block mb-1">🧾</span>
-                <strong class="d-block small text-dark" style="font-size:11px;">Invoices</strong>
+                <span class="fs-4 d-block mb-1">🧾</span>
+                <strong class="d-block small text-dark" style="font-size:10px;">Invoice</strong>
+              </div>
+            </div>
+            <div class="col-3">
+              <div class="action-card-gold" onclick="openAppSection('doc-receive-sec')">
+                <span class="fs-4 d-block mb-1">📁</span>
+                <strong class="d-block small text-dark" style="font-size:10px;">Doc Entry</strong>
+              </div>
+            </div>
+            <div class="col-3">
+              <div class="action-card-gold" onclick="openAppSection('stock-sec'); fetchStockData();">
+                <span class="fs-4 d-block mb-1">📦</span>
+                <strong class="d-block small text-dark" style="font-size:10px;">Stock</strong>
               </div>
             </div>
           </div>
@@ -395,7 +473,7 @@
               <div class="p-2 border rounded-3 bg-white text-center shadow-sm">
                 <span class="fs-4">💵</span>
                 <small class="d-block text-muted" style="font-size:10px;">Today's Total</small>
-                <strong class="text-success fs-6">₹0</strong>
+                <strong class="text-success fs-6" id="statTodayTotal">₹0.00</strong>
               </div>
             </div>
           </div>
@@ -561,7 +639,24 @@
                 <textarea id="invAddress" class="form-control inv-dark-input" placeholder="Client Address" rows="1"></textarea>
               </div>
               
-              <div class="col-12 mt-3 d-flex justify-content-between align-items-center">
+              <!-- Udhar Khata Alert Bar -->
+              <div id="udharKhataAlert" class="col-12 d-none">
+                <div class="alert alert-warning py-1 px-2 small fw-bold mb-1 d-flex justify-content-between align-items-center" style="font-size:11px; border-radius:10px;">
+                  <span>⚠️ पुराना उधार पेंडिंग: <strong class="text-danger" id="udharAmount">₹0.00</strong></span>
+                  <button type="button" class="btn btn-sm btn-outline-danger p-0 px-2 fw-bold" style="font-size:9px;" onclick="sendUdharWhatsAppReminder()">📲 रिमाइंडर भेजें</button>
+                </div>
+              </div>
+
+              <!-- GST / Estimate Toggle Switch -->
+              <div class="col-12 d-flex justify-content-between align-items-center bg-light p-2 rounded-3 border">
+                <span class="small fw-bold text-dark"> बिल प्रकार (Bill Type):</span>
+                <div class="form-check form-switch m-0">
+                  <input class="form-check-input" type="checkbox" id="gstToggle" onchange="toggleGstMode(this)">
+                  <label class="form-check-label small fw-bold text-primary" for="gstToggle" id="gstToggleLabel">एस्टिमेट / कच्चा बिल</label>
+                </div>
+              </div>
+
+              <div class="col-12 mt-2 d-flex justify-content-between align-items-center">
                 <h6 class="text-primary fw-bold m-0" style="font-size:0.95rem;">Item Details</h6>
                 <button type="button" class="btn btn-navy-add fw-bold" onclick="addInvoiceItemRow()">+ Add Item</button>
               </div>
@@ -675,9 +770,16 @@
             <div class="row g-2">
               <div class="col-12"><label class="small fw-bold">Customer Name</label><input type="text" id="docCustName" class="form-control form-control-sm" placeholder="Name"></div>
               <div class="col-12"><label class="small fw-bold">Mobile No.</label><input type="tel" id="docCustMobile" class="form-control form-control-sm" placeholder="Enter 10 digits" maxlength="10"></div>
-              <div class="col-12"><label class="small fw-bold">Document Type</label>
+              <div class="col-6"><label class="small fw-bold">Document Type</label>
                 <select id="docType" class="form-select form-select-sm">
-                  <option>PAN Card</option><option>Passport</option><option>Driving License</option><option>Voter ID</option><option>Other Document</option>
+                  <option>PAN Card</option><option>आय प्रमाण पत्र</option><option>निवास प्रमाण पत्र</option><option>जाति प्रमाण पत्र</option><option>Driving License</option><option>Voter ID</option><option>Other Document</option>
+                </select>
+              </div>
+              <div class="col-6"><label class="small fw-bold">Status (स्थिति)</label>
+                <select id="docStatus" class="form-select form-select-sm fw-bold text-primary">
+                  <option value="Pending">⏳ Pending (प्रक्रिया में)</option>
+                  <option value="Ready">✅ Ready (बन गया है)</option>
+                  <option value="Delivered">📦 Delivered (दे दिया)</option>
                 </select>
               </div>
               <div class="col-12"><label class="small fw-bold">Service Charge (Rs.)</label><input type="number" id="docCharge" class="form-control form-control-sm" placeholder="0"></div>
@@ -713,6 +815,40 @@
           </div>
         </div>
 
+        <!-- 4.5 UDHAR KHATA / HISAB KITAB TAB -->
+        <div class="tab-pane" id="udhar-khata-sec">
+          <div class="d-flex align-items-center mb-2">
+            <button class="btn app-back-btn py-1 px-3 fw-bold" onclick="openAppSection('dashboard-home-sec')" style="font-size: 11px;">⬅️ Dashboard</button>
+          </div>
+
+          <div class="card p-3 shadow-sm border-0">
+            <h6 class="fw-bold mb-3 text-dark border-bottom pb-2 d-flex align-items-center gap-2">
+              <span>📖</span> ग्राहकों का उधार खाता (Ledger)
+            </h6>
+
+            <!-- Search Box -->
+            <div class="mb-3">
+              <input type="text" id="udharSearchInput" class="form-control form-control-sm fw-bold" placeholder="🔍 नाम या मोबाइल नंबर से खोजें..." oninput="filterUdharKhataTable()">
+            </div>
+
+            <div class="table-responsive" style="max-height: 350px; overflow-y: auto;">
+              <table class="table table-sm table-bordered table-striped align-middle mb-0" style="font-size: 11px;">
+                <thead class="table-dark sticky-top">
+                  <tr>
+                    <th>नाम (Customer)</th>
+                    <th>मोबाइल</th>
+                    <th>बाकी (Pending)</th>
+                    <th>एक्शन (Action)</th>
+                  </tr>
+                </thead>
+                <tbody id="udharKhataTableBody">
+                  <tr><td colspan="4" class="text-center text-muted py-3">कोई उधार एंट्री नहीं मिली।</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
         <!-- 5. ANALYTICS & SUMMARY TAB -->
         <div class="tab-pane" id="analytics-sec">
           <button class="btn app-back-btn mb-2 w-100" onclick="openAppSection('dashboard-home-sec')">⬅️ Back To Dashboard</button>
@@ -742,6 +878,7 @@
       <!-- Developer Info Footer -->
       <div class="text-center py-2 mt-2 border-top">
         <small class="text-muted d-block fw-bold" style="font-size: 10px;">Developed By :- Anurag Shakya</small>
+        <small class="text-secondary d-block fw-bold" style="font-size: 9px;">Version:-2.0.1</small>
         <a href="tel:9761414105" class="text-decoration-none fw-bold text-primary" style="font-size: 10px;">📞 9761414105</a>
       </div>
     </div>
@@ -778,6 +915,10 @@
         <span class="nav-icon">🧾</span>
         <span>Inv.</span>
       </button>
+      <button class="nav-btn" onclick="openAppSection('udhar-khata-sec'); loadUdharKhataData();">
+        <span class="nav-icon">📖</span>
+        <span>खाता</span>
+      </button>
       <button class="nav-btn" onclick="openAppSection('stock-sec'); fetchStockData();">
         <span class="nav-icon">📦</span>
         <span>Stock</span>
@@ -796,7 +937,6 @@
   <script>
     // Deploy kiye gaye Web App ka URL yahan dalein (REST API fallback ke liye)
     var SCRIPT_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbz3MmpHGXWBQqwIoFnoII_SZStUaq1q-zp_hPgRJSd3Q4kP-hevbJntDpfS1yKYzs4T/exec";
-
     var currentLocation = "N/A";
     var slipImageBase64 = null;
     var receiverImageBase64 = null;
@@ -808,32 +948,42 @@
     var globalInvoiceHistory = [];
     var globalDocHistory = [];
     var rawAnalyticsData = { transactions: [], invoices: [] };
+    // Google Drive URL ko Direct Image View URL mein convert karne ka helper
+function fixDriveImageUrl(url) {
+    if (!url || url.length < 10) return "https://cdn-icons-png.flaticon.com/512/847/847969.png";
+    if (url.indexOf("data:image") === 0) return url;
+    
+    var match = url.match(/[-\w]{25,}/);
+    if (match && match[0]) {
+        return "https://lh3.googleusercontent.com/d/" + match[0];
+    }
+    return url;
+}
 
     function renderTxnHistoryTable() {
-      var tbody = document.getElementById("txnHistoryTableBody");
-      if(!tbody) return;
-      if(globalTxnHistory.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">Koi transaction entry nahi mili.</td></tr>';
-        return;
-      }
-      var html = "";
-      globalTxnHistory.forEach(function(row, idx) {
-        var userImg = (row.receiverPhoto && row.receiverPhoto.length > 20) 
-          ? row.receiverPhoto 
-          : "https://cdn-icons-png.flaticon.com/512/847/847969.png";
-
-        html += '<tr onclick="openTxnDetailsModal(' + idx + ')" style="cursor:pointer;" title="Click for Full Details">' +
-          '<td class="text-center" style="padding:2px;"><img src="' + userImg + '" style="width:28px; height:28px; border-radius:50%; object-fit:cover; border:1px solid #cbd5e1;"></td>' +
-          '<td>' + (row.date || new Date().toLocaleDateString()) + '</td>' +
-          '<td>' + (row.name || '-') + '</td>' +
-          '<td><span class="badge ' + (row.type==='Deposit'?'bg-success':'bg-danger') + '">' + row.type + '</span></td>' +
-          '<td class="fw-bold">Rs.' + (row.amount || 0) + '</td>' +
-          '<td>' + (row.method || '-') + '</td>' +
-          '<td>' + (row.txnId || '-') + '</td>' +
-        '</tr>';
-      });
-      tbody.innerHTML = html;
+    var tbody = document.getElementById("txnHistoryTableBody");
+    if(!tbody) return;
+    if(globalTxnHistory.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">Koi transaction entry nahi mili.</td></tr>';
+      return;
     }
+    var html = "";
+    globalTxnHistory.forEach(function(row, idx) {
+      // Direct Drive Link Fix Applied Here
+      var userImg = fixDriveImageUrl(row.receiverPhoto);
+
+      html += '<tr onclick="openTxnDetailsModal(' + idx + ')" style="cursor:pointer;" title="Click for Full Details">' +
+        '<td class="text-center" style="padding:2px;"><img src="' + userImg + '" style="width:28px; height:28px; border-radius:50%; object-fit:cover; border:1px solid #cbd5e1;" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/847/847969.png\'"></td>' +
+        '<td>' + (row.date || new Date().toLocaleDateString()) + '</td>' +
+        '<td>' + (row.name || '-') + '</td>' +
+        '<td><span class="badge ' + (row.type==='Deposit'?'bg-success':'bg-danger') + '">' + row.type + '</span></td>' +
+        '<td class="fw-bold">Rs.' + (row.amount || 0) + '</td>' +
+        '<td>' + (row.method || '-') + '</td>' +
+        '<td>' + (row.txnId || '-') + '</td>' +
+      '</tr>';
+    });
+    tbody.innerHTML = html;
+}
 
     function renderInvoiceHistoryTable() {
       var tbody = document.getElementById("invoiceHistoryTableBody");
@@ -915,33 +1065,40 @@
       if (backdrop) backdrop.remove();
     }
 
-    // 1. Transaction Full Details Pop-Up (Photo, Slip & Signature Included)
     function openTxnDetailsModal(index) {
-      var item = globalTxnHistory[index];
-      if(!item) return;
+    var item = globalTxnHistory[index];
+    if(!item) return;
 
-      var profileImgSrc = item.receiverPhoto && item.receiverPhoto.length > 20 ? item.receiverPhoto : 'https://cdn-icons-png.flaticon.com/512/847/847969.png';
-      var slipHtml = item.slipPhoto && item.slipPhoto.length > 20 ? '<img src="' + item.slipPhoto + '" class="modal-doc-img mt-1">' : '<small class="text-muted d-block mt-1">Not Uploaded</small>';
-      var sigHtml = item.signature && item.signature.length > 20 ? '<img src="' + item.signature + '" class="modal-doc-img mt-1">' : '<small class="text-muted d-block mt-1">No Signature</small>';
+    var profileImgSrc = fixDriveImageUrl(item.receiverPhoto);
+    var slipImgSrc = fixDriveImageUrl(item.slipPhoto);
+    var sigImgSrc = fixDriveImageUrl(item.signature);
 
-      var html = '<div class="text-center mb-3">' +
-        '<img src="' + profileImgSrc + '" class="modal-profile-img mb-1">' +
-        '<h6 class="fw-bold text-dark m-0">' + (item.name || 'Customer Name') + '</h6>' +
-        '<small class="text-muted">' + (item.date || '-') + '</small>' +
+    var slipHtml = (item.slipPhoto && item.slipPhoto.length > 20) 
+      ? '<img src="' + slipImgSrc + '" class="modal-doc-img mt-1" onerror="this.alt=\'Image Load Error\'">' 
+      : '<small class="text-muted d-block mt-1">Not Uploaded</small>';
+
+    var sigHtml = (item.signature && item.signature.length > 20) 
+      ? '<img src="' + sigImgSrc + '" class="modal-doc-img mt-1" style="background:#fff;" onerror="this.alt=\'No Signature\'">' 
+      : '<small class="text-muted d-block mt-1">No Signature</small>';
+
+    var html = '<div class="text-center mb-3">' +
+      '<img src="' + profileImgSrc + '" class="modal-profile-img mb-1" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/847/847969.png\'">' +
+      '<h6 class="fw-bold text-dark m-0">' + (item.name || 'Customer Name') + '</h6>' +
+      '<small class="text-muted">' + (item.date || '-') + '</small>' +
+    '</div>' +
+    '<div class="card p-2 border-0 bg-white shadow-sm" style="font-size:12px;">' +
+      '<div class="d-flex justify-content-between border-bottom pb-1 mb-2"><span class="text-muted">Transaction Type:</span><span class="badge ' + (item.type==='Deposit'?'bg-success':'bg-danger') + '">' + item.type + '</span></div>' +
+      '<div class="d-flex justify-content-between border-bottom pb-1 mb-2"><span class="text-muted">Amount:</span><strong class="text-primary fs-6">Rs. ' + (item.amount || 0) + '</strong></div>' +
+      '<div class="d-flex justify-content-between border-bottom pb-1 mb-2"><span class="text-muted">Gateway / Method:</span><strong>' + (item.gateway || '-') + ' (' + (item.method || '-') + ')</strong></div>' +
+      '<div class="d-flex justify-content-between border-bottom pb-1 mb-2"><span class="text-muted">Txn / UTR ID:</span><strong class="text-success">' + (item.txnId || '-') + '</strong></div>' +
+      '<div class="row text-center mt-2">' +
+        '<div class="col-6 border-end"><strong>📄 Transaction Slip</strong><br>' + slipHtml + '</div>' +
+        '<div class="col-6"><strong>✍️ Customer Signature</strong><br>' + sigHtml + '</div>' +
       '</div>' +
-      '<div class="card p-2 border-0 bg-white shadow-sm" style="font-size:12px;">' +
-        '<div class="d-flex justify-content-between border-bottom pb-1 mb-2"><span class="text-muted">Transaction Type:</span><span class="badge ' + (item.type==='Deposit'?'bg-success':'bg-danger') + '">' + item.type + '</span></div>' +
-        '<div class="d-flex justify-content-between border-bottom pb-1 mb-2"><span class="text-muted">Amount:</span><strong class="text-primary fs-6">Rs. ' + (item.amount || 0) + '</strong></div>' +
-        '<div class="d-flex justify-content-between border-bottom pb-1 mb-2"><span class="text-muted">Gateway / Method:</span><strong>' + (item.gateway || '-') + ' (' + (item.method || '-') + ')</strong></div>' +
-        '<div class="d-flex justify-content-between border-bottom pb-1 mb-2"><span class="text-muted">Txn / UTR ID:</span><strong class="text-success">' + (item.txnId || '-') + '</strong></div>' +
-        '<div class="row text-center mt-2">' +
-          '<div class="col-6 border-end"><strong>📄 Transaction Slip</strong>' + slipHtml + '</div>' +
-          '<div class="col-6"><strong>✍️ Customer Signature</strong>' + sigHtml + '</div>' +
-        '</div>' +
-      '</div>';
-      
-      showModalPopup("💸 Transaction Details", html);
-    }
+    '</div>';
+    
+    showModalPopup("💸 Transaction Details", html);
+}
 
     // 2. Invoice Full Details Pop-Up (Full Sheet Fields Display)
     function openInvoiceDetailsModal(index) {
@@ -1152,18 +1309,205 @@
       }
     }
 
+    var globalShopSettings = {
+      upiId: "anuragkumarshakya@ptaxis",
+      acName: "Anurag Kumar Shakya",
+      bankName: "Indian Bank",
+      acNo: "50135796528",
+      ifsc: "IDIB000M568"
+    };
+
+    // Google Sheet se Settings fetch karne ka function
+    function fetchShopSettings() {
+      if (typeof google !== 'undefined' && google.script && google.script.run) {
+        google.script.run.withSuccessHandler(function(res) {
+          if (res) globalShopSettings = res;
+        }).getShopSettings();
+      }
+    }
+
     function initApp() {
       if (isAppInitialized) return;
       isAppInitialized = true;
       startDashboardClock();
+      fetchShopSettings();
       fetchStockData();
-      fetchAllHistoryFromSheet(); // Google Sheet se pichli entries auto-load karega
+      fetchAllHistoryFromSheet();
+      fetchTodayLiveSales(); // Live Today's Counter Trigger
       
       var container = document.getElementById("invoiceItemsContainer");
       if (container) {
         container.innerHTML = "";
         itemRowCounter = 0;
         addInvoiceItemRow();
+      }
+    }
+    // --- UDHAR KHATA / HISAB KITAB LOGIC ---
+    function loadUdharKhataData() {
+      var tbody = document.getElementById("udharKhataTableBody");
+      if (!tbody) return;
+
+      var pendingList = globalInvoiceHistory.filter(function(inv) {
+        return parseFloat(inv.balance) > 0;
+      });
+
+      if (pendingList.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-3">🎉 किसी का कोई बकाया नहीं है!</td></tr>';
+        return;
+      }
+
+      var html = "";
+      pendingList.forEach(function(inv, idx) {
+        var safeName = (inv.name || 'Customer').replace(/'/g, "\\'");
+        html += '<tr>' +
+          '<td class="fw-bold text-dark">' + (inv.name || '-') + '</td>' +
+          '<td>' + (inv.mobile || '-') + '</td>' +
+          '<td class="fw-bold text-danger">₹' + inv.balance + '</td>' +
+          '<td class="text-center">' +
+            '<button type="button" class="btn btn-sm btn-success py-0 px-2 fw-bold" style="font-size:10px;" onclick="sendDirectWhatsAppReminder(\'' + inv.mobile + '\', \'' + safeName + '\', \'' + inv.balance + '\')">📲 रिमाइंडर</button>' +
+          '</td>' +
+        '</tr>';
+      });
+      tbody.innerHTML = html;
+    }
+
+    function filterUdharKhataTable() {
+      var q = document.getElementById("udharSearchInput").value.toLowerCase();
+      var tbody = document.getElementById("udharKhataTableBody");
+      if(!tbody) return;
+
+      var filtered = globalInvoiceHistory.filter(function(inv) {
+        return parseFloat(inv.balance) > 0 && 
+               ((inv.name || '').toLowerCase().indexOf(q) !== -1 || (inv.mobile || '').indexOf(q) !== -1);
+      });
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-2">कोई मैचिंग उधार नहीं मिला।</td></tr>';
+        return;
+      }
+
+      var html = "";
+      filtered.forEach(function(inv) {
+        var safeName = (inv.name || 'Customer').replace(/'/g, "\\'");
+        html += '<tr>' +
+          '<td class="fw-bold text-dark">' + (inv.name || '-') + '</td>' +
+          '<td>' + (inv.mobile || '-') + '</td>' +
+          '<td class="fw-bold text-danger">₹' + inv.balance + '</td>' +
+          '<td class="text-center">' +
+            '<button type="button" class="btn btn-sm btn-success py-0 px-2 fw-bold" style="font-size:10px;" onclick="sendDirectWhatsAppReminder(\'' + inv.mobile + '\', \'' + safeName + '\', \'' + inv.balance + '\')">📲 रिमाइंडर</button>' +
+          '</td>' +
+        '</tr>';
+      });
+      tbody.innerHTML = html;
+    }
+
+    function sendDirectWhatsAppReminder(mobile, name, balance) {
+      if(!mobile || mobile.length !== 10) return alert("⚠️ वैध मोबाइल नंबर नहीं है!");
+      
+      var upi = (typeof globalShopSettings !== 'undefined' && globalShopSettings.upiId) ? globalShopSettings.upiId : "anuragkumarshakya@ptaxis";
+      var payeeName = "Maa Ganga Jan Seva Kendra";
+      
+      // Raw UPI Intent String
+      var upiIntent = "upi://pay?pa=" + encodeURIComponent(upi) +
+                      "&pn=" + encodeURIComponent(payeeName) +
+                      "&am=" + encodeURIComponent(balance) +
+                      "&cu=INR";
+
+      // 100% Clickable Web QR Code Link for WhatsApp
+      var qrCodeLink = "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=" + encodeURIComponent(upiIntent);
+
+      var msg = "*🚩 माँ गंगा जन सेवा केंद्र व इलेक्ट्रॉनिक्स बरनाहल मैनपुरी रोड , कैरावली 🚩*\n" +
+                "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" +
+                "नमस्कार *" + name + " जी*,\n\n" +
+                "आपका कुल बकाया भुगतान (Pending Balance): *₹" + balance + "* है।\n\n" +
+                "📲 *भुगतान (Payment) करने के लिए नियम:*\n" +
+                "1️⃣ *UPI Link (PhonePe/GPay/Paytm):*\n" +
+                upiIntent + "\n\n" +
+                "2️⃣ *QR कोड डाउनलोड/देखकर स्कैन करें:*\n" +
+                qrCodeLink + "\n\n" +
+                "💳 *UPI ID:* `" + upi + "`\n" +
+                "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" +
+                "👤 *Pro:* अनुराग शाक्य (Anurag Shakya)\n" +
+                "📞 *संपर्क/WhatsApp:* 9761414105\n" +
+                "📍 *स्थान:* बरनाहल मैनपुरी रोड , कैरावली\n\n" +
+                "धन्यवाद! 🙏";
+
+      window.open("https://wa.me/91" + mobile + "?text=" + encodeURIComponent(msg), "_blank");
+    }
+
+    // 1. Live Today's Counter Fetch
+    function fetchTodayLiveSales() {
+      if (typeof google !== 'undefined' && google.script && google.script.run) {
+        google.script.run.withSuccessHandler(function(res) {
+          if (res && res.todayTotal) {
+            var el = document.getElementById("statTodayTotal");
+            if (el) el.innerText = "₹" + res.todayTotal;
+          }
+        }).getTodaySalesTotal();
+      }
+    }
+
+    // 2. GST / Estimate Switch Toggle Function
+    function toggleGstMode(chk) {
+      var label = document.getElementById("gstToggleLabel");
+      var taxInput = document.getElementById("invTax");
+      if (chk.checked) {
+        label.innerText = "GST बिल (18% Tax)";
+        label.className = "form-check-label small fw-bold text-success";
+        if (taxInput) taxInput.value = 18;
+      } else {
+        label.innerText = "एस्टिमेट / कच्चा बिल";
+        label.className = "form-check-label small fw-bold text-primary";
+        if (taxInput) taxInput.value = 0;
+      }
+      calcTotal();
+    }
+
+    // 3. Customer Udhar Khata Auto Check on Mobile Input
+    function checkCRM(mobile, nameField, aadhaarField) {
+      if(mobile.length === 10) {
+        // CRM Details Check
+        if(typeof google !== 'undefined' && google.script) {
+          google.script.run.withSuccessHandler(function(res) {
+            if(res) {
+              if(nameField && document.getElementById(nameField)) document.getElementById(nameField).value = res.name;
+              if(aadhaarField && res.aadhaar && document.getElementById(aadhaarField)) document.getElementById(aadhaarField).value = res.aadhaar.replace("XXXX-XXXX-","");
+            }
+          }).getCustomerDetails(mobile);
+
+          // Udhar Khata Pending Balance Check
+          google.script.run.withSuccessHandler(function(res) {
+            var alertBox = document.getElementById("udharKhataAlert");
+            var amtEl = document.getElementById("udharAmount");
+            if (res && parseFloat(res.pendingBalance) > 0) {
+              if(amtEl) amtEl.innerText = "₹" + res.pendingBalance;
+              if(alertBox) alertBox.classList.remove("d-none");
+            } else {
+              if(alertBox) alertBox.classList.add("d-none");
+            }
+          }).getCustomerPendingBalance(mobile);
+        }
+      }
+    }
+
+    // WhatsApp Udhar Reminder
+    function sendUdharWhatsAppReminder() {
+      var mob = document.getElementById("invMobile").value;
+      var name = document.getElementById("invName").value || "Customer";
+      var amt = document.getElementById("udharAmount").innerText;
+      
+      if (!mob || mob.length !== 10) return alert("⚠️ Valid Mobile Number daalein!");
+      
+      var msg = "*Maa Ganga Jan Seva Kendra*\n\nNamaskar " + name + " ji,\nAapka pichla *" + amt + "* balance pending hai. Kripya samay par bhugtan karein.\n\nUPI: " + (globalShopSettings.upiId || "") + "\nDhanyawad!";
+      window.open("https://wa.me/91" + mob + "?text=" + encodeURIComponent(msg), "_blank");
+    }
+
+    // 4. Auto Stock Deduct Call on Invoice Save
+    function triggerAutoStockDeduct(items) {
+      if (items && items.length > 0 && typeof google !== 'undefined' && google.script) {
+        items.forEach(function(item) {
+          google.script.run.updateStockQuantity(item.desc, item.qty);
+        });
       }
     }
 
@@ -1586,16 +1930,68 @@
       return { total: total.toFixed(2), paid: paid.toFixed(2), balance: (total - paid).toFixed(2) };
     }
 
-    // PDF Generate & Auto-Download Helper Function
-    function generateInvoicePDF(data, callback) {
+    var globalShopSettings = {
+  upiId: "anuragkumarshakya@ptaxis",
+  acName: "Anurag Kumar Shakya",
+  bankName: "Indian Bank",
+  acNo: "50135796528",
+  ifsc: "IDIB000M568"
+};
+
+// Google Sheet se Settings fetch karne ka function
+function fetchShopSettings() {
+  if (typeof google !== 'undefined' && google.script && google.script.run) {
+    google.script.run.withSuccessHandler(function(res) {
+      if (res) globalShopSettings = res;
+    }).getShopSettings();
+  }
+}
+
+function generateInvoicePDF(data, callback) {
       document.getElementById("pdfClientName").innerText = data.name;
       document.getElementById("pdfClientMobile").innerText = data.mobile;
       document.getElementById("pdfClientAddr").innerText = data.address || "N/A";
       document.getElementById("pdfInvNo").innerText = data.invNo;
-      document.getElementById("pdfInvDate").innerText = new Date().toLocaleDateString();
+      document.getElementById("pdfInvDate").innerText = new Date().toLocaleDateString('en-IN');
       document.getElementById("pdfTotal").innerText = data.total;
       document.getElementById("pdfPaid").innerText = data.paid;
       document.getElementById("pdfBalance").innerText = data.balance;
+      
+      // Update Bank Details from Settings Sheet
+      if(document.getElementById("pdfBankName")) document.getElementById("pdfBankName").innerText = globalShopSettings.bankName;
+      if(document.getElementById("pdfAcName")) document.getElementById("pdfAcName").innerText = globalShopSettings.acName;
+      if(document.getElementById("pdfAcNo")) document.getElementById("pdfAcNo").innerText = globalShopSettings.acNo;
+      if(document.getElementById("pdfIfsc")) document.getElementById("pdfIfsc").innerText = globalShopSettings.ifsc;
+
+      var grandTotalEl = document.getElementById("displayTotalSummary");
+      if (grandTotalEl) grandTotalEl.innerText = data.total;
+
+      // --- DYNAMIC PAYMENT QR CODE GENERATOR ---
+      var qrContainer = document.getElementById("pdfQrContainer");
+      if (qrContainer) {
+        qrContainer.innerHTML = "";
+        
+        var payAmount = parseFloat(data.balance) > 0 ? data.balance : data.total;
+        var upiId = globalShopSettings.upiId || "anuragkumarshakya@ptaxis"; 
+        var payeeName = globalShopSettings.acName || "Maa Ganga Jan Seva Kendra";
+        
+        var upiUrl = "upi://pay?pa=" + encodeURIComponent(upiId) +
+                     "&pn=" + encodeURIComponent(payeeName) +
+                     "&am=" + encodeURIComponent(payAmount) +
+                     "&cu=INR" +
+                     "&tn=" + encodeURIComponent("Invoice " + data.invNo);
+
+        if (typeof QRCode !== 'undefined') {
+          new QRCode(qrContainer, {
+            text: upiUrl,
+            width: 75,
+            height: 75,
+            colorDark : "#0b132b",
+            colorLight : "#ffffff",
+            correctLevel : QRCode.CorrectLevel.M
+          });
+        }
+      }
 
       var tableBody = document.getElementById("pdfTableBody");
       tableBody.innerHTML = "";
@@ -1603,11 +1999,11 @@
         data.items.forEach(function(item, idx) {
           var amt = (parseFloat(item.qty || 1) * parseFloat(item.rate || 0)).toFixed(2);
           tableBody.innerHTML += '<tr>' +
-            '<td style="text-align:center;">' + (idx + 1) + '</td>' +
-            '<td>' + item.desc + '</td>' +
-            '<td style="text-align:center;">' + item.qty + '</td>' +
-            '<td style="text-align:right;">' + item.rate + '</td>' +
-            '<td style="text-align:right;">' + amt + '</td>' +
+            '<td style="padding: 5px; text-align:center; border: 1px solid #cbd5e1;">' + (idx + 1) + '</td>' +
+            '<td style="padding: 5px; border: 1px solid #cbd5e1;">' + item.desc + '</td>' +
+            '<td style="padding: 5px; text-align:center; border: 1px solid #cbd5e1;">' + item.qty + '</td>' +
+            '<td style="padding: 5px; text-align:right; border: 1px solid #cbd5e1;">' + item.rate + '</td>' +
+            '<td style="padding: 5px; text-align:right; border: 1px solid #cbd5e1;">' + amt + '</td>' +
           '</tr>';
         });
       }
@@ -1616,11 +2012,12 @@
       pdfElement.style.display = "block";
 
       var opt = {
-        margin:       0.5,
+        margin:       0,
         filename:     'Invoice_' + data.invNo + '_' + data.name + '.pdf',
         image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2 },
-        jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+        html2canvas:  { scale: 2, useCORS: true, scrollY: 0 },
+        jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' },
+        pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
       };
 
       if (typeof html2pdf !== 'undefined') {
@@ -1695,6 +2092,10 @@
             // Local History Table Auto-Update
             globalInvoiceHistory.unshift(data);
             renderInvoiceHistoryTable();
+            
+            // Auto Stock Deduct & Live Sales Refresh
+            triggerAutoStockDeduct(data.items);
+            fetchTodayLiveSales();
 
             // WhatsApp Trigger Mode
             if(sendWhatsApp) {
@@ -1725,51 +2126,151 @@
     }
   </script>
 
-  <!-- Hidden Printable Invoice Area for PDF Generation -->
-  <div id="pdfPrintArea" style="display: none; padding: 20px; font-family: Arial, sans-serif; background: #fff; color: #000;">
-    <div style="text-align: center; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 15px;">
-      <h2 style="margin: 0; color: #161b3d;">माँ गंगा जन सेवा केंद्र</h2>
-      <p style="margin: 2px 0; font-size: 12px;">Digital Seva & Electronics Center</p>
-      <small style="font-size: 10px;">Mobile: 9761414105 | Location: Main Market</small>
-    </div>
+ <!-- Full Page Fitted Printable Invoice Layout with Round Logo & Sheet Bank Settings -->
+  <div id="pdfPrintArea" style="display: none; padding: 25px 30px; font-family: 'Poppins', Arial, sans-serif; background: #ffffff; color: #000000; box-sizing: border-box; width: 100%; max-width: 800px; margin: 0 auto; page-break-inside: avoid;">
     
-    <div style="display: flex; justify-content: space-between; margin-bottom: 15px; font-size: 12px;">
-      <div>
-        <strong>Invoice To:</strong><br>
-        <span id="pdfClientName">-</span><br>
-        Mobile: <span id="pdfClientMobile">-</span><br>
-        Address: <span id="pdfClientAddr">-</span>
+    <!-- Top Navy Accent Bar -->
+    <div style="background: #0b132b; height: 10px; margin: -25px -30px 15px -30px;"></div>
+
+    <!-- Header Section with Round Logo -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <!-- ROUND LOGO -->
+        <img src="https://lh3.googleusercontent.com/d/1AVhGGj41J973HK0KgI1im5JJwJZsKhJR" alt="Logo" style="width: 55px; height: 55px; border-radius: 50%; border: 2px solid #0b132b; object-fit: cover;">
+        <div>
+          <h2 style="margin: 0; color: #0b132b; font-weight: 800; font-size: 16px; text-transform: uppercase;">Maa Ganga Jan Seva Kendra & Electronic Center</h2>
+          <div style="font-size: 11px; color: #222; margin-top: 3px; line-height: 1.3;">
+            <strong>Pro:</strong> Anurag Shakya | <strong>Mo. No.:</strong> 9761414105<br>
+            <strong>Email Us:</strong> maagangjansevakendra@zohomail.in
+          </div>
+        </div>
       </div>
       <div style="text-align: right;">
-        <strong>Invoice No:</strong> <span id="pdfInvNo">-</span><br>
-        <strong>Date:</strong> <span id="pdfInvDate">-</span>
+        <h1 style="margin: 0; color: #0b132b; font-size: 22px; font-weight: 800; letter-spacing: 0.5px;">INVOICE</h1>
+        <div style="font-size: 11px; margin-top: 3px; line-height: 1.3;">
+          <strong>Invoice No:</strong> <span id="pdfInvNo">INV-0000</span><br>
+          <strong>Date:</strong> <span id="pdfInvDate">00/00/0000</span>
+        </div>
       </div>
     </div>
 
-    <table style="width: 100%; border-collapse: collapse; margin-bottom: 15px; font-size: 11px;" border="1" cellpadding="6">
-      <thead style="background-color: #f2f2f2;">
+    <hr style="border: none; border-top: 2px solid #0b132b; margin: 8px 0 14px 0;">
+
+    <!-- Customer Details Section -->
+    <div style="margin-bottom: 14px; font-size: 12px;">
+      <h4 style="margin: 0 0 4px 0; color: #0b132b; font-weight: 700; font-size: 12px; text-transform: uppercase;">CUSTOMER DETAILS</h4>
+      <div style="line-height: 1.4; color: #111;">
+        <strong>To:</strong> <span id="pdfClientName">-</span><br>
+        <span id="pdfClientAddr">-</span><br>
+        <strong>Contact:</strong> <span id="pdfClientMobile">-</span>
+      </div>
+    </div>
+
+    <!-- Dynamic Items Table -->
+    <table style="width: 100%; border-collapse: collapse; margin-bottom: 12px; font-size: 11.5px; border: 1.5px solid #0b132b;">
+      <thead style="background-color: #0b132b; color: #ffffff;">
         <tr>
-          <th style="text-align: center;">S.No</th>
-          <th>Item / Service Description</th>
-          <th style="text-align: center;">Qty</th>
-          <th style="text-align: right;">Rate (₹)</th>
-          <th style="text-align: right;">Amount (₹)</th>
+          <th style="padding: 7px; text-align: center; width: 8%; border: 1px solid #0b132b;">S.No.</th>
+          <th style="padding: 7px; text-align: left; border: 1px solid #0b132b;">Description of Goods/Services</th>
+          <th style="padding: 7px; text-align: center; width: 10%; border: 1px solid #0b132b;">Qty</th>
+          <th style="padding: 7px; text-align: right; width: 18%; border: 1px solid #0b132b;">Unit Price (₹)</th>
+          <th style="padding: 7px; text-align: right; width: 20%; border: 1px solid #0b132b;">Amount (₹)</th>
         </tr>
       </thead>
-      <tbody id="pdfTableBody"></tbody>
+      <tbody id="pdfTableBody" style="text-align: left; color: #111;">
+        <!-- Dynamic rows inserted via JS -->
+      </tbody>
     </table>
 
-    <div style="display: flex; justify-content: space-between; font-size: 12px; border-top: 1px solid #ddd; padding-top: 10px;">
-      <div>
-        <strong>Payment Status:</strong> Paid / Recorded<br>
-        <small style="color: #666;">Thank you for your business!</small>
+    <!-- Totals Box -->
+    <div style="display: flex; justify-content: flex-end; margin-bottom: 14px;">
+      <table style="width: 48%; border-collapse: collapse; font-size: 11.5px; border: 1px solid #cbd5e1;">
+        <tr>
+          <td style="padding: 5px 8px; font-weight: 600; background-color: #f8fafc; border: 1px solid #cbd5e1;">Sub-Total</td>
+          <td style="padding: 5px 8px; text-align: right; font-weight: 700; border: 1px solid #cbd5e1;">₹<span id="pdfTotal">0.00</span></td>
+        </tr>
+        <tr>
+          <td style="padding: 5px 8px; font-weight: 600; background-color: #f8fafc; color: #16a34a; border: 1px solid #cbd5e1;">Paid Amount</td>
+          <td style="padding: 5px 8px; text-align: right; font-weight: 700; color: #16a34a; border: 1px solid #cbd5e1;">₹<span id="pdfPaid">0.00</span></td>
+        </tr>
+        <tr>
+          <td style="padding: 5px 8px; font-weight: 600; background-color: #f8fafc; color: #dc2626; border: 1px solid #cbd5e1;">Balance Due</td>
+          <td style="padding: 5px 8px; text-align: right; font-weight: 700; color: #dc2626; border: 1px solid #cbd5e1;">₹<span id="pdfBalance">0.00</span></td>
+        </tr>
+        <tr style="background-color: #0b132b; color: #ffffff;">
+          <td style="padding: 6px 8px; font-weight: 800; font-size: 12px;">GRAND TOTAL</td>
+          <td style="padding: 6px 8px; text-align: right; font-weight: 800; font-size: 12px;">₹<span id="displayTotalSummary">0.00</span></td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- SECTION 1: Online Services Badges -->
+    <div style="background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 8px; padding: 8px 12px; margin-bottom: 12px;">
+      <div style="text-align: center; font-size: 11px; font-weight: 800; color: #0b132b; margin-bottom: 6px; text-transform: uppercase;">
+        🌟 हमारी प्रमुख ऑनलाइन व जन सेवा केंद्र की सेवाएँ 🌟
       </div>
-      <div style="text-align: right; width: 200px;">
-        <div>Total: <strong>₹<span id="pdfTotal">0</span></strong></div>
-        <div>Paid Amount: <strong style="color: green;">₹<span id="pdfPaid">0</span></strong></div>
-        <div>Balance Due: <strong style="color: red;">₹<span id="pdfBalance">0</span></strong></div>
+      <div style="display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; font-size: 9.5px; font-weight: 700;">
+        <span style="background: #dbeafe; color: #1e40af; border: 1px solid #93c5fd; padding: 3px 8px; border-radius: 8px;">📄 आय प्रमाण पत्र</span>
+        <span style="background: #dcfce7; color: #166534; border: 1px solid #86efac; padding: 3px 8px; border-radius: 8px;">🏡 निवास प्रमाण पत्र</span>
+        <span style="background: #fef3c7; color: #92400e; border: 1px solid #fde047; padding: 3px 8px; border-radius: 8px;">📑 जाति प्रमाण पत्र</span>
+        <span style="background: #fce7f3; color: #9d174d; border: 1px solid #fbcfe8; padding: 3px 8px; border-radius: 8px;">💳 पैन कार्ड (PAN)</span>
+        <span style="background: #e0e7ff; color: #3730a3; border: 1px solid #c7d2fe; padding: 3px 8px; border-radius: 8px;">🗳️ वोटर ID कार्ड</span>
+        <span style="background: #ccfbf1; color: #115e59; border: 1px solid #99f6e4; padding: 3px 8px; border-radius: 8px;">🆔 आधार कार्ड प्रिंट</span>
+        <span style="background: #ffedd5; color: #9a3412; border: 1px solid #fed7aa; padding: 3px 8px; border-radius: 8px;">📝 सभी ऑनलाइन फॉर्म</span>
+        <span style="background: #f1f5f9; color: #334155; border: 1px solid #cbd5e1; padding: 3px 8px; border-radius: 8px;">💸 मनी ट्रांसफर</span>
       </div>
     </div>
+
+    <!-- SECTION 2: SPECIAL NOTES BOX -->
+    <div style="background: #fffbebf8; border: 1.5px dashed #d97706; border-radius: 8px; padding: 10px 12px; margin-bottom: 16px; font-size: 10px; color: #78350f;">
+      <div style="font-weight: 800; font-size: 11px; color: #b45309; border-bottom: 1px solid #fcd34d; padding-bottom: 3px; margin-bottom: 6px; text-transform: uppercase; text-align: center;">
+        ⚡ विशेष सूचना एवं रिपेयरिंग/बिक्री सेवाएँ ⚡
+      </div>
+      <div style="line-height: 1.5;">
+        <div style="margin-bottom: 5px;">
+          📌 <strong>नोट 1 (इलेक्ट्रॉनिक्स व वाइंडिंग):</strong> हमारे यहाँ सभी प्रकार के <strong>पंखे (Fan) एवं कूलर की मोटर की बाइंडिंग (Motor Winding)</strong> तसल्लीबख्श की जाती है। साथ ही सभी इलेक्ट्रॉनिक उपकरण जैसे—<em>पंखे, किट, LED बल्ब, केबल, बोर्ड, स्विच</em> इत्यादि उचित दामों पर उपलब्ध हैं।
+        </div>
+        <div>
+          📌 <strong>नोट 2 (मोबाइल व एक्सेसरीज़):</strong> हमारे यहाँ <strong>कीपैड मोबाइल (Keypad Phones)</strong> एवं मोबाइल से संबंधित सभी प्रकार की ओरिजिनल एक्सेसरीज़ जैसे—<em>इयरबड्स (Earbuds), इयरफोन, पावरबैंक, चार्जर, हेडफोन, टेम्पर्ड ग्लास, कवर</em> इत्यादि भी उपलब्ध हैं।
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Section: Dynamic Bank Info + Dynamic QR Code + Signature -->
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; font-size: 10px; page-break-inside: avoid; margin-top: 10px;">
+      
+      <!-- DYNAMIC BANK DETAILS FROM SHEET -->
+      <div style="width: 42%;">
+        <h5 style="margin: 0 0 3px 0; font-weight: 700; font-size: 10px; text-transform: uppercase; color: #0b132b;">PAYMENT INFORMATION</h5>
+        <div style="line-height: 1.3;">
+          <strong>Bank Details:</strong> <span id="pdfBankName">Indian Bank</span><br>
+          <strong>A/c Holder:</strong> <span id="pdfAcName">Anurag Kumar Shakya</span><br>
+          <strong>A/c No:</strong> <span id="pdfAcNo">50135796528</span><br>
+          <strong>IFSC:</strong> <span id="pdfIfsc">IDIB000M568</span>
+        </div>
+
+        <h5 style="margin: 8px 0 3px 0; font-weight: 700; font-size: 10px; text-transform: uppercase; color: #0b132b;">Terms & Conditions</h5>
+        <ul style="margin: 0; padding-left: 12px; line-height: 1.3; color: #475569;">
+          <li>Goods once sold are not returnable.</li>
+          <li>Please verify goods before leaving.</li>
+        </ul>
+      </div>
+
+      <!-- DYNAMIC DEDICATED QR CODE BOX -->
+      <div style="width: 28%; text-align: center; background: #fafafa; border: 1px dashed #0b132b; border-radius: 8px; padding: 6px;">
+        <div style="font-size: 8.5px; font-weight: 800; color: #0b132b; margin-bottom: 4px;">SCAN & PAY VIA UPI</div>
+        <div id="pdfQrContainer" style="display: flex; justify-content: center; align-items: center; margin: 0 auto;"></div>
+        <div style="font-size: 8px; color: #64748b; margin-top: 4px; font-weight: 600;">PhonePe / GPay / Paytm</div>
+      </div>
+
+      <!-- Authorized Signature Area -->
+      <div style="text-align: center; width: 25%;">
+        <div style="border-bottom: 1.5px solid #0b132b; width: 100%; margin-bottom: 6px;"></div>
+        <strong style="font-size: 10px; color: #0b132b;">Authorized Signature</strong>
+      </div>
+
+    </div>
+
   </div>
 </body>
 </html>
