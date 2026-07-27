@@ -221,17 +221,24 @@
     .tab-pane.active { display: block !important; animation: fadeIn 0.25s ease forwards; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* Screenshot Matching Invoice Dark Navy & Gold Custom Styling */
+    /* Clean White Invoice Input Fields Styling */
     .inv-dark-input {
-      background-color: #161b3d !important;
-      color: #ffffff !important;
-      border: 1px solid #283063 !important;
+      background-color: #ffffff !important;
+      color: #000000 !important;
+      border: 1.5px solid #cbd5e1 !important;
       border-radius: 12px !important;
       padding: 10px 14px !important;
       font-weight: 600 !important;
     }
     .inv-dark-input::placeholder {
-      color: #6b77a1 !important;
+      color: #64748b !important;
+      font-weight: 400 !important;
+    }
+    .inv-dark-input:focus {
+      background-color: #ffffff !important;
+      color: #000000 !important;
+      border-color: #0b57d0 !important;
+      box-shadow: 0 0 0 3px rgba(11, 87, 208, 0.15) !important;
     }
     .inv-item-card {
       border: 1.5px dashed #2563eb !important;
@@ -602,14 +609,14 @@
             </div>
             <div class="table-responsive" style="max-height: 250px; overflow-y: auto;">
               <table class="table table-sm table-bordered align-middle mb-0" style="font-size: 10px;">
-                <thead style="background-color: #161b3d; color: #ffffff;">
+                <thead class="table-dark">
                   <tr>
-                    <th style="background-color: #161b3d; color: #ffffff;">Inv No</th>
-                    <th style="background-color: #161b3d; color: #ffffff;">Client Name</th>
-                    <th style="background-color: #161b3d; color: #ffffff;">Mobile</th>
-                    <th style="background-color: #161b3d; color: #ffffff;">Total</th>
-                    <th style="background-color: #161b3d; color: #ffffff;">Paid</th>
-                    <th style="background-color: #161b3d; color: #ffffff;">Balance</th>
+                    <th>Inv No</th>
+                    <th>Client Name</th>
+                    <th>Mobile</th>
+                    <th>Total</th>
+                    <th>Paid</th>
+                    <th>Balance</th>
                   </tr>
                 </thead>
                 <tbody id="invoiceHistoryTableBody">
@@ -788,7 +795,7 @@
 
   <script>
     // Deploy kiye gaye Web App ka URL yahan dalein (REST API fallback ke liye)
-    var SCRIPT_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzUS4kGQc0vTn7OUj80D5U4iSG2RXLWjWY2joOwYgQtOB3wYOo6sdlX1VVUobtgaL7A/exec";
+    var SCRIPT_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbz3MmpHGXWBQqwIoFnoII_SZStUaq1q-zp_hPgRJSd3Q4kP-hevbJntDpfS1yKYzs4T/exec";
 
     var currentLocation = "N/A";
     var slipImageBase64 = null;
