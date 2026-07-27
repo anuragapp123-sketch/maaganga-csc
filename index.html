@@ -787,6 +787,9 @@
   </div>
 
   <script>
+    // Deploy kiye gaye Web App ka URL yahan dalein (REST API fallback ke liye)
+    var SCRIPT_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzUS4kGQc0vTn7OUj80D5U4iSG2RXLWjWY2joOwYgQtOB3wYOo6sdlX1VVUobtgaL7A/exec";
+
     var currentLocation = "N/A";
     var slipImageBase64 = null;
     var receiverImageBase64 = null;
@@ -1113,39 +1116,32 @@
     }
 
     function fetchAllHistoryFromSheet() {
-      if (typeof google !== 'undefined' && google.script) {
-        // 1. Transaction History Fetch (JSON Parse)
+      if (typeof google !== 'undefined' && google.script && google.script.run) {
         google.script.run.withSuccessHandler(function(jsonString) {
           try {
-            var data = JSON.parse(jsonString || "[]");
-            if (data && data.length > 0) {
-              globalTxnHistory = data;
-              renderTxnHistoryTable();
-            }
-          } catch(e) { console.log("Txn parse error", e); }
+            var data = typeof jsonString === 'string' ? JSON.parse(jsonString || "[]") : jsonString;
+            if (data && data.length > 0) { globalTxnHistory = data; renderTxnHistoryTable(); }
+          } catch(e) {}
         }).getTxnHistory();
 
-        // 2. Invoice History Fetch (JSON Parse)
         google.script.run.withSuccessHandler(function(jsonString) {
           try {
-            var data = JSON.parse(jsonString || "[]");
-            if (data && data.length > 0) {
-              globalInvoiceHistory = data;
-              renderInvoiceHistoryTable();
-            }
-          } catch(e) { console.log("Invoice parse error", e); }
+            var data = typeof jsonString === 'string' ? JSON.parse(jsonString || "[]") : jsonString;
+            if (data && data.length > 0) { globalInvoiceHistory = data; renderInvoiceHistoryTable(); }
+          } catch(e) {}
         }).getInvoiceHistory();
 
-        // 3. Document History Fetch (JSON Parse)
         google.script.run.withSuccessHandler(function(jsonString) {
           try {
-            var data = JSON.parse(jsonString || "[]");
-            if (data && data.length > 0) {
-              globalDocHistory = data;
-              renderDocHistoryTable();
-            }
-          } catch(e) { console.log("Doc parse error", e); }
+            var data = typeof jsonString === 'string' ? JSON.parse(jsonString || "[]") : jsonString;
+            if (data && data.length > 0) { globalDocHistory = data; renderDocHistoryTable(); }
+          } catch(e) {}
         }).getDocHistory();
+      } else if (SCRIPT_WEB_APP_URL && SCRIPT_WEB_APP_URL.indexOf("http") === 0) {
+        // Android APK Fallback via HTTP REST API
+        fetch(SCRIPT_WEB_APP_URL + "?action=getTxnHistory").then(function(r){ return r.json(); }).then(function(d){ if(d){ globalTxnHistory=d; renderTxnHistoryTable(); }});
+        fetch(SCRIPT_WEB_APP_URL + "?action=getInvoiceHistory").then(function(r){ return r.json(); }).then(function(d){ if(d){ globalInvoiceHistory=d; renderInvoiceHistoryTable(); }});
+        fetch(SCRIPT_WEB_APP_URL + "?action=getDocHistory").then(function(r){ return r.json(); }).then(function(d){ if(d){ globalDocHistory=d; renderDocHistoryTable(); }});
       }
     }
 
@@ -1281,13 +1277,20 @@
       var loadingEl = document.getElementById("stockLoading");
       if(globalStockData.length > 0) return;
       if (loadingEl) loadingEl.classList.remove("d-none");
-      
-      if (typeof google !== 'undefined' && google.script) {
+
+      if (typeof google !== 'undefined' && google.script && google.script.run) {
         google.script.run.withSuccessHandler(function(data) {
           if (loadingEl) loadingEl.classList.add("d-none");
           globalStockData = data || [];
           renderStockTable(globalStockData);
         }).getStockDetails();
+      } else if (SCRIPT_WEB_APP_URL && SCRIPT_WEB_APP_URL.indexOf("http") === 0) {
+        // Android APK Fallback via HTTP REST API
+        fetch(SCRIPT_WEB_APP_URL + "?action=getStock").then(function(r){ return r.json(); }).then(function(data){
+          if (loadingEl) loadingEl.classList.add("d-none");
+          globalStockData = data || [];
+          renderStockTable(globalStockData);
+        }).catch(function(){ if (loadingEl) loadingEl.classList.add("d-none"); });
       } else {
         if (loadingEl) loadingEl.classList.add("d-none");
         globalStockData = [
@@ -1500,12 +1503,10 @@
         signature: sigData || ""
       };
 
-      // 1. STRICT MANDATORY CHECK FOR ALL FIELDS
       if (!data.amount || !data.name || !data.mobile || !data.aadhaar || !data.txnId) {
         return alert("⚠️ Sabhi Details Bharna Compulsory Hai!\n(Name, Mobile, Amount, Aadhaar, Txn ID sabhi fill karein)");
       }
 
-      // 2. MOBILE NUMBER LENGTH VALIDATION (10 DIGITS)
       if (data.mobile.length !== 10) {
         return alert("⚠️ Mobile Number poore 10 digits ka hona chahiye!");
       }
@@ -1513,34 +1514,45 @@
       var btn = document.getElementById("saveTxnBtn");
       if(btn) { btn.innerText = "Saving Transaction..."; btn.disabled = true; }
 
-      if (typeof google !== 'undefined' && google.script) {
+      function resetTxnUI() {
+        if(btn) { btn.innerText = "💾 Save Transaction"; btn.disabled = false; }
+        alert("Transaction Saved Successfully!");
+        data.date = new Date().toLocaleDateString();
+        globalTxnHistory.unshift(data);
+        renderTxnHistoryTable();
+        clearForm('transaction-sec');
+        clearSignature();
+        slipImageBase64 = null;
+        receiverImageBase64 = null;
+        var previewImg = document.getElementById("nativePreviewImg");
+        if(previewImg) previewImg.src = "https://cdn-icons-png.flaticon.com/512/847/847969.png";
+        var ocrSt = document.getElementById("ocrStatus");
+        if(ocrSt) ocrSt.innerText = "Ready to scan...";
+      }
+
+      if (typeof google !== 'undefined' && google.script && google.script.run) {
         google.script.run
-        .withSuccessHandler(function(res) {
-          if(btn) { btn.innerText = "💾 Save Transaction"; btn.disabled = false; }
-          alert("Transaction Saved Successfully!");
-          
-          data.date = new Date().toLocaleDateString();
-          globalTxnHistory.unshift(data);
-          renderTxnHistoryTable();
-          
-          clearForm('transaction-sec');
-          clearSignature();
-          slipImageBase64 = null;
-          receiverImageBase64 = null;
-          var previewImg = document.getElementById("nativePreviewImg");
-          if(previewImg) previewImg.src = "https://cdn-icons-png.flaticon.com/512/847/847969.png";
-          var ocrSt = document.getElementById("ocrStatus");
-          if(ocrSt) ocrSt.innerText = "Ready to scan...";
-        })
+        .withSuccessHandler(function(res) { resetTxnUI(); })
         .withFailureHandler(function(err) {
           if(btn) { btn.innerText = "💾 Save Transaction"; btn.disabled = false; }
           alert("Error: " + (err.message || err));
         })
         .saveTransaction(data);
+      } else if (SCRIPT_WEB_APP_URL && SCRIPT_WEB_APP_URL.indexOf("http") === 0) {
+        // Android APK Fallback via HTTP REST API
+        fetch(SCRIPT_WEB_APP_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain" },
+          body: JSON.stringify({ action: "saveTxn", data: data })
+        })
+        .then(function(r){ return r.json(); })
+        .then(function(res){ resetTxnUI(); })
+        .catch(function(err){
+          if(btn) { btn.innerText = "💾 Save Transaction"; btn.disabled = false; }
+          alert("Save Error in App Mode: " + err);
+        });
       } else {
-        if(btn) { btn.innerText = "💾 Save Transaction"; btn.disabled = false; }
-        alert("Saved in Local Mode");
-        clearForm('transaction-sec');
+        resetTxnUI();
       }
     }
 
