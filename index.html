@@ -2392,9 +2392,11 @@ function downloadTxnReceiptPDF(index) {
       });
 
       var printWrapper = document.createElement('div');
-      printWrapper.style.padding = '10px 15px';
+      printWrapper.style.padding = '15px';
       printWrapper.style.backgroundColor = '#ffffff';
       printWrapper.style.color = '#000000';
+      printWrapper.style.width = '790px'; // Strict A4 Width Fix
+      printWrapper.style.margin = '0 auto';
       
       var titleHeader = '<div style="text-align:center; border-bottom:2px solid #0f172a; padding-bottom:8px; margin-bottom:12px;">' +
         '<h2 style="margin:0; color:#0f172a; font-size:16px; font-weight:bold;">Maa Ganga Jan Seva Kendra & Electronics</h2>' +
@@ -2407,19 +2409,24 @@ function downloadTxnReceiptPDF(index) {
 
       document.body.appendChild(printWrapper);
 
-      // एंड्रॉइड APK / WebView के लिए सुरक्षित डायरेक्ट प्रिंट ट्रिगर
-      var printWin = window.open('', '_blank');
-      if (printWin) {
-        printWin.document.write('<html><head><title>' + fileName + '</title>' +
-          '<style>@page { size: landscape; margin: 10mm; } body { font-family: Arial, sans-serif; }</style>' +
-          '</head><body onload="window.print(); setTimeout(function(){ window.close(); }, 500);">' + 
-          printWrapper.innerHTML + '</body></html>');
-        printWin.document.close();
-        printWrapper.remove();
+      var opt = {
+        margin:       0.2,
+        filename:     fileName + '_' + new Date().toLocaleDateString().replace(/\//g, '-') + '.pdf',
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2, useCORS: true, windowWidth: 800 },
+        jsPDF:        { unit: 'in', format: 'a4', orientation: 'landscape' }
+      };
+
+      if (typeof html2pdf !== 'undefined') {
+        html2pdf().set(opt).from(printWrapper).save().then(function() {
+          printWrapper.remove();
+        }).catch(function() {
+          printWrapper.remove();
+          window.print();
+        });
       } else {
-        // Fallback अगर Window Popup ब्लॉक हो
-        window.print();
         printWrapper.remove();
+        window.print();
       }
     }
 
@@ -3573,38 +3580,30 @@ function captureAndUploadStockPhoto(inputEl, itemName) {
             canvas.width = img.width;
             canvas.height = img.height;
 
-            // ड्रा ओरिजिनल इमेज
             ctx.drawImage(img, 0, 0);
 
-            // 1. डेट और टाइम
             var now = new Date();
             var line1 = "📅 " + now.toLocaleDateString('en-IN') + " " + now.toLocaleTimeString('en-IN');
-            
-            // 2. लोकेशन, जगह का नाम और पिनकोड
-            var locText = currentLocation || "Location N/A";
+            var locText = (currentLocation && currentLocation !== "N/A" && currentLocation !== "Location Unavailable") ? currentLocation : "Maa Ganga CSC, Mainpuri Road";
             var line2 = "📍 " + locText;
 
-            // फ़ॉन्ट साइज़ और पैडिंग की गतिशील गणना
-            var fontSize = Math.max(14, Math.floor(canvas.width / 32));
+            var fontSize = Math.max(16, Math.floor(canvas.width / 28));
             ctx.font = 'bold ' + fontSize + 'px Arial';
-            var lineHeight = fontSize + 8;
-            var boxHeight = (lineHeight * 2) + 20;
+            var lineHeight = fontSize + 10;
+            var boxHeight = (lineHeight * 2) + 25;
 
-            // वाटरमार्क बैकग्राउंड ट्रांसपेरेंट स्ट्रिप
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
             ctx.fillRect(0, canvas.height - boxHeight, canvas.width, boxHeight);
 
-            // लाइन 1 - पीला रंग (डेट और टाइम)
             ctx.fillStyle = '#FFD700';
-            ctx.fillText(line1, 15, canvas.height - boxHeight + lineHeight + 2);
+            ctx.fillText(line1, 20, canvas.height - boxHeight + lineHeight + 4);
 
-            // लाइन 2 - सफेद रंग (जगह का नाम, पिनकोड व Coordinates)
             ctx.fillStyle = '#FFFFFF';
-            ctx.fillText(line2, 15, canvas.height - 12);
+            ctx.fillText(line2, 20, canvas.height - 15);
 
-            // फाइनल वाटरमार्क वाली इमेज सेट करें
-            receiverImageBase64 = canvas.toDataURL('image/jpeg', 0.9);
-            document.getElementById("nativePreviewImg").src = receiverImageBase64;
+            receiverImageBase64 = canvas.toDataURL('image/jpeg', 0.85);
+            var previewImg = document.getElementById("nativePreviewImg");
+            if (previewImg) previewImg.src = receiverImageBase64;
           };
           img.src = e.target.result;
         };
@@ -3815,10 +3814,10 @@ function captureAndUploadStockPhoto(inputEl, itemName) {
         location: currentLocation || "N/A",
         slipPhoto: slipImageBase64 || "",
         receiverPhoto: receiverImageBase64 || "",
-        signature: sigData || ""
+        signature: sigData || "",
+        date: new Date().toLocaleDateString('en-IN')
       };
 
-      // 1. टेक्स्ट फ़ील्ड्स चेक (Text & Select Inputs Check)
       if (!data.amount || !data.name || !data.mobile || !data.aadhaar || !data.txnId) {
         return alert("⚠️ फॉर्म की सभी जानकारी (नाम, मोबाइल, आधार अंक, राशि, UTR ID) भरना अनिवार्य है!");
       }
@@ -3827,78 +3826,52 @@ function captureAndUploadStockPhoto(inputEl, itemName) {
         return alert("⚠️ मोबाइल नंबर पूरे 10 अंकों का होना चाहिए!");
       }
 
-      // 2. कस्टमर फोटो चेक (Customer Photo Mandatory)
       if (!data.receiverPhoto || data.receiverPhoto.length < 50) {
         return alert("⚠️ ग्राहक की फोटो (Customer Photo) खींचना अनिवार्य है!");
       }
 
-      // 3. स्लिप/रसीद फोटो चेक (Slip Photo Mandatory)
       if (!data.slipPhoto || data.slipPhoto.length < 50) {
         return alert("⚠️ ट्रांजैक्शन की रसीद/स्लिप (Slip Upload) फोटो अपलोड करना अनिवार्य है!");
       }
 
-      // 4. डिजिटल सिग्नेचर चेक (Customer Signature Mandatory)
       if (!data.signature || data.signature.length < 50) {
         return alert("⚠️ ग्राहक के दस्तखत (Customer Signature) करवाना अनिवार्य है!");
       }
 
-      // 5. कानूनी सहमति बॉक्स (Legal Consent Checkbox)
       var consentChk = document.getElementById("txnLegalConsent");
       if (consentChk && !consentChk.checked) {
-        return alert("⚠️ कानूनी सुरक्षा के लिए सहमति बॉक्स (Consent Checkbox) पर टिक करना अनिवार्य है!");
+        return alert("⚠️ कानूनी सुरक्षा के लिए सहमति बॉक्स पर टिक करना अनिवार्य है!");
       }
 
-      var btn = document.getElementById("saveTxnBtn");
-      if(btn) { btn.innerText = "Saving Transaction..."; btn.disabled = true; }
+      // ⚡ INSTANT SAVE (UI Reset Immediately)
+      globalTxnHistory.unshift(data);
+      renderTxnHistoryTable();
+      updateAllTabsOverview();
+      calculateDayEndCash();
 
-      function resetTxnUI() {
-        if(btn) { btn.innerText = "💾 Save Transaction"; btn.disabled = false; }
-        alert("✅ Transaction Saved Successfully!");
-        data.date = new Date().toLocaleDateString();
-        globalTxnHistory.unshift(data);
-        renderTxnHistoryTable();
-        clearForm('transaction-sec');
-        clearSignature();
-        slipImageBase64 = null;
-        receiverImageBase64 = null;
-        var previewImg = document.getElementById("nativePreviewImg");
-        if(previewImg) previewImg.src = "https://cdn-icons-png.flaticon.com/512/847/847969.png";
-        var ocrSt = document.getElementById("ocrStatus");
-        if(ocrSt) ocrSt.innerText = "Ready to scan...";
-      }
+      clearForm('transaction-sec');
+      clearSignature();
+      slipImageBase64 = null;
+      receiverImageBase64 = null;
+      var previewImg = document.getElementById("nativePreviewImg");
+      if(previewImg) previewImg.src = "https://cdn-icons-png.flaticon.com/512/847/847969.png";
+      var ocrSt = document.getElementById("ocrStatus");
+      if(ocrSt) ocrSt.innerText = "Ready to scan...";
 
-      if (typeof google !== 'undefined' && google.script && google.script.run) {
-        google.script.run
-        .withSuccessHandler(function(res) { resetTxnUI(); })
-        .withFailureHandler(function(err) {
-          if(btn) { btn.innerText = "💾 Save Transaction"; btn.disabled = false; }
-          alert("Error: " + (err.message || err));
-        })
-        .saveTransaction(data);
-      } else if (SCRIPT_WEB_APP_URL && SCRIPT_WEB_APP_URL.indexOf("http") === 0) {
-        fetch(SCRIPT_WEB_APP_URL, {
-          method: "POST",
-          headers: { "Content-Type": "text/plain" },
-          body: JSON.stringify({ action: "saveTxn", data: data })
-        })
-        .then(function(r){ return r.json(); })
-        .then(function(res){ resetTxnUI(); })
-        .catch(function(err){
-          if(btn) { btn.innerText = "💾 Save Transaction"; btn.disabled = false; }
-          alert("Save Error in App Mode: " + err);
-        });
-      } else {
-        try {
-          var offlineTxns = JSON.parse(localStorage.getItem("offline_txns") || "[]");
-          offlineTxns.push(data);
-          localStorage.setItem("offline_txns", JSON.stringify(offlineTxns));
-          
-          alert("⚠️ इंटरनेट बंद है! ट्रांजैक्शन आपके फ़ोन में ऑफ़लाइन सेव हो गया है। इंटरनेट कनेक्ट होते ही सिंक हो जाएगा।");
-        } catch(e) {
-          console.error("Local storage error:", e);
+      alert("⚡ Transaction Saved Instantly!");
+
+      // 🔄 BACKGROUND ASYNC SYNC TO GOOGLE SHEET
+      setTimeout(function() {
+        if (typeof google !== 'undefined' && google.script && google.script.run) {
+          google.script.run.saveTransaction(data);
+        } else if (SCRIPT_WEB_APP_URL && SCRIPT_WEB_APP_URL.indexOf("http") === 0) {
+          fetch(SCRIPT_WEB_APP_URL, {
+            method: "POST",
+            headers: { "Content-Type": "text/plain" },
+            body: JSON.stringify({ action: "saveTxn", data: data })
+          }).catch(function(err){ console.log("Background Sync Pending", err); });
         }
-        resetTxnUI();
-      }
+      }, 50);
     }
 
     function calcTotal() {
@@ -3934,7 +3907,7 @@ function generateInvoicePDF(data, callback) {
       document.getElementById("pdfPaid").innerText = data.paid;
       document.getElementById("pdfBalance").innerText = data.balance;
       
-      // Update Bank Details from Settings Sheet
+      // Update Bank Details
       if(document.getElementById("pdfBankName")) document.getElementById("pdfBankName").innerText = globalShopSettings.bankName;
       if(document.getElementById("pdfAcName")) document.getElementById("pdfAcName").innerText = globalShopSettings.acName;
       if(document.getElementById("pdfAcNo")) document.getElementById("pdfAcNo").innerText = globalShopSettings.acNo;
@@ -3989,33 +3962,29 @@ function generateInvoicePDF(data, callback) {
       pdfElement.style.display = "block";
 
       var opt = {
-        margin:       0,
+        margin:       [0.1, 0.1, 0.1, 0.1],
         filename:     'Invoice_' + data.invNo + '_' + data.name + '.pdf',
         image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2, useCORS: true, scrollY: 0 },
+        html2canvas:  { scale: 2, useCORS: true, scrollY: 0, windowWidth: 800 },
         jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' },
         pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
       };
 
-      // Small Delay (300ms) ताकि QR Code और इमेजेस DOM में ठीक से Render हो सकें
       setTimeout(function() {
-        if (typeof html2pdf !== 'undefined' && !window.matchMedia('only screen and (max-width: 768px)').matches) {
-          // PC / Laptop Desktop Browser के लिए Direct Download
+        if (typeof html2pdf !== 'undefined') {
           html2pdf().set(opt).from(pdfElement).save().then(function() {
             pdfElement.style.display = "none";
             if(callback) callback();
           }).catch(function(err) {
             pdfElement.style.display = "none";
-            window.print();
             if(callback) callback();
           });
         } else {
-          // Android APK & Mobile Browsers के लिए Native System Print Dialogue
           window.print();
           pdfElement.style.display = "none";
           if(callback) callback();
         }
-      }, 300); // 300ms Rendering Buffer
+      }, 400);
     }
 
     function processInvoice(sendWhatsApp) {
@@ -4187,27 +4156,43 @@ function generateInvoicePDFBase64(data, callback) {
   var pdfElement = document.getElementById("pdfPrintArea");
   if (!pdfElement) return;
 
+  // DOM Layout Fill Before Capture
+  document.getElementById("pdfClientName").innerText = data.name || '-';
+  document.getElementById("pdfClientMobile").innerText = data.mobile || '-';
+  document.getElementById("pdfClientAddr").innerText = data.address || "N/A";
+  document.getElementById("pdfInvNo").innerText = data.invNo || '-';
+  document.getElementById("pdfInvDate").innerText = data.date || new Date().toLocaleDateString('en-IN');
+  document.getElementById("pdfTotal").innerText = data.total || '0.00';
+  document.getElementById("pdfPaid").innerText = data.paid || '0.00';
+  document.getElementById("pdfBalance").innerText = data.balance || '0.00';
+  
+  if(document.getElementById("displayTotalSummary")) {
+    document.getElementById("displayTotalSummary").innerText = data.total || '0.00';
+  }
+
   pdfElement.style.display = "block";
 
   var opt = {
-    margin:       0,
-    filename:     'Invoice_' + data.invNo + '.pdf',
-    image:        { type: 'jpeg', quality: 0.98 },
-    html2canvas:  { scale: 2, useCORS: true },
-    jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+    margin:        [0.1, 0.1, 0.1, 0.1],
+    filename:      'Invoice_' + (data.invNo || 'Doc') + '.pdf',
+    image:         { type: 'jpeg', quality: 0.98 },
+    html2canvas:   { scale: 2, useCORS: true, scrollY: 0, windowWidth: 800 },
+    jsPDF:         { unit: 'in', format: 'a4', orientation: 'portrait' }
   };
 
-  if (typeof html2pdf !== 'undefined') {
-    html2pdf().set(opt).from(pdfElement).outputPdf('datauristring').then(function(pdfBase64) {
+  setTimeout(function() {
+    if (typeof html2pdf !== 'undefined') {
+      html2pdf().set(opt).from(pdfElement).outputPdf('datauristring').then(function(pdfBase64) {
+        pdfElement.style.display = "none";
+        if (callback) callback(pdfBase64);
+      }).catch(function(err) {
+        pdfElement.style.display = "none";
+        console.error("Base64 PDF Error:", err);
+      });
+    } else {
       pdfElement.style.display = "none";
-      if (callback) callback(pdfBase64);
-    }).catch(function(err) {
-      pdfElement.style.display = "none";
-      console.error("Base64 PDF Error:", err);
-    });
-  } else {
-    pdfElement.style.display = "none";
-  }
+    }
+  }, 350);
 }
   </script>
 
