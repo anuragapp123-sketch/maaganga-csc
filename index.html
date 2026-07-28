@@ -2363,7 +2363,7 @@ function downloadTxnReceiptPDF(index) {
       }
     }
 
-    // === 2. FIXED: BULK TABLE EXPORT TO PDF (Full Detailed & No Blank Top Margin) ===
+    // === 2. FIXED: BULK TABLE EXPORT TO PDF (Android APK & Browser Supported) ===
     function exportTableToPDF(tbodyId, fileName) {
       var tbody = document.getElementById(tbodyId);
       if (!tbody || tbody.rows.length === 0) return alert("⚠️ डाउनलोड करने के लिए कोई डेटा नहीं है!");
@@ -2407,22 +2407,19 @@ function downloadTxnReceiptPDF(index) {
 
       document.body.appendChild(printWrapper);
 
-      var opt = {
-        margin:       [0.15, 0.2, 0.2, 0.2], // Top margin fix (no blank space above)
-        filename:     fileName + '_' + new Date().toLocaleDateString().replace(/\//g, '-') + '.pdf',
-        image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2, useCORS: true, scrollY: 0 },
-        jsPDF:        { unit: 'in', format: 'a4', orientation: 'landscape' },
-        pagebreak:    { mode: ['avoid-all', 'css'] }
-      };
-
-      if (typeof html2pdf !== 'undefined') {
-        html2pdf().set(opt).from(printWrapper).save().then(function() {
-          printWrapper.remove();
-        }).catch(function() { printWrapper.remove(); });
-      } else {
+      // एंड्रॉइड APK / WebView के लिए सुरक्षित डायरेक्ट प्रिंट ट्रिगर
+      var printWin = window.open('', '_blank');
+      if (printWin) {
+        printWin.document.write('<html><head><title>' + fileName + '</title>' +
+          '<style>@page { size: landscape; margin: 10mm; } body { font-family: Arial, sans-serif; }</style>' +
+          '</head><body onload="window.print(); setTimeout(function(){ window.close(); }, 500);">' + 
+          printWrapper.innerHTML + '</body></html>');
+        printWin.document.close();
         printWrapper.remove();
+      } else {
+        // Fallback अगर Window Popup ब्लॉक हो
         window.print();
+        printWrapper.remove();
       }
     }
 
