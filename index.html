@@ -413,17 +413,6 @@
       @page { size: A4 portrait; margin: 5mm; }
       body { background: #ffffff !important; color: #000000 !important; }
       .app-mobile-frame, .app-bottom-nav, .fab-btn, .app-header, #addNewStockFormCard, .modal { display: none !important; }
-      #pdfPrintArea { 
-        display: block !important; 
-        position: absolute !important; 
-        left: 0 !important; 
-        top: 0 !important; 
-        width: 100% !important; 
-        max-width: 100% !important; 
-        margin: 0 !important; 
-        padding: 10px !important; 
-        box-sizing: border-box !important; 
-      }
     }
   </style>
 </head>
@@ -1271,7 +1260,7 @@
 
   <script>
     // Deploy kiye gaye Web App ka URL yahan dalein (REST API fallback ke liye)
-    var SCRIPT_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbz3MmpHGXWBQqwIoFnoII_SZStUaq1q-zp_hPgRJSd3Q4kP-hevbJntDpfS1yKYzs4T/exec";
+    var SCRIPT_WEB_APP_URL = "https://script.google.com/macros/s/AKfycby-fcEQGlJXRXo_iGUGJucThZfm99L_MisZKhhzWBVKh-f7Wb77ONFRtK6_ij80mx6Q/exec";
     var currentLocation = "N/A";
     var slipImageBase64 = null;
     var receiverImageBase64 = null;
@@ -2417,16 +2406,21 @@ function downloadTxnReceiptPDF(index) {
         jsPDF:        { unit: 'in', format: 'a4', orientation: 'landscape' }
       };
 
-      if (typeof html2pdf !== 'undefined') {
+      if (window.AndroidApp && typeof window.AndroidApp.savePdfFile === "function") {
+        html2pdf().set(opt).from(printWrapper).outputPdf('datauristring').then(function(pdfBase64) {
+          printWrapper.remove();
+          window.AndroidApp.savePdfFile(pdfBase64, fileName);
+        }).catch(function() {
+          printWrapper.remove();
+        });
+      } else if (typeof html2pdf !== 'undefined') {
         html2pdf().set(opt).from(printWrapper).save().then(function() {
           printWrapper.remove();
         }).catch(function() {
           printWrapper.remove();
-          window.print();
         });
       } else {
         printWrapper.remove();
-        window.print();
       }
     }
 
@@ -2951,13 +2945,17 @@ function downloadTxnReceiptPDF(index) {
         jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
       };
 
-      if (typeof html2pdf !== 'undefined') {
+      if (window.AndroidApp && typeof window.AndroidApp.savePdfFile === "function") {
+        html2pdf().set(opt).from(reportWrapper).outputPdf('datauristring').then(function(pdfBase64) {
+          reportWrapper.remove();
+          window.AndroidApp.savePdfFile(pdfBase64, 'Khata_Statement_' + name.replace(/[^a-zA-Z0-9]/g, '_'));
+        }).catch(function() { reportWrapper.remove(); });
+      } else if (typeof html2pdf !== 'undefined') {
         html2pdf().set(opt).from(reportWrapper).save().then(function() {
           reportWrapper.remove();
         }).catch(function() { reportWrapper.remove(); });
       } else {
         reportWrapper.remove();
-        window.print();
       }
     }
 
@@ -3971,7 +3969,18 @@ function generateInvoicePDF(data, callback) {
       };
 
       setTimeout(function() {
-        if (typeof html2pdf !== 'undefined') {
+        if (window.AndroidApp && typeof window.AndroidApp.savePdfFile === "function") {
+          // 📱 Android APK Mode: Base64 PDF बनाकर सीधे Java स्टोरेज में सेव करें
+          html2pdf().set(opt).from(pdfElement).outputPdf('datauristring').then(function(pdfBase64) {
+            pdfElement.style.display = "none";
+            window.AndroidApp.savePdfFile(pdfBase64, 'Invoice_' + (data.invNo || 'Doc'));
+            if(callback) callback();
+          }).catch(function(err) {
+            pdfElement.style.display = "none";
+            if(callback) callback();
+          });
+        } else if (typeof html2pdf !== 'undefined') {
+          // 💻 Web / Browser Mode: Direct Browser Download
           html2pdf().set(opt).from(pdfElement).save().then(function() {
             pdfElement.style.display = "none";
             if(callback) callback();
@@ -3980,7 +3989,6 @@ function generateInvoicePDF(data, callback) {
             if(callback) callback();
           });
         } else {
-          window.print();
           pdfElement.style.display = "none";
           if(callback) callback();
         }
