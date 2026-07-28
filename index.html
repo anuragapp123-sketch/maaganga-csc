@@ -1469,10 +1469,6 @@ function renderTxnHistoryTable() {
         '<div class="col-6"><strong>✍️ Customer Signature</strong><br>' + sigHtml + '</div>' +
       '</div>' +
     '</div>';
-    
-    html += '<div class="mt-3">' +
-      '<button type="button" class="btn btn-sm btn-primary w-100 fw-bold py-2" style="border-radius:8px;" onclick="downloadTxnReceiptPDF(' + index + ')">📄 रसीद/स्लिप डाउनलोड करें (Download Slip)</button>' +
-    '</div>';
 
     showModalPopup("💸 Transaction Details", html);
 }
@@ -1531,13 +1527,17 @@ function downloadTxnReceiptPDF(index) {
     jsPDF:        { unit: 'in', format: 'a5', orientation: 'portrait' }
   };
 
-  if (typeof html2pdf !== 'undefined') {
+  if (window.AndroidApp && typeof window.AndroidApp.savePdfFile === "function") {
+    html2pdf().set(opt).from(receiptWrapper).outputPdf('datauristring').then(function(pdfBase64) {
+      receiptWrapper.remove();
+      window.AndroidApp.savePdfFile(pdfBase64, 'Receipt_' + (item.txnId || 'Txn'));
+    }).catch(function() { receiptWrapper.remove(); });
+  } else if (typeof html2pdf !== 'undefined') {
     html2pdf().set(opt).from(receiptWrapper).save().then(function() {
       receiptWrapper.remove();
     }).catch(function() { receiptWrapper.remove(); });
   } else {
     receiptWrapper.remove();
-    window.print();
   }
 }
 
@@ -2313,14 +2313,12 @@ function downloadTxnReceiptPDF(index) {
       }
     }
 
-    // === 1. FIXED: POP-UP MODAL DETAILS EXPORT TO PDF ===
     function downloadModalAsPDF() {
       var modalBody = document.getElementById("modalBodyContent");
       var modalTitleEl = document.getElementById("modalTitle");
       var titleText = modalTitleEl ? modalTitleEl.innerText.replace(/[^a-zA-Z0-9]/g, '_') : "Entry_Details";
       if (!modalBody) return;
 
-      // Temporary Clean Printable Container
       var cloneContainer = document.createElement('div');
       cloneContainer.style.padding = '20px';
       cloneContainer.style.backgroundColor = '#ffffff';
@@ -2328,31 +2326,36 @@ function downloadTxnReceiptPDF(index) {
       cloneContainer.style.fontFamily = 'Arial, sans-serif';
       cloneContainer.innerHTML = '<h3 style="text-align:center; color:#0b132b; border-bottom:2px solid #0b132b; padding-bottom:8px; margin-bottom:15px;">' + (modalTitleEl ? modalTitleEl.innerText : 'Details') + '</h3>' + modalBody.innerHTML;
 
-      // Remove any close buttons or action buttons inside clone
       var removeBtns = cloneContainer.querySelectorAll('button');
       removeBtns.forEach(function(btn) { btn.remove(); });
 
       document.body.appendChild(cloneContainer);
 
       var opt = {
-        margin:       0.3,
-        filename:     titleText + '.pdf',
-        image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2, useCORS: true, scrollY: 0 },
-        jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+        margin:        0.3,
+        filename:      titleText + '.pdf',
+        image:         { type: 'jpeg', quality: 0.98 },
+        html2canvas:   { scale: 2, useCORS: true, allowTaint: true, scrollY: 0 },
+        jsPDF:         { unit: 'in', format: 'a4', orientation: 'portrait' }
       };
 
-      if (typeof html2pdf !== 'undefined') {
+      if (window.AndroidApp && typeof window.AndroidApp.savePdfFile === "function") {
+        html2pdf().set(opt).from(cloneContainer).outputPdf('datauristring').then(function(pdfBase64) {
+          cloneContainer.remove();
+          window.AndroidApp.savePdfFile(pdfBase64, titleText);
+        }).catch(function(err) {
+          cloneContainer.remove();
+          alert("PDF Error: " + err);
+        });
+      } else if (typeof html2pdf !== 'undefined') {
         html2pdf().set(opt).from(cloneContainer).save().then(function() {
           cloneContainer.remove();
         }).catch(function() { cloneContainer.remove(); });
       } else {
         cloneContainer.remove();
-        window.print();
       }
     }
 
-    // === 2. FIXED: BULK TABLE EXPORT TO PDF (Android APK & Browser Supported) ===
     function exportTableToPDF(tbodyId, fileName) {
       var tbody = document.getElementById(tbodyId);
       if (!tbody || tbody.rows.length === 0) return alert("⚠️ डाउनलोड करने के लिए कोई डेटा नहीं है!");
@@ -2369,14 +2372,15 @@ function downloadTxnReceiptPDF(index) {
       var rows = cleanTable.querySelectorAll('tr');
       rows.forEach(function(row, rIdx) {
         var cells = row.querySelectorAll('th, td');
-        cells.forEach(function(cell) {
+        cells.forEach(function(cell, cIdx) {
           cell.style.border = '1px solid #334155';
-          cell.style.padding = '5px 8px';
+          cell.style.padding = '6px 8px';
           cell.style.color = rIdx === 0 ? '#ffffff' : '#000000';
           cell.style.backgroundColor = rIdx === 0 ? '#0f172a' : '#ffffff';
           
-          var btns = cell.querySelectorAll('button, img');
-          btns.forEach(function(b) { b.remove(); });
+          // PDF को साफ़ सुथरा बनाने के लिए फोटो और बटन हटाएँ
+          var elements = cell.querySelectorAll('button, img, svg');
+          elements.forEach(function(el) { el.remove(); });
         });
       });
 
@@ -2384,7 +2388,7 @@ function downloadTxnReceiptPDF(index) {
       printWrapper.style.padding = '15px';
       printWrapper.style.backgroundColor = '#ffffff';
       printWrapper.style.color = '#000000';
-      printWrapper.style.width = '790px'; // Strict A4 Width Fix
+      printWrapper.style.width = '790px';
       printWrapper.style.margin = '0 auto';
       
       var titleHeader = '<div style="text-align:center; border-bottom:2px solid #0f172a; padding-bottom:8px; margin-bottom:12px;">' +
@@ -2399,19 +2403,20 @@ function downloadTxnReceiptPDF(index) {
       document.body.appendChild(printWrapper);
 
       var opt = {
-        margin:       0.2,
-        filename:     fileName + '_' + new Date().toLocaleDateString().replace(/\//g, '-') + '.pdf',
-        image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2, useCORS: true, windowWidth: 800 },
-        jsPDF:        { unit: 'in', format: 'a4', orientation: 'landscape' }
+        margin:        0.2,
+        filename:      fileName + '_' + new Date().toLocaleDateString().replace(/\//g, '-') + '.pdf',
+        image:         { type: 'jpeg', quality: 0.98 },
+        html2canvas:   { scale: 2, useCORS: true, allowTaint: true, windowWidth: 800 },
+        jsPDF:         { unit: 'in', format: 'a4', orientation: 'landscape' }
       };
 
       if (window.AndroidApp && typeof window.AndroidApp.savePdfFile === "function") {
         html2pdf().set(opt).from(printWrapper).outputPdf('datauristring').then(function(pdfBase64) {
           printWrapper.remove();
           window.AndroidApp.savePdfFile(pdfBase64, fileName);
-        }).catch(function() {
+        }).catch(function(err) {
           printWrapper.remove();
+          alert("PDF Error: " + err);
         });
       } else if (typeof html2pdf !== 'undefined') {
         html2pdf().set(opt).from(printWrapper).save().then(function() {
