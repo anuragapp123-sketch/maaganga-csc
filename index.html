@@ -1201,7 +1201,7 @@
       <!-- Developer Info Footer -->
       <div class="text-center py-2 mt-2 border-top">
         <small class="text-muted d-block fw-bold" style="font-size: 10px;">Developed By :- Anurag Shakya</small>
-        <small class="text-secondary d-block fw-bold" style="font-size: 9px;">Version:-2.0.3</small>
+        <small class="text-secondary d-block fw-bold" style="font-size: 9px;">Version:-2.0.4</small>
         <a href="tel:9761414105" class="text-decoration-none fw-bold text-primary" style="font-size: 10px;">📞 9761414105</a>
       </div>
     </div>
@@ -1260,7 +1260,7 @@
 
   <script>
     // Deploy kiye gaye Web App ka URL yahan dalein (REST API fallback ke liye)
-    var SCRIPT_WEB_APP_URL = "https://script.google.com/macros/s/AKfycby-fcEQGlJXRXo_iGUGJucThZfm99L_MisZKhhzWBVKh-f7Wb77ONFRtK6_ij80mx6Q/exec";
+    var SCRIPT_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyMLgTGIuJKjDnz0RNthpqeQe9O8f0Dou947ZZ1khaTsi4WlPwbxtgUmOI12E3qlrvx/exec";
     var currentLocation = "N/A";
     var slipImageBase64 = null;
     var receiverImageBase64 = null;
@@ -2377,8 +2377,6 @@ function downloadTxnReceiptPDF(index) {
           cell.style.padding = '6px 8px';
           cell.style.color = rIdx === 0 ? '#ffffff' : '#000000';
           cell.style.backgroundColor = rIdx === 0 ? '#0f172a' : '#ffffff';
-          
-          // PDF को साफ़ सुथरा बनाने के लिए फोटो और बटन हटाएँ
           var elements = cell.querySelectorAll('button, img, svg');
           elements.forEach(function(el) { el.remove(); });
         });
@@ -2399,33 +2397,49 @@ function downloadTxnReceiptPDF(index) {
       
       printWrapper.innerHTML = titleHeader;
       printWrapper.appendChild(cleanTable);
-
       document.body.appendChild(printWrapper);
 
       var opt = {
-        margin:        0.2,
-        filename:      fileName + '_' + new Date().toLocaleDateString().replace(/\//g, '-') + '.pdf',
-        image:         { type: 'jpeg', quality: 0.98 },
-        html2canvas:   { scale: 2, useCORS: true, allowTaint: true, windowWidth: 800 },
-        jsPDF:         { unit: 'in', format: 'a4', orientation: 'landscape' }
+        margin: 0.2,
+        filename: fileName + '_' + new Date().toLocaleDateString().replace(/\//g, '-') + '.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true, allowTaint: true, windowWidth: 800 },
+        jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' }
+      };
+
+      var fallbackToPrint = function() {
+        var printWin = window.open('', '_blank');
+        if (printWin) {
+          printWin.document.write('<html><head><title>' + fileName + '</title></head><body>' + printWrapper.innerHTML + '</body></html>');
+          printWin.document.close();
+          printWin.focus();
+          printWin.print();
+          printWin.close();
+        } else {
+          window.print();
+        }
+        printWrapper.remove();
       };
 
       if (window.AndroidApp && typeof window.AndroidApp.savePdfFile === "function") {
         html2pdf().set(opt).from(printWrapper).outputPdf('datauristring').then(function(pdfBase64) {
           printWrapper.remove();
-          window.AndroidApp.savePdfFile(pdfBase64, fileName);
+          try {
+            window.AndroidApp.savePdfFile(pdfBase64, fileName);
+          } catch(err) {
+            fallbackToPrint();
+          }
         }).catch(function(err) {
-          printWrapper.remove();
-          alert("PDF Error: " + err);
+          fallbackToPrint();
         });
       } else if (typeof html2pdf !== 'undefined') {
         html2pdf().set(opt).from(printWrapper).save().then(function() {
           printWrapper.remove();
         }).catch(function() {
-          printWrapper.remove();
+          fallbackToPrint();
         });
       } else {
-        printWrapper.remove();
+        fallbackToPrint();
       }
     }
 
@@ -2444,7 +2458,6 @@ function downloadTxnReceiptPDF(index) {
         var row = [], cols = rows[i].querySelectorAll("td, th");
         for (var j = 0; j < cols.length; j++) {
           var headerText = cols[j].innerText.trim();
-          // Skip action/photo headers and cells
           if (headerText === 'PDF' || headerText === 'WA' || headerText === 'Photo' || headerText === 'IMG' || headerText === 'ACT') {
             continue;
           }
@@ -2454,11 +2467,9 @@ function downloadTxnReceiptPDF(index) {
         if(row.length > 0) csv.push(row.join(","));
       }
 
-      var csvContent = "\uFEFF" + csv.join("\n");
-      var blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      var csvContent = "data:text/csv;charset=utf-8,\uFEFF" + encodeURIComponent(csv.join("\n"));
       var link = document.createElement("a");
-      var url = URL.createObjectURL(blob);
-      link.setAttribute("href", url);
+      link.setAttribute("href", csvContent);
       link.setAttribute("download", fileName + "_" + new Date().toLocaleDateString().replace(/\//g, '-') + ".csv");
       document.body.appendChild(link);
       link.click();
@@ -3974,30 +3985,45 @@ function generateInvoicePDF(data, callback) {
       };
 
       setTimeout(function() {
+        var triggerNativePrint = function() {
+          var printContents = pdfElement.innerHTML;
+          var printWindow = window.open('', '_blank');
+          if (printWindow) {
+            printWindow.document.write('<html><head><title>Invoice_' + (data.invNo || 'Doc') + '</title></head><body>' + printContents + '</body></html>');
+            printWindow.document.close();
+            printWindow.focus();
+            printWindow.print();
+            printWindow.close();
+          } else {
+            window.print();
+          }
+          pdfElement.style.display = "none";
+          if(callback) callback();
+        };
+
         if (window.AndroidApp && typeof window.AndroidApp.savePdfFile === "function") {
-          // 📱 Android APK Mode: Base64 PDF बनाकर सीधे Java स्टोरेज में सेव करें
           html2pdf().set(opt).from(pdfElement).outputPdf('datauristring').then(function(pdfBase64) {
             pdfElement.style.display = "none";
-            window.AndroidApp.savePdfFile(pdfBase64, 'Invoice_' + (data.invNo || 'Doc'));
+            try {
+              window.AndroidApp.savePdfFile(pdfBase64, 'Invoice_' + (data.invNo || 'Doc'));
+            } catch(e) {
+              triggerNativePrint();
+            }
             if(callback) callback();
           }).catch(function(err) {
-            pdfElement.style.display = "none";
-            if(callback) callback();
+            triggerNativePrint();
           });
         } else if (typeof html2pdf !== 'undefined') {
-          // 💻 Web / Browser Mode: Direct Browser Download
           html2pdf().set(opt).from(pdfElement).save().then(function() {
             pdfElement.style.display = "none";
             if(callback) callback();
           }).catch(function(err) {
-            pdfElement.style.display = "none";
-            if(callback) callback();
+            triggerNativePrint();
           });
         } else {
-          pdfElement.style.display = "none";
-          if(callback) callback();
+          triggerNativePrint();
         }
-      }, 400);
+      }, 600);
     }
 
     function processInvoice(sendWhatsApp) {
