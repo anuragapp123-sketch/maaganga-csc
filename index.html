@@ -1217,7 +1217,7 @@
       <!-- Developer Info Footer -->
       <div class="text-center py-2 mt-2 border-top">
         <small class="text-muted d-block fw-bold" style="font-size: 10px;">Developed By :- Anurag Shakya</small>
-        <small class="text-secondary d-block fw-bold" style="font-size: 9px;">Version:-2.0.5</small>
+        <small class="text-secondary d-block fw-bold" style="font-size: 9px;">Version:-2.0.6</small>
         <a href="tel:9761414105" class="text-decoration-none fw-bold text-primary" style="font-size: 10px;">📞 9761414105</a>
       </div>
     </div>
@@ -2392,127 +2392,122 @@ function downloadTxnReceiptPDF(index) {
       }
     }
 
-    // === FIXED FOR ANDROID APK: FULL TABLE PDF EXPORT ===
-    function exportTableToPDF(tbodyId, fileName) {
-      var tbody = document.getElementById(tbodyId);
-      if (!tbody || tbody.rows.length === 0) return alert("⚠️ डाउनलोड करने के लिए कोई डेटा नहीं है!");
+    function exportTableToPDF(tbodyId, reportName) {
+  var tbody = document.getElementById(tbodyId);
+  if (!tbody || tbody.rows.length === 0) return alert("⚠️ डाउनलोड करने के लिए कोई डेटा नहीं है!");
 
-      var tableEl = tbody.closest('table');
-      if (!tableEl) return;
+  var tableEl = tbody.closest('table');
+  if (!tableEl) return;
 
-      var cleanTable = tableEl.cloneNode(true);
-      cleanTable.style.width = '100%';
-      cleanTable.style.borderCollapse = 'collapse';
-      cleanTable.style.fontSize = '10px';
-      cleanTable.style.fontFamily = 'Arial, sans-serif';
+  var cleanTable = tableEl.cloneNode(true);
+  cleanTable.style.width = '100%';
+  cleanTable.style.borderCollapse = 'collapse';
+  cleanTable.style.fontSize = '10px';
+  cleanTable.style.fontFamily = 'Arial, sans-serif';
 
-      var rows = cleanTable.querySelectorAll('tr');
-      rows.forEach(function(row, rIdx) {
-        var cells = row.querySelectorAll('th, td');
-        cells.forEach(function(cell) {
-          cell.style.border = '1px solid #334155';
-          cell.style.padding = '6px 8px';
-          cell.style.color = rIdx === 0 ? '#ffffff' : '#000000';
-          cell.style.backgroundColor = rIdx === 0 ? '#0f172a' : '#ffffff';
-          var elements = cell.querySelectorAll('button, img, svg');
-          elements.forEach(function(el) { el.remove(); });
-        });
+  cleanTable.querySelectorAll('tr').forEach(function(row, rIdx) {
+    row.querySelectorAll('th, td').forEach(function(cell) {
+      cell.style.border = '1px solid #334155';
+      cell.style.padding = '6px';
+      cell.style.color = rIdx === 0 ? '#ffffff' : '#000000';
+      cell.style.backgroundColor = rIdx === 0 ? '#0f172a' : '#ffffff';
+      cell.querySelectorAll('button, img, svg').forEach(el => el.remove());
+    });
+  });
+
+  var now = new Date();
+  var dateStr = String(now.getDate()).padStart(2, '0') + "-" + String(now.getMonth() + 1).padStart(2, '0') + "-" + now.getFullYear();
+  var timeStr = String(now.getHours()).padStart(2, '0') + "-" + String(now.getMinutes()).padStart(2, '0') + "-" + String(now.getSeconds()).padStart(2, '0');
+  var fileName = reportName + "_" + dateStr + "_" + timeStr + ".pdf";
+
+  var printWrapper = document.createElement('div');
+  printWrapper.style.padding = '15px';
+  printWrapper.style.backgroundColor = '#ffffff';
+  printWrapper.style.color = '#000000';
+  printWrapper.style.width = '100%';
+  printWrapper.style.maxWidth = '800px';
+  printWrapper.style.margin = '0 auto';
+
+  printWrapper.innerHTML = `
+    <div style="text-align:center; border-bottom:2px solid #0f172a; padding-bottom:8px; margin-bottom:12px;">
+      <h2 style="margin:0; color:#0f172a; font-size:16px; font-weight:bold;">Maa Ganga Jan Seva Kendra & Electronics</h2>
+      <h4 style="margin:4px 0 0 0; color:#2563eb; font-size:13px;">REPORT: ${reportName.replace(/_/g, ' ').toUpperCase()}</h4>
+      <small style="color:#64748b; font-size:9px;">Generated Date & Time: ${now.toLocaleString('en-IN')}</small>
+    </div>
+  `;
+  printWrapper.appendChild(cleanTable);
+  document.body.appendChild(printWrapper);
+
+  var opt = {
+    margin: 0.2,
+    filename: fileName,
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2, useCORS: true, allowTaint: true, logging: false },
+    jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' }
+  };
+
+  setTimeout(function() {
+    if (window.AndroidApp && typeof window.AndroidApp.savePdfFile === "function") {
+      html2pdf().set(opt).from(printWrapper).outputPdf('datauristring').then(function(pdfBase64) {
+        printWrapper.remove();
+        window.AndroidApp.savePdfFile(pdfBase64, fileName);
+      }).catch(function() {
+        printWrapper.remove();
+        alert("❌ PDF जनरेट करने में विफलता!");
       });
-
-      var printWrapper = document.createElement('div');
-      printWrapper.style.padding = '15px';
-      printWrapper.style.backgroundColor = '#ffffff';
-      printWrapper.style.color = '#000000';
-      printWrapper.style.width = '100%';
-      printWrapper.style.maxWidth = '800px';
-      printWrapper.style.margin = '0 auto';
-      
-      var titleHeader = '<div style="text-align:center; border-bottom:2px solid #0f172a; padding-bottom:8px; margin-bottom:12px;">' +
-        '<h2 style="margin:0; color:#0f172a; font-size:16px; font-weight:bold;">Maa Ganga Jan Seva Kendra & Electronics</h2>' +
-        '<h4 style="margin:4px 0 0 0; color:#2563eb; font-size:13px;">REPORT: ' + fileName.replace(/_/g, ' ').toUpperCase() + '</h4>' +
-        '<small style="color:#64748b; font-size:9px;">Generated Date: ' + new Date().toLocaleDateString('en-IN') + '</small>' +
-      '</div>';
-      
-      printWrapper.innerHTML = titleHeader;
-      printWrapper.appendChild(cleanTable);
-      document.body.appendChild(printWrapper);
-
-      var opt = {
-        margin: 0.2,
-        filename: fileName + '_' + new Date().toLocaleDateString().replace(/\//g, '-') + '.pdf',
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, allowTaint: true },
-        jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' }
-      };
-
-      // 300ms टाइमआउट ताकि एंड्रॉइड लेआउट को पूरी तरह रेंडर कर सके (खाली PDF रोके)
-      setTimeout(function() {
-        if (typeof html2pdf !== 'undefined') {
-          html2pdf().set(opt).from(printWrapper).save().then(function() {
-            printWrapper.remove();
-          }).catch(function() {
-            window.print();
-            printWrapper.remove();
-          });
-        } else {
-          window.print();
-          printWrapper.remove();
-        }
-      }, 300);
+    } else if (typeof html2pdf !== 'undefined') {
+      html2pdf().set(opt).from(printWrapper).save().then(function() {
+        printWrapper.remove();
+      }).catch(function() {
+        printWrapper.remove();
+        window.print();
+      });
+    } else {
+      window.print();
+      printWrapper.remove();
     }
+  }, 400);
+}
 
-    // === 3. FIXED FOR ANDROID APK: EXCEL / CSV EXPORT ===
-    function exportTableToExcel(tbodyId, fileName) {
-      var tbody = document.getElementById(tbodyId);
-      if (!tbody || tbody.rows.length === 0) return alert("⚠️ डाउनलोड करने के लिए कोई डेटा नहीं है!");
+    function exportTableToExcel(tbodyId, reportName) {
+  var tbody = document.getElementById(tbodyId);
+  if (!tbody || tbody.rows.length === 0) return alert("⚠️ डाउनलोड करने के लिए कोई डेटा नहीं है!");
 
-      var tableEl = tbody.closest('table');
-      if (!tableEl) return;
+  var tableEl = tbody.closest('table');
+  if (!tableEl) return;
 
-      var csv = [];
-      var rows = tableEl.querySelectorAll("tr");
-      var skipIndexes = [];
+  var csv = [];
+  var rows = tableEl.querySelectorAll("tr");
 
-      // हेडर से गैर-जरूरी कॉलम्स (इमेज, बटन) के इंडेक्स निकालें
-      if (rows.length > 0) {
-        var headerCols = rows[0].querySelectorAll("th, td");
-        for (var j = 0; j < headerCols.length; j++) {
-          var hText = headerCols[j].innerText.trim();
-          if (hText === 'PDF' || hText === 'WA' || hText === 'Photo' || hText === 'IMG' || hText === 'ACT' || hText === 'Action') {
-            skipIndexes.push(j);
-          }
-        }
-      }
-
-      for (var i = 0; i < rows.length; i++) {
-        var row = [], cols = rows[i].querySelectorAll("td, th");
-        for (var j = 0; j < cols.length; j++) {
-          if (skipIndexes.includes(j)) continue;
-          var text = cols[j].innerText.replace(/(\r\n|\n|\r)/gm, " ").replace(/📄|💬|📄 PDF|💬 WA|🔍/g, "").trim();
-          row.push('"' + text.replace(/"/g, '""') + '"');
-        }
-        if(row.length > 0) csv.push(row.join(","));
-      }
-
-      var csvData = "\uFEFF" + csv.join("\r\n");
-      var fullFileName = fileName + "_" + new Date().toLocaleDateString().replace(/\//g, '-') + ".csv";
-
-      // 1. Android Native Java Storage Interface Support
-      if (window.AndroidApp && typeof window.AndroidApp.saveCsvFile === "function") {
-        window.AndroidApp.saveCsvFile(csvData, fullFileName);
-      } else {
-        // 2. Browser Blob Download Fallback
-        var blob = new Blob([csvData], { type: "text/csv;charset=utf-8;" });
-        var link = document.createElement("a");
-        var url = URL.createObjectURL(blob);
-        link.setAttribute("href", url);
-        link.setAttribute("download", fullFileName);
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        setTimeout(function() { URL.revokeObjectURL(url); }, 1000);
-      }
+  for (var i = 0; i < rows.length; i++) {
+    var row = [], cols = rows[i].querySelectorAll("td, th");
+    for (var j = 0; j < cols.length; j++) {
+      var text = cols[j].innerText.replace(/(\r\n|\n|\r)/gm, " ").replace(/📄|💬|🔍/g, "").trim();
+      row.push('"' + text.replace(/"/g, '""') + '"');
     }
+    if (row.length > 0) csv.push(row.join(","));
+  }
+
+  var csvData = "\uFEFF" + csv.join("\r\n");
+  var now = new Date();
+  var dateStr = String(now.getDate()).padStart(2, '0') + "-" + String(now.getMonth() + 1).padStart(2, '0') + "-" + now.getFullYear();
+  var timeStr = String(now.getHours()).padStart(2, '0') + "-" + String(now.getMinutes()).padStart(2, '0') + "-" + String(now.getSeconds()).padStart(2, '0');
+  var fullFileName = reportName + "_" + dateStr + "_" + timeStr + ".csv";
+
+  if (window.AndroidApp && typeof window.AndroidApp.saveCsvFile === "function") {
+    window.AndroidApp.saveCsvFile(csvData, fullFileName);
+  } else {
+    var blob = new Blob([csvData], { type: "text/csv;charset=utf-8;" });
+    var link = document.createElement("a");
+    var url = URL.createObjectURL(blob);
+    link.setAttribute("href", url);
+    link.setAttribute("download", fullFileName);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+}
 
     // === FEATURE 1: Complete CRM Customer 360 & Quick Actions ===
     function searchCustomer360(mobile) {
@@ -3300,45 +3295,55 @@ function downloadTxnReceiptPDF(index) {
     }
 
     function autoSyncLocation() {
-      if (navigator.geolocation) {
-        var geoOptions = {
-          enableHighAccuracy: true, // Exact GPS accuracy ke liye
-          timeout: 10000,           // 10 second wait time
-          maximumAge: 0             // Purana cache location na le, fresh GPS le
-        };
+  if (navigator.geolocation) {
+    var geoOptions = {
+      enableHighAccuracy: true, // GPS चिप से सटीक लोकेशन लेने के लिए
+      timeout: 15000,           // 15 सेकंड का समय
+      maximumAge: 0             // पुरानी कैश्ड लोकेशन को पूरी तरह से बायपास करने के लिए
+    };
 
-        navigator.geolocation.getCurrentPosition(function(pos) {
-          var lat = pos.coords.latitude;
-          var lng = pos.coords.longitude;
-          currentLocation = "Lat: " + lat.toFixed(4) + ", Lng: " + lng.toFixed(4);
+    navigator.geolocation.getCurrentPosition(function(pos) {
+      var lat = pos.coords.latitude;
+      var lng = pos.coords.longitude;
+      
+      // डिफ़ॉल्ट रूप से सटीक अक्षांश-देशांतर सेट करें
+      currentLocation = "Lat: " + lat.toFixed(5) + ", Lng: " + lng.toFixed(5);
 
-          // Reverse Geocoding via Nominatim API with User-Agent
-          fetch("https://nominatim.openstreetmap.org/reverse?format=json&lat=" + lat + "&lon=" + lng, {
-            headers: { 'Accept-Language': 'en-US,en;q=0.9' }
-          })
-            .then(function(res) { return res.json(); })
-            .then(function(data) {
-              if (data && data.address) {
-                var addr = data.address;
-                var place = addr.village || addr.suburb || addr.town || addr.city || addr.county || addr.state_district || "";
-                var state = addr.state || "";
-                var postcode = addr.postcode || "";
-                
-                var locationDetails = [place, state, postcode].filter(Boolean).join(", ");
-                if (locationDetails) {
-                  currentLocation = locationDetails + " (" + lat.toFixed(4) + ", " + lng.toFixed(4) + ")";
-                }
-              }
-            })
-            .catch(function(e) { console.log("Geocoding Error:", e); });
-        }, function(err) { 
-          console.warn("Location Error Code: " + err.code + " - " + err.message);
-          currentLocation = "Maa Ganga CSC, Mainpuri Road"; 
-        }, geoOptions);
-      } else {
-        currentLocation = "Maa Ganga CSC, Mainpuri Road";
-      }
-    }
+      // Nominatim OSM API से सटीक पता निकालें
+      fetch("https://nominatim.openstreetmap.org/reverse?format=json&lat=" + lat + "&lon=" + lng + "&zoom=18&addressdetails=1", {
+        headers: { 'Accept-Language': 'hi,en-US,en;q=0.9' }
+      })
+      .then(function(res) { return res.json(); })
+      .then(function(data) {
+        if (data && data.address) {
+          var addr = data.address;
+          // सटीक स्थान: मोहल्ला / गाँव / सबअर्ब / सड़क
+          var exactPlace = addr.suburb || addr.neighbourhood || addr.residential || addr.village || addr.road || addr.town || addr.city || "";
+          var district = addr.county || addr.state_district || "";
+          var postcode = addr.postcode || "";
+
+          var locationParts = [];
+          if (exactPlace) locationParts.push(exactPlace);
+          if (district) locationParts.push(district);
+          if (postcode) locationParts.push(postcode);
+
+          if (locationParts.length > 0) {
+            currentLocation = locationParts.join(", ");
+          }
+        }
+      })
+      .catch(function(e) {
+        console.log("Geocoding Error:", e);
+      });
+    }, function(err) { 
+      console.warn("Location Error: " + err.message);
+      // लोकेशन परमिशन न मिलने पर डिफ़ॉल्ट
+      currentLocation = "Maa Ganga CSC Center"; 
+    }, geoOptions);
+  } else {
+    currentLocation = "Maa Ganga CSC Center";
+  }
+}
 
     window.addEventListener('popstate', function() { openAppSection('dashboard-home-sec', true); });
 
