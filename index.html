@@ -11,6 +11,8 @@
   
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+  <!-- HTML to Canvas Library (Fix for Uncaught ReferenceError) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <!-- PDF Generator Library -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -737,9 +739,9 @@
                       <small class="d-block text-muted fw-bold" style="font-size: 9px;">Add Photo 📷</small>
                     </div>
                     <div class="col-8">
-                      <input type="tel" id="txnMobile" class="form-control form-control-sm mb-1" placeholder="📱 Mobile No" maxlength="10" oninput="checkCRM(this.value, 'txnName', 'txnAadhaar')">
+                      <input type="tel" id="txnMobile" class="form-control form-control-sm mb-1" placeholder="📱 Mobile No" maxlength="10" oninput="checkCRM(this.value, 'txnName', 'txnAadhaar', null)">
                       <input type="text" id="txnName" class="form-control form-control-sm mb-1" placeholder="👤 Customer Name">
-                      <input type="text" id="txnAadhaar" class="form-control form-control-sm" placeholder="🪪 Aadhaar (Last 4 Digits)">
+                      <input type="text" id="txnAadhaar" class="form-control form-control-sm" placeholder="🏦 Bank Account Number">
                     </div>
                   </div>
                 </div>
@@ -834,7 +836,7 @@
             <div class="row g-2 compact-grid-form">
               <div class="col-6">
                 <label class="form-label-sm">Client Mobile</label>
-                <input type="tel" id="invMobile" class="form-control form-control-sm inv-dark-input" placeholder="Mobile No." maxlength="10" oninput="checkCRM(this.value, 'invName', null)">
+                <input type="tel" id="invMobile" class="form-control form-control-sm inv-dark-input" placeholder="Mobile No." maxlength="10" oninput="checkCRM(this.value, 'invName', null, 'invAddress')">
               </div>
               <div class="col-6">
                 <label class="form-label-sm">Client Name</label>
@@ -894,6 +896,8 @@
               <div class="col-12 text-end mt-3">
                 <h5 class="inv-grand-total m-0">Grand Total: ₹<span id="displayTotal">0.00</span></h5>
               </div>
+              <!-- 📱 Live Payment QR Box Placeholder -->
+              <div class="col-12" id="formUpiQrBox"></div>
             </div>
 
             <div class="mt-3">
@@ -1010,15 +1014,22 @@
             </div>
           </div>
 
-          <!-- Modern Search & Filter Pills -->
+          <!-- Modern Search & Category Filter Pills -->
           <div class="card p-2.5 shadow-sm border-0 mb-3 bg-white" style="border-radius: 16px;">
             <div class="input-group input-group-sm mb-2">
               <span class="input-group-text bg-light border-0 fw-bold text-muted">🔍</span>
-              <input type="text" id="stockSearchInput" class="form-control border-0 bg-light fw-bold" placeholder="स्टॉक में सामान खोजें (e.g. WIRE, BOARD, BULB)..." oninput="filterStockTable()">
+              <input type="text" id="stockSearchInput" class="form-control form-control-sm bg-light fw-bold" placeholder="स्टॉक में सामान खोजें..." oninput="filterStockTable()">
             </div>
             
+            <!-- 🗂️ Dynamic Sheet Group Filter Dropdown -->
+            <div class="mb-2">
+              <select id="stockCategoryFilter" class="form-select form-select-sm fw-bold text-primary" style="font-size: 11px; border-radius: 8px;" onchange="filterStockTable()">
+                <option value="ALL">📂 सभी ग्रुप (All Categories - Sheet Data)</option>
+              </select>
+            </div>
+
             <div class="d-flex gap-1.5">
-              <button type="button" class="btn btn-sm btn-dark w-50 fw-bold py-1.5" style="font-size:10.5px; border-radius:8px;" onclick="document.getElementById('stockSearchInput').value=''; filterStockTable();">📋 सब देखें (All Items)</button>
+              <button type="button" class="btn btn-sm btn-dark w-50 fw-bold py-1.5" style="font-size:10.5px; border-radius:8px;" onclick="document.getElementById('stockSearchInput').value=''; document.getElementById('stockCategoryFilter').value='ALL'; filterStockTable();">📋 सब देखें (All)</button>
               <button type="button" class="btn btn-sm btn-outline-danger w-50 fw-bold py-1.5" style="font-size:10.5px; border-radius:8px;" onclick="showLowStockOnly()">⚠️ कम स्टॉक (Low)</button>
             </div>
           </div>
@@ -1041,7 +1052,7 @@
             <h6 class="fw-bold mb-3 text-dark border-bottom pb-2">📁 Document Receiving Entry</h6>
             <div class="row g-2">
               <div class="col-6"><label class="small fw-bold">Customer Name</label><input type="text" id="docCustName" class="form-control form-control-sm" placeholder="Name"></div>
-              <div class="col-6"><label class="small fw-bold">Mobile No.</label><input type="tel" id="docCustMobile" class="form-control form-control-sm" placeholder="10 digits" maxlength="10"></div>
+              <div class="col-6"><label class="small fw-bold">Mobile No.</label><input type="tel" id="docCustMobile" class="form-control form-control-sm" placeholder="10 digits" maxlength="10" oninput="checkCRM(this.value, 'docCustName', null, 'docCustAddress')"></div>
               <div class="col-12"><label class="small fw-bold">Address (पता)</label><input type="text" id="docCustAddress" class="form-control form-control-sm" placeholder="Address / Village"></div>
               <div class="col-6"><label class="small fw-bold">Document Type</label>
                 <select id="docType" class="form-select form-select-sm">
@@ -1219,7 +1230,7 @@
       <!-- Developer Info Footer -->
       <div class="text-center py-2 mt-2 border-top">
         <small class="text-muted d-block fw-bold" style="font-size: 10px;">Developed By :- Anurag Shakya</small>
-        <small class="text-secondary d-block fw-bold" style="font-size: 9px;">Version:-2.0.10</small>
+        <small class="text-secondary d-block fw-bold" style="font-size: 9px;">Version:-2.0.11</small>
         <a href="tel:9761414105" class="text-decoration-none fw-bold text-primary" style="font-size: 10px;">📞 9761414105</a>
       </div>
     </div>
@@ -1230,12 +1241,13 @@
         <div class="modal-content">
           <div class="bottom-sheet-drag-handle"></div>
           <div class="modal-header border-0 pb-0 d-flex justify-content-between align-items-center">
-            <h6 class="modal-title fw-bold text-dark m-0" id="modalTitle">📄 Entry Full Details</h6>
-            <div class="d-flex align-items-center gap-2">
-              <button type="button" class="btn btn-sm btn-outline-success py-0 px-2 fw-bold d-flex align-items-center gap-1" style="font-size: 10px; border-radius:6px;" onclick="downloadModalAsImage()" title="Download as Image">🖼️ Download Image</button>
-              <button type="button" class="btn-close" onclick="closeModalPopup()" aria-label="Close"></button>
-            </div>
-          </div>
+  <h6 class="modal-title fw-bold text-dark m-0" id="modalTitle">📄 Entry Full Details</h6>
+  <div class="d-flex align-items-center gap-1.5">
+    <button type="button" class="btn btn-sm btn-success py-0 px-2 fw-bold d-flex align-items-center gap-1 text-white" style="font-size: 10px; border-radius:6px; background-color:#25D366 !important; border:none;" onclick="sendModalDetailsToWhatsApp()" title="Send WhatsApp">💬 WhatsApp</button>
+    <button type="button" class="btn btn-sm btn-outline-success py-0 px-2 fw-bold d-flex align-items-center gap-1" style="font-size: 10px; border-radius:6px;" onclick="downloadModalAsImage()" title="Download as Image">🖼️ Download Image</button>
+    <button type="button" class="btn-close" onclick="closeModalPopup()" aria-label="Close"></button>
+  </div>
+</div>
           <div class="modal-body p-3" id="modalBodyContent" style="background-color: #f8fafc;">
             <!-- Dynamic Content -->
           </div>
@@ -1482,6 +1494,11 @@ function openTxnDetailsModal(index) {
       ? '<img src="' + sigImgSrc + '" class="modal-doc-img mt-1 cursor-pointer" style="background:#fff;" onclick="viewFullImageZoom(\'' + sigImgSrc + '\', \'Customer Signature\')" title="टैप करके बड़ा देखें" onerror="this.alt=\'No Signature\'">' 
       : '<small class="text-muted d-block mt-1">No Signature</small>';
 
+    var serviceDetails = item.method || item.remarks || item.summary || item.type || 'General Transaction';
+    
+    // गूगल शीट या लोकल सेशन से यूज़रनेम ऑटो-चेक करने का लॉजिक
+    var entryUser = item.entryDoneBy || item.entrydoneby || item.user || (currentLoggedInUser && currentLoggedInUser.name ? currentLoggedInUser.name : "Anurag Shakya");
+
     var html = '<div class="text-center mb-3">' +
       '<img src="' + profileImgSrc + '" class="modal-profile-img mb-1 cursor-pointer" onclick="viewFullImageZoom(\'' + profileImgSrc + '\', \'' + (item.name || 'Customer') + '\')" title="टैप करके बड़ा देखें" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/847/847969.png\'">' +
       '<h6 class="fw-bold text-dark m-0">' + (item.name || 'Customer Name') + '</h6>' +
@@ -1493,6 +1510,8 @@ function openTxnDetailsModal(index) {
       '<div class="d-flex justify-content-between border-bottom pb-1 mb-2"><span class="text-muted">Amount:</span><strong class="text-primary fs-6">Rs. ' + (item.amount || 0) + '</strong></div>' +
       '<div class="d-flex justify-content-between border-bottom pb-1 mb-2"><span class="text-muted">Gateway:</span><strong>' + (item.gateway || '-') + '</strong></div>' +
       '<div class="d-flex justify-content-between border-bottom pb-1 mb-2"><span class="text-muted">Txn / UTR ID:</span><strong class="text-success">' + (item.txnId || '-') + '</strong></div>' +
+      '<div class="d-flex justify-content-between border-bottom pb-1 mb-2"><span class="text-muted">Respond By:</span><strong class="text-dark">' + entryUser + '</strong></div>' +
+      '<div class="border-bottom pb-2 mb-2"><span class="text-muted d-block mb-1">🛠️ Service / Other Details:</span><div class="p-2 bg-light rounded text-dark fw-bold" style="font-size:11px;">' + serviceDetails + '</div></div>' +
       '<div class="row text-center mt-2">' +
         '<div class="col-6 border-end"><strong>📄 Transaction Slip</strong><br>' + slipHtml + '<small class="d-block text-muted" style="font-size:8px;">🔍 टैप करके बड़ा देखें</small></div>' +
         '<div class="col-6"><strong>✍️ Customer Signature</strong><br>' + sigHtml + '<small class="d-block text-muted" style="font-size:8px;">🔍 टैप करके बड़ा देखें</small></div>' +
@@ -1575,12 +1594,15 @@ function downloadTxnReceiptPDF(index) {
       var item = globalInvoiceHistory[index];
       if(!item) return;
 
+      var entryUser = item.entryDoneBy || item.entrydoneby || (currentLoggedInUser && currentLoggedInUser.name ? currentLoggedInUser.name : "Anurag Shakya");
+
       var html = '<div class="card p-2 border-0 bg-white shadow-sm" style="font-size:12px;">' +
         '<div class="d-flex justify-content-between border-bottom pb-1 mb-2"><span class="text-muted">Date & Time:</span><strong class="text-dark">' + (item.date || '-') + '</strong></div>' +
         '<div class="d-flex justify-content-between border-bottom pb-1 mb-2"><span class="text-muted">Invoice No:</span><strong class="text-primary">' + (item.invNo || '-') + '</strong></div>' +
         '<div class="d-flex justify-content-between border-bottom pb-1 mb-2"><span class="text-muted">Client Name:</span><strong class="text-dark">' + (item.name || '-') + '</strong></div>' +
         '<div class="d-flex justify-content-between border-bottom pb-1 mb-2"><span class="text-muted">Mobile No:</span><strong>' + (item.mobile || '-') + '</strong></div>' +
         '<div class="d-flex justify-content-between border-bottom pb-1 mb-2"><span class="text-muted">Address:</span><span>' + (item.address || 'N/A') + '</span></div>' +
+        '<div class="d-flex justify-content-between border-bottom pb-1 mb-2"><span class="text-muted">Respond By:</span><strong class="text-dark">' + entryUser + '</strong></div>' +
         '<div class="border-bottom pb-2 mb-2"><span class="text-muted d-block mb-1">Products Summary:</span><div class="p-2 bg-light rounded text-dark fw-bold" style="font-size:11px;">' + (item.summary || 'No Items Details') + '</div></div>' +
         '<div class="d-flex justify-content-between border-bottom pb-1 mb-2"><span class="text-muted">Grand Total:</span><strong class="text-dark">Rs. ' + (item.total || 0) + '</strong></div>' +
         '<div class="d-flex justify-content-between border-bottom pb-1 mb-2"><span class="text-muted">Amount Paid:</span><strong class="text-success">Rs. ' + (item.paid || 0) + '</strong></div>' +
@@ -1822,30 +1844,46 @@ function downloadTxnReceiptPDF(index) {
     }
 
     function fetchAllHistoryFromSheet() {
+      // ⚡ INSTANT LOAD: सबसे पहले लोकल स्टोरेज से कैश्ड डेटा लोड करें
+      var cTxn = localStorage.getItem("cache_txn_history");
+      var cInv = localStorage.getItem("cache_inv_history");
+      var cDoc = localStorage.getItem("cache_doc_history");
+
+      if (cTxn) { try { globalTxnHistory = JSON.parse(cTxn); renderTxnHistoryTable(); } catch(e){} }
+      if (cInv) { try { globalInvoiceHistory = JSON.parse(cInv); renderInvoiceHistoryTable(); loadUdharKhataData(); updateAllTabsOverview(); calculateDayEndCash(); } catch(e){} }
+      if (cDoc) { try { globalDocHistory = JSON.parse(cDoc); renderDocHistoryTable(); } catch(e){} }
+
+      // 🔄 BACKGROUND SYNC: गूगल शीट से सिंक करके स्टोरेज अपडेट करें
       if (typeof google !== 'undefined' && google.script && google.script.run) {
         google.script.run.withSuccessHandler(function(jsonString) {
           try {
             var data = typeof jsonString === 'string' ? JSON.parse(jsonString || "[]") : jsonString;
-            if (data && data.length > 0) { globalTxnHistory = data; renderTxnHistoryTable(); }
+            if (data && data.length > 0) { 
+              globalTxnHistory = data; 
+              localStorage.setItem("cache_txn_history", JSON.stringify(data));
+              renderTxnHistoryTable(); 
+            }
           } catch(e) {}
         }).getTxnHistory();
 
         google.script.run.withSuccessHandler(function(jsonString) {
           try {
             var data = typeof jsonString === 'string' ? JSON.parse(jsonString || "[]") : jsonString;
-            if (data && data.length > 0) { globalInvoiceHistory = data; renderInvoiceHistoryTable(); loadUdharKhataData(); updateAllTabsOverview(); calculateDayEndCash(); }
+            if (data && data.length > 0) { 
+              globalInvoiceHistory = data; 
+              localStorage.setItem("cache_inv_history", JSON.stringify(data));
+              renderInvoiceHistoryTable(); loadUdharKhataData(); updateAllTabsOverview(); calculateDayEndCash(); 
+            }
           } catch(e) {}
         }).getInvoiceHistory();
 
         google.script.run.withSuccessHandler(function(jsonString) {
           try {
             var data = typeof jsonString === 'string' ? JSON.parse(jsonString || "[]") : jsonString;
-            // Khata tab data mapping to globalInvoiceHistory
             if (data && data.length > 0) {
               data.forEach(function(row) {
                 var amt = parseFloat(row.amount || 0);
                 var entry = (row.entryType || row.entrytype || '').toUpperCase();
-                
                 var totalAmt = entry === 'GIVE' ? amt : 0;
                 var paidAmt = entry === 'GET' ? amt : 0;
                 var balAmt = entry === 'GIVE' ? amt : (entry === 'GET' ? -amt : 0);
@@ -1870,13 +1908,17 @@ function downloadTxnReceiptPDF(index) {
         google.script.run.withSuccessHandler(function(jsonString) {
           try {
             var data = typeof jsonString === 'string' ? JSON.parse(jsonString || "[]") : jsonString;
-            if (data && data.length > 0) { globalDocHistory = data; renderDocHistoryTable(); }
+            if (data && data.length > 0) { 
+              globalDocHistory = data; 
+              localStorage.setItem("cache_doc_history", JSON.stringify(data));
+              renderDocHistoryTable(); 
+            }
           } catch(e) {}
         }).getDocHistory();
       } else if (SCRIPT_WEB_APP_URL && SCRIPT_WEB_APP_URL.indexOf("http") === 0) {
-        fetch(SCRIPT_WEB_APP_URL + "?action=getTxnHistory").then(function(r){ return r.json(); }).then(function(d){ if(d){ globalTxnHistory=d; renderTxnHistoryTable(); }});
-        fetch(SCRIPT_WEB_APP_URL + "?action=getInvoiceHistory").then(function(r){ return r.json(); }).then(function(d){ if(d){ globalInvoiceHistory=d; renderInvoiceHistoryTable(); loadUdharKhataData(); }});
-        fetch(SCRIPT_WEB_APP_URL + "?action=getDocHistory").then(function(r){ return r.json(); }).then(function(d){ if(d){ globalDocHistory=d; renderDocHistoryTable(); }});
+        fetch(SCRIPT_WEB_APP_URL + "?action=getTxnHistory").then(function(r){ return r.json(); }).then(function(d){ if(d){ globalTxnHistory=d; localStorage.setItem("cache_txn_history", JSON.stringify(d)); renderTxnHistoryTable(); }});
+        fetch(SCRIPT_WEB_APP_URL + "?action=getInvoiceHistory").then(function(r){ return r.json(); }).then(function(d){ if(d){ globalInvoiceHistory=d; localStorage.setItem("cache_inv_history", JSON.stringify(d)); renderInvoiceHistoryTable(); loadUdharKhataData(); }});
+        fetch(SCRIPT_WEB_APP_URL + "?action=getDocHistory").then(function(r){ return r.json(); }).then(function(d){ if(d){ globalDocHistory=d; localStorage.setItem("cache_doc_history", JSON.stringify(d)); renderDocHistoryTable(); }});
       }
     }
 
@@ -2095,6 +2137,19 @@ function downloadTxnReceiptPDF(index) {
     }
     // === LOGIN AUTHENTICATION SYSTEM ===
     var currentLoggedInUser = null;
+    // 📈 Today's Net Profit Calculator
+    function calculateTodayProfit() {
+      var totalProfit = 0;
+      var todayStr = new Date().toLocaleDateString('en-IN');
+
+      (globalInvoiceHistory || []).forEach(function(inv) {
+        if (inv.date && parseDateObj(inv.date).toLocaleDateString('en-IN') === todayStr) {
+          totalProfit += (parseFloat(inv.total || 0) * 0.15); // औसतन 15% मार्जिन
+        }
+      });
+
+      return totalProfit.toFixed(2);
+    }
 
     function checkAutoLogin() {
       var savedUser = localStorage.getItem("mg_csc_user_session");
@@ -2517,10 +2572,9 @@ function downloadModalAsImage() {
   var timeStr = String(now.getHours()).padStart(2, '0') + "-" + String(now.getMinutes()).padStart(2, '0') + "-" + String(now.getSeconds()).padStart(2, '0');
   var fileName = rawCustName + "_Receipt_" + dateStr + "_" + timeStr + ".jpg";
 
-  // मोडल का साफ़ क्लोन तैयार करना
+  // मोडल का साफ़ क्लोन
   var bodyClone = modalBody.cloneNode(true);
   bodyClone.querySelectorAll('button').forEach(function(btn) { btn.remove(); });
-
   bodyClone.querySelectorAll('img').forEach(function(img) {
     img.style.maxWidth = '100px';
     img.style.maxHeight = '100px';
@@ -2528,17 +2582,53 @@ function downloadModalAsImage() {
     img.style.borderRadius = '8px';
   });
 
-  var container = document.createElement('div');
-  container.style.cssText = 'position:absolute; top:0; left:0; width:550px; background:#ffffff; color:#000000; padding:20px; font-family:Arial, sans-serif; box-sizing:border-box; z-index:999999; display:block;';
-
-  var headerTitle = modalTitleEl ? modalTitleEl.innerText : "Payment Receipt";
-  container.innerHTML = 
-    '<div style="text-align:center; border-bottom:2px solid #0f172a; padding-bottom:8px; margin-bottom:12px; background:#ffffff;">' +
-      '<h2 style="margin:0; color:#0f172a; font-size:16px; font-weight:bold;">Maa Ganga Jan Seva Kendra</h2>' +
-      '<h4 style="margin:4px 0 0 0; color:#2563eb; font-size:13px;">' + headerTitle.toUpperCase() + '</h4>' +
-      '<small style="color:#64748b; font-size:9px;">Generated Date & Time: ' + now.toLocaleString('en-IN') + '</small>' +
+  // 🌟 ब्रांडिंग एवं प्रचार बॉक्स (व्यवस्थित लेआउट)
+  var brandingHtml = 
+    '<div style="margin-top:14px; background: #f1f5f9; border: 1.5px solid #cbd5e1; border-radius: 10px; padding: 10px 14px; font-family: Arial, sans-serif;">' +
+      '<div style="text-align: center; font-size: 11px; font-weight: 800; color: #0f172a; margin-bottom: 6px; text-transform: uppercase; border-bottom:1px solid #cbd5e1; padding-bottom:4px;">' +
+        '🌟 हमारी प्रमुख ऑनलाइन व जन सेवा केंद्र की सेवाएँ 🌟' +
+      '</div>' +
+      '<div style="display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; font-size: 9px; font-weight: 700;">' +
+        '<span style="background: #dbeafe; color: #1e40af; border: 1px solid #93c5fd; padding: 3px 7px; border-radius: 6px;">📄 आय प्रमाण पत्र</span>' +
+        '<span style="background: #dcfce7; color: #166534; border: 1px solid #86efac; padding: 3px 7px; border-radius: 6px;">🏡 निवास प्रमाण पत्र</span>' +
+        '<span style="background: #fef3c7; color: #92400e; border: 1px solid #fde047; padding: 3px 7px; border-radius: 6px;">📑 जाति प्रमाण पत्र</span>' +
+        '<span style="background: #fce7f3; color: #9d174d; border: 1px solid #fbcfe8; padding: 3px 7px; border-radius: 6px;">💳 पैन कार्ड (PAN)</span>' +
+        '<span style="background: #e0e7ff; color: #3730a3; border: 1px solid #c7d2fe; padding: 3px 7px; border-radius: 6px;">🗳️ वोटर ID कार्ड</span>' +
+        '<span style="background: #ccfbf1; color: #115e59; border: 1px solid #99f6e4; padding: 3px 7px; border-radius: 6px;">🆔 आधार कार्ड प्रिंट</span>' +
+        '<span style="background: #ffedd5; color: #9a3412; border: 1px solid #fed7aa; padding: 3px 7px; border-radius: 6px;">📝 सभी ऑनलाइन फॉर्म</span>' +
+        '<span style="background: #f1f5f9; color: #334155; border: 1px solid #cbd5e1; padding: 3px 7px; border-radius: 6px;">💸 मनी ट्रांसफर</span>' +
+      '</div>' +
     '</div>' +
-    '<div style="background:#ffffff; color:#000000;">' + bodyClone.innerHTML + '</div>';
+    '<div style="margin-top:8px; background: #fffbebf8; border: 1.5px dashed #d97706; border-radius: 10px; padding: 10px 12px; font-size: 9.5px; color: #78350f; font-family: Arial, sans-serif;">' +
+      '<div style="font-weight: 800; font-size: 10.5px; color: #b45309; border-bottom: 1px solid #fcd34d; padding-bottom: 3px; margin-bottom: 6px; text-transform: uppercase; text-align: center;">' +
+        '⚡ विशेष सूचना एवं रिपेयरिंग/बिक्री सेवाएँ ⚡' +
+      '</div>' +
+      '<div style="line-height: 1.4;">' +
+        '<div style="margin-bottom: 4px;">📌 <strong>नोट 1 (इलेक्ट्रॉनिक्स व वाइंडिंग):</strong> हमारे यहाँ सभी प्रकार के <strong>पंखे (Fan) एवं कूलर की मोटर की बाइंडिंग (Motor Winding)</strong> तसल्लीबख्श की जाती है। साथ ही सभी इलेक्ट्रॉनिक उपकरण उचित दामों पर उपलब्ध हैं।</div>' +
+        '<div>📌 <strong>नोट 2 (मोबाइल व एक्सेसरीज़):</strong> हमारे यहाँ <strong>कीपैड मोबाइल (Keypad Phones)</strong> एवं मोबाइल से संबंधित ओरिजिनल एक्सेसरीज़ जैसे इयरबड्स, इयरफोन, चार्जर इत्यादि उपलब्ध हैं।</div>' +
+      '</div>' +
+    '</div>';
+
+  var container = document.createElement('div');
+  container.style.cssText = 'position:fixed; top:-9999px; left:-9999px; width:580px; background:#ffffff; color:#000000; padding:22px; font-family:Arial, sans-serif; box-sizing:border-box; z-index:999999; display:block; border: 2px solid #0f172a; border-radius: 12px;';
+
+  var headerTitle = modalTitleEl ? modalTitleEl.innerText : "Transaction Receipt";
+  container.innerHTML = 
+    '<div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #0f172a; padding-bottom:10px; margin-bottom:14px; background:#ffffff;">' +
+      '<div style="display:flex; align-items:center; gap:10px;">' +
+        '<img src="https://lh3.googleusercontent.com/d/1AVhGGj41J973HK0KgI1im5JJwJZsKhJR" style="width:48px; height:48px; border-radius:50%; border:2px solid #0f172a; object-fit:cover;">' +
+        '<div>' +
+          '<h2 style="margin:0; color:#0f172a; font-size:15px; font-weight:800; text-transform:uppercase;">Maa Ganga Jan Seva Kendra</h2>' +
+          '<small style="color:#475569; font-size:9.5px; font-weight:600;">Pro: Anurag Shakya | Mo: 9761414105</small>' +
+        '</div>' +
+      '</div>' +
+      '<div style="text-align:right;">' +
+        '<h4 style="margin:0; color:#2563eb; font-size:13px; font-weight:800;">' + headerTitle.toUpperCase() + '</h4>' +
+        '<small style="color:#64748b; font-size:9px; font-weight:600;">' + now.toLocaleDateString('en-IN') + ' ' + now.toLocaleTimeString('en-IN') + '</small>' +
+      '</div>' +
+    '</div>' +
+    '<div style="background:#ffffff; color:#000000;">' + bodyClone.innerHTML + '</div>' +
+    brandingHtml;
 
   document.body.appendChild(container);
 
@@ -2546,33 +2636,160 @@ function downloadModalAsImage() {
     container.remove();
     var imgData = canvas.toDataURL('image/jpeg', 0.95);
 
-    // 1. अगर Android APK के अंदर चल रहा है
+    // 1. Android APK Native Environment
     if (window.AndroidApp && typeof window.AndroidApp.savePdfFile === "function") {
       window.AndroidApp.savePdfFile(imgData, fileName);
     } 
-    // 2. Google Apps Script Iframe / Web Browser के लिए सुरक्षित तरीका (पॉप-अप ब्लॉक से बचने के लिए)
+    // 2. Browser Web Share API Support
     else {
-      try {
-        var win = window.open();
-        if (win) {
-          win.document.write('<html><head><title>' + fileName + '</title></head><body style="margin:0;background:#0f172a;text-align:center;padding:20px;"><h3 style="color:#fff;font-family:Arial;">रसीद तैयार है! इमेज पर Long Press करके Download करें</h3><img src="' + imgData + '" style="max-width:100%;border-radius:10px;box-shadow:0 0 10px #000;"/><p style="color:#aaa;font-size:12px;">(Alternatively, right-click or tap-and-hold the image to save)</p></body></html>');
-          win.document.close();
-        } else {
-          // अगर ब्राउज़र ने फिर भी पॉप-अप रोका तो डायरेक्ट डाउनलोड लिंक ट्रिगर करें
+      fetch(imgData)
+        .then(function(res){ return res.blob(); })
+        .then(function(blob){
+          var file = new File([blob], fileName, { type: "image/jpeg" });
+          if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+            navigator.share({
+              files: [file],
+              title: 'Transaction Receipt',
+              text: '*Maa Ganga Jan Seva Kendra* - Receipt'
+            }).catch(function(e){});
+          } else {
+            var link = document.createElement('a');
+            link.href = imgData;
+            link.download = fileName;
+            link.target = "_self";
+            document.body.appendChild(link);
+            setTimeout(function() {
+              link.click();
+              document.body.removeChild(link);
+            }, 100);
+          }
+        }).catch(function() {
           var link = document.createElement('a');
           link.href = imgData;
           link.download = fileName;
+          link.target = "_self";
           document.body.appendChild(link);
-          link.click();
-          link.remove();
-        }
-      } catch (e) {
-        alert("❌ डाउनलोड त्रुटि: कृपया ब्राउज़र की पॉप-अप अनुमति दें।");
-      }
+          setTimeout(function() {
+            link.click();
+            document.body.removeChild(link);
+          }, 100);
+        });
     }
   }).catch(function(err) {
+    if (document.body.contains(container)) container.remove();
+    alert("❌ इमेज डाउनलोड में त्रुटि: " + err);
+  });
+}
+// मोडल के अंदर दिख रहे विवरण की इमेज/रसीद को सीधे व्हाट्सएप पर भेजने का फ़ंक्शन
+function sendModalDetailsToWhatsApp() {
+  var modalBody = document.getElementById("modalBodyContent");
+  var modalTitleEl = document.getElementById("modalTitle");
+  if (!modalBody) return alert("⚠️ कोई विवरण उपलब्ध नहीं है!");
+
+  var fullText = modalBody.innerText;
+  var mobileMatch = fullText.match(/\b\d{10}\b/);
+  var targetMobile = mobileMatch ? mobileMatch[0] : "";
+
+  var custNameEl = modalBody.querySelector("h6.text-dark, h6, strong");
+  var rawCustName = custNameEl ? custNameEl.innerText.replace(/[^a-zA-Z0-9 ]/g, '').trim() : "ग्राहक";
+
+  if (!targetMobile || targetMobile.length !== 10) {
+    targetMobile = prompt("📲 कृपया ग्राहक का 10-अंकों का व्हाट्सएप मोबाइल नंबर दर्ज करें:", "");
+    if (!targetMobile || targetMobile.length !== 10) return alert("⚠️ व्हाट्सएप मैसेज भेजने के लिए सही मोबाइल नंबर अनिवार्य है!");
+  }
+
+  var now = new Date();
+  var headerTitle = modalTitleEl ? modalTitleEl.innerText : "Transaction Receipt";
+  var fileName = rawCustName.replace(/\s+/g, '_') + "_Receipt.jpg";
+
+  var message = "*🚩 माँ गंगा जन सेवा केंद्र व इलेक्ट्रॉनिक्स 🚩*\n" +
+                "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" +
+                "नमस्कार *" + rawCustName + " जी*,\n" +
+                "आपकी विवरण रसीद (" + headerTitle + ") संलग्न है।\n\n" +
+                "📅 *दिनांक:* " + now.toLocaleDateString('en-IN') + "\n" +
+                "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" +
+                "धन्यवाद! 🙏";
+
+  var bodyClone = modalBody.cloneNode(true);
+  bodyClone.querySelectorAll('button').forEach(function(btn) { btn.remove(); });
+  bodyClone.querySelectorAll('img').forEach(function(img) {
+    img.style.maxWidth = '100px';
+    img.style.maxHeight = '100px';
+    img.style.objectFit = 'contain';
+    img.style.borderRadius = '8px';
+  });
+
+  // 🌟 ब्रांडिंग एवं प्रचार बॉक्स
+  var brandingHtml = 
+    '<div style="margin-top:14px; background: #f1f5f9; border: 1.5px solid #cbd5e1; border-radius: 10px; padding: 10px 14px; font-family: Arial, sans-serif;">' +
+      '<div style="text-align: center; font-size: 11px; font-weight: 800; color: #0f172a; margin-bottom: 6px; text-transform: uppercase; border-bottom:1px solid #cbd5e1; padding-bottom:4px;">' +
+        '🌟 हमारी प्रमुख ऑनलाइन व जन सेवा केंद्र की सेवाएँ 🌟' +
+      '</div>' +
+      '<div style="display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; font-size: 9px; font-weight: 700;">' +
+        '<span style="background: #dbeafe; color: #1e40af; border: 1px solid #93c5fd; padding: 3px 7px; border-radius: 6px;">📄 आय प्रमाण पत्र</span>' +
+        '<span style="background: #dcfce7; color: #166534; border: 1px solid #86efac; padding: 3px 7px; border-radius: 6px;">🏡 निवास प्रमाण पत्र</span>' +
+        '<span style="background: #fef3c7; color: #92400e; border: 1px solid #fde047; padding: 3px 7px; border-radius: 6px;">📑 जाति प्रमाण पत्र</span>' +
+        '<span style="background: #fce7f3; color: #9d174d; border: 1px solid #fbcfe8; padding: 3px 7px; border-radius: 6px;">💳 पैन कार्ड (PAN)</span>' +
+        '<span style="background: #e0e7ff; color: #3730a3; border: 1px solid #c7d2fe; padding: 3px 7px; border-radius: 6px;">🗳️ वोटर ID कार्ड</span>' +
+        '<span style="background: #ccfbf1; color: #115e59; border: 1px solid #99f6e4; padding: 3px 7px; border-radius: 6px;">🆔 आधार कार्ड प्रिंट</span>' +
+        '<span style="background: #ffedd5; color: #9a3412; border: 1px solid #fed7aa; padding: 3px 7px; border-radius: 6px;">📝 सभी ऑनलाइन फॉर्म</span>' +
+        '<span style="background: #f1f5f9; color: #334155; border: 1px solid #cbd5e1; padding: 3px 7px; border-radius: 6px;">💸 मनी ट्रांसफर</span>' +
+      '</div>' +
+    '</div>' +
+    '<div style="margin-top:8px; background: #fffbebf8; border: 1.5px dashed #d97706; border-radius: 10px; padding: 10px 12px; font-size: 9.5px; color: #78350f; font-family: Arial, sans-serif;">' +
+      '<div style="font-weight: 800; font-size: 10.5px; color: #b45309; border-bottom: 1px solid #fcd34d; padding-bottom: 3px; margin-bottom: 6px; text-transform: uppercase; text-align: center;">' +
+        '⚡ विशेष सूचना एवं रिपेयरिंग/बिक्री सेवाएँ ⚡' +
+      '</div>' +
+      '<div style="line-height: 1.4;">' +
+        '<div style="margin-bottom: 4px;">📌 <strong>नोट 1 (इलेक्ट्रॉनिक्स व वाइंडिंग):</strong> हमारे यहाँ सभी प्रकार के <strong>पंखे (Fan) एवं कूलर की मोटर की बाइंडिंग (Motor Winding)</strong> तसल्लीबख्श की जाती है। साथ ही सभी इलेक्ट्रॉनिक उपकरण उचित दामों पर उपलब्ध हैं।</div>' +
+        '<div>📌 <strong>नोट 2 (मोबाइल व एक्सेसरीज़):</strong> हमारे यहाँ <strong>कीपैड मोबाइल (Keypad Phones)</strong> एवं मोबाइल से संबंधित ओरिजिनल एक्सेसरीज़ जैसे इयरबड्स, इयरफोन, चार्जर इत्यादि उपलब्ध हैं।</div>' +
+      '</div>' +
+    '</div>';
+
+  var container = document.createElement('div');
+  container.style.cssText = 'position:fixed; top:-9999px; left:-9999px; width:580px; background:#ffffff; color:#000000; padding:22px; font-family:Arial, sans-serif; box-sizing:border-box; z-index:999999; display:block; border: 2px solid #0f172a; border-radius: 12px;';
+
+  container.innerHTML = 
+    '<div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #0f172a; padding-bottom:10px; margin-bottom:14px; background:#ffffff;">' +
+      '<div style="display:flex; align-items:center; gap:10px;">' +
+        '<img src="https://lh3.googleusercontent.com/d/1AVhGGj41J973HK0KgI1im5JJwJZsKhJR" style="width:48px; height:48px; border-radius:50%; border:2px solid #0f172a; object-fit:cover;">' +
+        '<div>' +
+          '<h2 style="margin:0; color:#0f172a; font-size:15px; font-weight:800; text-transform:uppercase;">Maa Ganga Jan Seva Kendra</h2>' +
+          '<small style="color:#475569; font-size:9.5px; font-weight:600;">Pro: Anurag Shakya | Mo: 9761414105</small>' +
+        '</div>' +
+      '</div>' +
+      '<div style="text-align:right;">' +
+        '<h4 style="margin:0; color:#2563eb; font-size:13px; font-weight:800;">' + headerTitle.toUpperCase() + '</h4>' +
+        '<small style="color:#64748b; font-size:9px; font-weight:600;">' + now.toLocaleDateString('en-IN') + ' ' + now.toLocaleTimeString('en-IN') + '</small>' +
+      '</div>' +
+    '</div>' +
+    '<div style="background:#ffffff; color:#000000;">' + bodyClone.innerHTML + '</div>' +
+    brandingHtml;
+
+  document.body.appendChild(container);
+
+  html2canvas(container, { scale: 2, useCORS: true, allowTaint: true, backgroundColor: '#ffffff' }).then(function(canvas) {
     container.remove();
-    alert("❌ इमेज बनाने में त्रुटि: " + err);
+    var imgData = canvas.toDataURL('image/jpeg', 0.95);
+
+    if (window.AndroidApp && typeof window.AndroidApp.sharePdfToWhatsApp === "function") {
+      window.AndroidApp.sharePdfToWhatsApp(imgData, targetMobile, message);
+    } else {
+      var link = document.createElement('a');
+      link.href = imgData;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      setTimeout(function() {
+        var waUrl = "https://wa.me/91" + targetMobile + "?text=" + encodeURIComponent(message + "\n\n(नोट: डाउनलोड की गई रसीद की फोटो को शेयर करें)");
+        window.open(waUrl, '_blank');
+      }, 500);
+    }
+  }).catch(function(err) {
+    if (document.body.contains(container)) container.remove();
+    alert("❌ इमेज जनरेट करने में त्रुटि: " + err);
   });
 }
     function exportTableToExcel(tbodyId, reportName) {
@@ -2691,6 +2908,12 @@ function downloadModalAsImage() {
         '<button type="button" class="btn btn-sm btn-success py-1 px-2 fw-bold w-50" style="font-size:9.5px;" onclick="quickStartTxnForCustomer(\'' + mobile + '\', \'' + safeName + '\')">💸 + Nya Txn</button>' +
       '</div>' +
 
+      // 📥 CUSTOMER REPORT DOWNLOAD BUTTONS (PDF & EXCEL)
+      '<div class="d-flex gap-1 mb-2">' +
+        '<button type="button" class="btn btn-sm btn-outline-danger py-1 w-50 fw-bold" style="font-size:9.5px;" onclick="downloadCustomerReportPDF(\'' + mobile + '\', \'' + safeName + '\')">📄 Download PDF</button>' +
+        '<button type="button" class="btn btn-sm btn-outline-success py-1 w-50 fw-bold" style="font-size:9.5px;" onclick="downloadCustomerReportExcel(\'' + mobile + '\', \'' + safeName + '\')">📊 Download Excel</button>' +
+      '</div>' +
+
       (totalPending > 0 ? '<button type="button" class="btn btn-sm btn-outline-danger py-1 w-100 fw-bold mb-2" style="font-size:9.5px;" onclick="sendDirectWhatsAppReminder(\'' + mobile + '\', \'' + safeName + '\', \'' + totalPending + '\')">📲 उधार रिमाइंडर भेजें (WhatsApp)</button>' : '') +
 
       // History Accordion Box
@@ -2779,6 +3002,17 @@ function downloadModalAsImage() {
 
     // === KHATABOOK APP MATCHING LOGIC ===
     var currentActiveKhataCust = null;
+    // 🔊 Smart Voice Soundbox Alert System (Hindi Speech)
+    function speakHindiAlert(textMessage) {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel(); // पुराना साउंड रोकें
+        var msg = new SpeechSynthesisUtterance(textMessage);
+        msg.lang = 'hi-IN'; // हिंदी भाषा
+        msg.rate = 0.95;    // आवाज़ की गति
+        msg.pitch = 1.0;
+        window.speechSynthesis.speak(msg);
+      }
+    }
 
     function toggleAddCustomerForm() {
       var card = document.getElementById("addCustFormCard");
@@ -2873,17 +3107,79 @@ function downloadModalAsImage() {
         // Safely escape special characters to prevent JavaScript runtime crashes
         var safeName = escapeHtml(c.name).replace(/'/g, "\\'");
 
-        var isDue = bal > 0;
-        var isZero = bal === 0;
+        // 3. Smart Universal Auto-Fill for Name, Address, & Aadhaar
+    function checkCRM(mobile, nameFieldId, aadhaarFieldId, addressFieldId) {
+      if (!mobile || mobile.trim().length !== 10) return;
 
-        var badgeHtml = isZero ? '<span class="badge bg-success" style="font-size:8px;">✅ Settled</span>' : 
-                        (isDue ? '<small class="text-primary fw-bold" style="font-size:9.5px;" onclick="event.stopPropagation(); sendDirectWhatsAppReminder(\'' + c.mobile + '\', \'' + safeName + '\', \'' + bal + '\')">REMIND ></small>' : '');
+      var mobStr = mobile.trim();
+      var foundName = "", foundAddr = "", foundAadhaar = "";
+
+      // Step A: सबसे पहले स्थानीय (Local History/Cache) डेटा से तेज़ी से चेक करें
+      var allHistory = [
+        ...(globalInvoiceHistory || []),
+        ...(globalTxnHistory || []),
+        ...(globalDocHistory || [])
+      ];
+
+      for (var i = 0; i < allHistory.length; i++) {
+        var item = allHistory[i];
+        if (item.mobile && String(item.mobile).trim() === mobStr) {
+          if (!foundName && item.name) foundName = item.name;
+          if (!foundAddr && item.address && item.address !== 'N/A') foundAddr = item.address;
+          if (!foundAadhaar && item.aadhaar) foundAadhaar = item.aadhaar;
+        }
+        if (foundName && foundAddr && foundAadhaar) break;
+      }
+
+      // यदि स्थानीय डेटा में मिला तो ऑटो-फिल करें
+      if (nameFieldId && document.getElementById(nameFieldId) && foundName) {
+        document.getElementById(nameFieldId).value = foundName;
+      }
+      if (addressFieldId && document.getElementById(addressFieldId) && foundAddr) {
+        document.getElementById(addressFieldId).value = foundAddr;
+      }
+      if (aadhaarFieldId && document.getElementById(aadhaarFieldId) && foundAadhaar) {
+        document.getElementById(aadhaarFieldId).value = foundAadhaar.replace(/\D/g, '').slice(-4);
+      }
+
+      // Step B: Google Sheet बैकएंड से भी सर्च करके ऑटो-फिल सिंक करें
+      if (typeof google !== 'undefined' && google.script && google.script.run) {
+        google.script.run.withSuccessHandler(function(res) {
+          if (res) {
+            if (nameFieldId && document.getElementById(nameFieldId) && res.name) {
+              document.getElementById(nameFieldId).value = res.name;
+            }
+            if (addressFieldId && document.getElementById(addressFieldId) && res.address) {
+              document.getElementById(addressFieldId).value = res.address;
+            }
+            if (aadhaarFieldId && document.getElementById(aadhaarFieldId) && res.aadhaar) {
+              document.getElementById(aadhaarFieldId).value = String(res.aadhaar).replace(/\D/g, '').slice(-4);
+            }
+          }
+        }).getCustomerDetails(mobStr);
+
+        // बकाया राशि (Udhar Balance) अलर्ट भी चेक करें
+        google.script.run.withSuccessHandler(function(res) {
+          var alertBox = document.getElementById("udharKhataAlert");
+          var amtEl = document.getElementById("udharAmount");
+          if (res && parseFloat(res.pendingBalance) > 0) {
+            if(amtEl) amtEl.innerText = "₹" + res.pendingBalance;
+            if(alertBox) alertBox.classList.remove("d-none");
+          } else {
+            if(alertBox) alertBox.classList.add("d-none");
+          }
+        }).getCustomerPendingBalance(mobStr);
+      }
+    }
 
         html += '<div class="d-flex align-items-center justify-content-between p-3 pe-4 border-bottom cursor-pointer hover-bg-light" onclick="openCustomerPassbookView(\'' + c.mobile + '\', \'' + safeName + '\')">' +
           '<div class="d-flex align-items-center gap-3">' +
             '<div class="rounded-circle bg-light border text-secondary fw-bold d-flex align-items-center justify-content-center" style="width:42px; height:42px; font-size:13px; min-width:42px;">' + avatar + '</div>' +
             '<div>' +
-              '<h6 class="fw-bold text-dark m-0" style="font-size:13px;">' + escapeHtml(c.name) + '</h6>' +
+              '<div class="d-flex align-items-center gap-1.5">' +
+                '<h6 class="fw-bold text-dark m-0" style="font-size:13px;">' + escapeHtml(c.name) + '</h6>' +
+                '<span class="cursor-pointer" onclick="event.stopPropagation(); sendFestivalGreeting(\'' + c.mobile + '\', \'' + safeName + '\')" title="बधाई सन्देश भेजें">🎉</span>' +
+              '</div>' +
               '<small class="text-muted" style="font-size:10px;">' + escapeHtml(c.lastDate) + '</small>' +
             '</div>' +
           '</div>' +
@@ -3466,29 +3762,56 @@ function downloadModalAsImage() {
 
     function fetchStockData() {
       var loadingEl = document.getElementById("stockLoading");
-      if(globalStockData.length > 0) return;
-      if (loadingEl) loadingEl.classList.remove("d-none");
 
+      // ⚡ FAST LOAD: सबसे पहले लोकल स्टोरेज से कैश्ड स्टॉक तुरंत स्क्रीन पर दिखाएँ
+      var cachedStock = localStorage.getItem("cache_stock_data");
+      if (cachedStock) {
+        try {
+          globalStockData = JSON.parse(cachedStock);
+          renderStockTable(globalStockData);
+          if (typeof populateSheetGroupDropdown === "function") {
+            populateSheetGroupDropdown(globalStockData);
+          }
+          if (loadingEl) loadingEl.classList.add("d-none");
+        } catch(e) {}
+      } else if (globalStockData.length === 0 && loadingEl) {
+        loadingEl.classList.remove("d-none");
+      }
+
+      // 🔄 BACKGROUND SYNC: गूगल शीट से लेटेस्ट स्टॉक डेटा सिंक करें
       if (typeof google !== 'undefined' && google.script && google.script.run) {
         google.script.run.withSuccessHandler(function(data) {
           if (loadingEl) loadingEl.classList.add("d-none");
-          globalStockData = data || [];
-          renderStockTable(globalStockData);
+          if (data && data.length > 0) {
+            globalStockData = data;
+            localStorage.setItem("cache_stock_data", JSON.stringify(data));
+            renderStockTable(globalStockData);
+            if (typeof populateSheetGroupDropdown === "function") {
+              populateSheetGroupDropdown(globalStockData);
+            }
+          }
         }).getStockDetails();
       } else if (SCRIPT_WEB_APP_URL && SCRIPT_WEB_APP_URL.indexOf("http") === 0) {
-        // Android APK Fallback via HTTP REST API
         fetch(SCRIPT_WEB_APP_URL + "?action=getStock").then(function(r){ return r.json(); }).then(function(data){
           if (loadingEl) loadingEl.classList.add("d-none");
-          globalStockData = data || [];
-          renderStockTable(globalStockData);
+          if (data && data.length > 0) {
+            globalStockData = data;
+            localStorage.setItem("cache_stock_data", JSON.stringify(data));
+            renderStockTable(globalStockData);
+            if (typeof populateSheetGroupDropdown === "function") {
+              populateSheetGroupDropdown(globalStockData);
+            }
+          }
         }).catch(function(){ if (loadingEl) loadingEl.classList.add("d-none"); });
       } else {
-        if (loadingEl) loadingEl.classList.add("d-none");
-        globalStockData = [
-          { name: "Casting Wax", totalQty: "1000 Kg", sellQty: "350 Kg", restQty: "650 Kg", actualPrice: "₹450", sellingPrice: "₹550", otherDetails: "Imported quality" },
-          { name: "PLUG MALE FEMALE", totalQty: "50 Pcs", sellQty: "35 Pcs", restQty: "15 Pcs", actualPrice: "₹8", sellingPrice: "₹10", otherDetails: "BOARD AND CHATKANI" }
-        ];
-        renderStockTable(globalStockData);
+        if (!cachedStock) {
+          if (loadingEl) loadingEl.classList.add("d-none");
+          globalStockData = [
+            { name: "Casting Wax", totalQty: "1000 Kg", sellQty: "350 Kg", restQty: "650 Kg", actualPrice: "₹450", sellingPrice: "₹550", otherDetails: "Imported quality" },
+            { name: "PLUG MALE FEMALE", totalQty: "50 Pcs", sellQty: "35 Pcs", restQty: "15 Pcs", actualPrice: "₹8", sellingPrice: "₹10", otherDetails: "BOARD AND CHATKANI" }
+          ];
+          renderStockTable(globalStockData);
+        }
       }
     }
 
@@ -3562,12 +3885,13 @@ function downloadModalAsImage() {
           // Pricing & Quick Actions Footer Strip
           '<div class="d-flex justify-content-between align-items-center border-top mt-2 pt-2" style="font-size: 10px;">' +
             '<div>' +
-              '<span class="text-muted d-inline-block me-2">खरीद: <del>₹' + (row.actualPrice || 0) + '</del></span>' +
+              '<span class="text-muted d-inline-block me-2">Item Ref: <del>₹' + (row.actualPrice || 0) + '</del></span>' +
               '<strong class="text-success fs-6">₹' + safePrice + '</strong>' +
             '</div>' +
             
             '<div class="d-flex gap-1.5">' +
               '<button type="button" class="btn btn-sm btn-outline-secondary py-1 px-2 fw-bold" style="font-size:9.5px; border-radius:8px;" onclick="document.getElementById(\'camInput_' + safeId + '\').click()">📷 फोटो</button>' +
+              '<button type="button" class="btn btn-sm btn-outline-dark py-1 px-2 fw-bold" style="font-size:9.5px; border-radius:8px;" onclick="printStockSticker(\'' + safeName + '\', \'' + safePrice + '\')">🏷️ टैग</button>' +
               '<button type="button" class="btn btn-sm btn-primary py-1 px-2.5 fw-bold" style="font-size:9.5px; border-radius:8px;" data-name="' + safeName + '" data-price="' + safePrice + '" onclick="quickBillFromStockBtn(this)">🧾 बिल में जोड़ें</button>' +
             '</div>' +
           '</div>' +
@@ -4039,14 +4363,29 @@ function captureAndUploadStockPhoto(inputEl, itemName) {
         return alert("⚠️ कृपया ग्राहक का नाम (Customer Name) दर्ज करें!");
       }
 
-      // आधार केवल तब ज़रूरी होगा जब वह स्क्रीन पर दिख रहा हो (AePS / Bank Deposit)
-      var isAadhaarVisible = (data.type === "AePS Withdrawal" || data.type === "Bank Cash Deposit");
-      if (isAadhaarVisible && (!data.aadhaar || data.aadhaar.length < 4)) {
-        return alert("⚠️ कृपया आधार कार्ड के अंतिम 4 अंक दर्ज करें!");
+      if (data.type === "Bank Cash Deposit" && (!data.aadhaar || data.aadhaar.trim().length < 6)) {
+        return alert("⚠️ कृपया सही बैंक खाता संख्या (Account Number) दर्ज करें!");
+      }
+      if (data.type === "AePS Withdrawal" && (!data.aadhaar || data.aadhaar.trim().length < 4)) {
+        return alert("⚠️ कृपया आधार के अंतिम 4 अंक दर्ज करें!");
       }
 
       if (!data.txnId) {
         return alert("⚠️ कृपया Transaction ID / UTR नंबर दर्ज करें!");
+      }
+
+      // Auto-Capitalize UTR / Txn ID
+      data.txnId = data.txnId.toUpperCase().trim();
+
+      // Duplicate Txn ID Check
+      var isDup = (globalTxnHistory || []).some(function(t) {
+        return t.txnId && t.txnId.toUpperCase().trim() === data.txnId;
+      });
+
+      if (isDup) {
+        if (!confirm("⚠️ चेतावनी: यह Txn ID / UTR (" + data.txnId + ") पहले से सेव है! क्या आप इसे दोबारा सेव करना चाहते हैं?")) {
+          return;
+        }
       }
       if (!data.receiverPhoto || data.receiverPhoto.length < 50) {
         return alert("⚠️ कृपया ग्राहक की फोटो (Customer Photo) खींचें!");
@@ -4078,6 +4417,8 @@ function captureAndUploadStockPhoto(inputEl, itemName) {
       var ocrSt = document.getElementById("ocrStatus");
       if(ocrSt) ocrSt.innerText = "Ready to scan...";
 
+      var alertTxt = "माँ गंगा जन सेवा केंद्र में " + data.amount + " रुपये का लेन-देन सफलतापूर्वक सेव हुआ।";
+      speakHindiAlert(alertTxt);
       alert("⚡ Transaction Saved Instantly!");
 
       // 🔄 BACKGROUND ASYNC SYNC TO GOOGLE SHEET
@@ -4099,11 +4440,20 @@ function captureAndUploadStockPhoto(inputEl, itemName) {
   
   if (!aadhaarInput) return;
 
-  if (selectedType === "AePS Withdrawal" || selectedType === "Bank Cash Deposit") {
+  if (selectedType === "Bank Cash Deposit") {
+    // केवल बैंक में नकद जमा पर अकाउंट नंबर मांगेगा
     aadhaarInput.classList.remove("d-none");
+    aadhaarInput.placeholder = "🏦 Bank Account Number";
+    aadhaarInput.removeAttribute("maxlength");
+  } else if (selectedType === "AePS Withdrawal") {
+    // केवल AePS नकद निकासी पर आधार के अंतिम 4 अंक मांगेगा
+    aadhaarInput.classList.remove("d-none");
+    aadhaarInput.placeholder = "🪪 Aadhaar (Last 4 Digits)";
+    aadhaarInput.setAttribute("maxlength", "4");
   } else {
+    // UPI Sent / UPI Received आदि में यह बॉक्स छुप जाएगा
     aadhaarInput.classList.add("d-none");
-    aadhaarInput.value = ""; // Hide होने पर वैल्यू साफ़ हो जाएगी
+    aadhaarInput.value = "";
   }
 }
 
@@ -4124,10 +4474,21 @@ function captureAndUploadStockPhoto(inputEl, itemName) {
       var paidVal = document.getElementById('invPaid').value;
       var paid = paidVal === "" ? total : parseFloat(paidVal) || 0;
       
+      var balAmt = (total - paid).toFixed(2);
       var balEl = document.getElementById('invBalance');
-      if (balEl) balEl.value = (total - paid).toFixed(2);
+      if (balEl) balEl.value = balAmt;
+
+      // 📱 Live Payment QR Generator Box on Invoice Form
+      var formQrBox = document.getElementById("formUpiQrBox");
+      if (formQrBox && parseFloat(balAmt) > 0) {
+        var upi = (typeof globalShopSettings !== 'undefined' && globalShopSettings.upiId) ? globalShopSettings.upiId : "anuragkumarshakya@ptaxis";
+        var upiUrl = "upi://pay?pa=" + encodeURIComponent(upi) + "&pn=Maa%20Ganga%20CSC&am=" + balAmt + "&cu=INR";
+        formQrBox.innerHTML = '<div class="p-2 border rounded text-center bg-light mt-2"><small class="fw-bold d-block text-primary" style="font-size:10px;">📲 तुरंत पेमेंट स्कैन करवाएँ (₹' + balAmt + ')</small><img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=' + encodeURIComponent(upiUrl) + '" style="width:100px; height:100px; border-radius:8px;" /></div>';
+      } else if (formQrBox) {
+        formQrBox.innerHTML = "";
+      }
       
-      return { total: total.toFixed(2), paid: paid.toFixed(2), balance: (total - paid).toFixed(2) };
+      return { total: total.toFixed(2), paid: paid.toFixed(2), balance: balAmt };
     }
 
 function generateInvoicePDF(data, callback) {
@@ -4178,29 +4539,56 @@ function generateInvoicePDF(data, callback) {
 
       var tableBody = document.getElementById("pdfTableBody");
       tableBody.innerHTML = "";
-      if(data.items && data.items.length > 0) {
+
+      // 1. अगर Items एरे मौजूद है (नया बिल बनाते समय)
+      if(data.items && Array.isArray(data.items) && data.items.length > 0) {
         data.items.forEach(function(item, idx) {
-          var amt = (parseFloat(item.qty || 1) * parseFloat(item.rate || 0)).toFixed(2);
+          var qty = parseFloat(item.qty || 1);
+          var rate = parseFloat(item.rate || 0);
+          var amt = (qty * rate).toFixed(2);
           tableBody.innerHTML += '<tr>' +
             '<td style="padding: 5px; text-align:center; border: 1px solid #cbd5e1;">' + (idx + 1) + '</td>' +
-            '<td style="padding: 5px; border: 1px solid #cbd5e1;">' + item.desc + '</td>' +
-            '<td style="padding: 5px; text-align:center; border: 1px solid #cbd5e1;">' + item.qty + '</td>' +
-            '<td style="padding: 5px; text-align:right; border: 1px solid #cbd5e1;">' + item.rate + '</td>' +
-            '<td style="padding: 5px; text-align:right; border: 1px solid #cbd5e1;">' + amt + '</td>' +
+            '<td style="padding: 5px; border: 1px solid #cbd5e1;">' + (item.desc || '-') + '</td>' +
+            '<td style="padding: 5px; text-align:center; border: 1px solid #cbd5e1;">' + qty + '</td>' +
+            '<td style="padding: 5px; text-align:right; border: 1px solid #cbd5e1;">₹' + rate.toFixed(2) + '</td>' +
+            '<td style="padding: 5px; text-align:right; border: 1px solid #cbd5e1;">₹' + amt + '</td>' +
           '</tr>';
         });
+      } 
+      // 2. अगर Items एरे नहीं है लेकिन History/Khata से Summary डेटा आया है
+      else {
+        var rawSummary = data.summary || "General Goods & Services";
+        
+        // "1x mobile (@ Rs.1050)" में से फालतू अक्षरों (1x, @ Rs...) को हटाकर साफ़ नाम निकालना
+        var cleanGoodsName = rawSummary
+          .replace(/^\d+x\s*/i, '')                 // "1x " को हटाएगा
+          .replace(/\s*\(@\s*Rs\.\d+(\.\d+)?\)/gi, '') // " (@ Rs.1050)" को हटाएगा
+          .replace(/\s*\(\s*Rs\.\d+(\.\d+)?\)/gi, '')   // " (Rs.1050)" को हटाएगा
+          .trim();
+
+        if (!cleanGoodsName) cleanGoodsName = rawSummary; // फॉलबैक साफ़ न होने पर
+
+        var totalAmt = parseFloat(data.total || 0).toFixed(2);
+        
+        tableBody.innerHTML = '<tr>' +
+          '<td style="padding: 5px; text-align:center; border: 1px solid #cbd5e1;">1</td>' +
+          '<td style="padding: 5px; border: 1px solid #cbd5e1;">' + cleanGoodsName + '</td>' +
+          '<td style="padding: 5px; text-align:center; border: 1px solid #cbd5e1;">1</td>' +
+          '<td style="padding: 5px; text-align:right; border: 1px solid #cbd5e1;">₹' + totalAmt + '</td>' +
+          '<td style="padding: 5px; text-align:right; border: 1px solid #cbd5e1;">₹' + totalAmt + '</td>' +
+        '</tr>';
       }
 
       var pdfElement = document.getElementById("pdfPrintArea");
       pdfElement.style.display = "block";
 
       var opt = {
-        margin:       [0.1, 0.1, 0.1, 0.1],
+        margin:       [0.15, 0.15, 0.15, 0.15],
         filename:     'Invoice_' + data.invNo + '_' + data.name + '.pdf',
         image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2, useCORS: true, scrollY: 0, windowWidth: 800 },
+        html2canvas:  { scale: 1.8, useCORS: true, scrollY: 0, scrollX: 0 },
         jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' },
-        pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
+        pagebreak:    { mode: ['css', 'legacy'] }
       };
 
       setTimeout(function() {
@@ -4478,6 +4866,28 @@ function saveNewStockItem() {
     alert("✅ नया आइटम लोकल मोड में जुड़ गया है!");
   }
 }
+// 🏷️ Product Price & QR Sticker Print
+function printStockSticker(itemName, price) {
+  var printWin = window.open('', '_blank', 'width=350,height=350');
+  if (!printWin) return alert("Pop-up allow करें!");
+
+  var stickerContent = 
+    '<html><head><style>' +
+    'body { font-family: Arial, sans-serif; text-align: center; padding: 10px; margin: 0; }' +
+    '.box { border: 2px solid #000; border-radius: 8px; padding: 8px; display: inline-block; width: 220px; }' +
+    '</style></head><body>' +
+    '<div class="box">' +
+      '<strong style="font-size:12px; display:block;">Maa Ganga CSC & Electronics</strong>' +
+      '<span style="font-size:11px; font-weight:bold; display:block; margin:4px 0;">' + itemName + '</span>' +
+      '<img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=' + encodeURIComponent(itemName) + '" style="width:70px; height:70px;" />' +
+      '<div style="font-size:14px; font-weight:bold; color:#000; margin-top:3px;">M.R.P: ₹' + price + '</div>' +
+    '</div>' +
+    '<script>window.onload = function(){ window.print(); window.close(); }<\/script>' +
+    '</body></html>';
+
+  printWin.document.write(stickerContent);
+  printWin.document.close();
+}
 // Base64 PDF Generator for Android Native WhatsApp Attachment
 function generateInvoicePDFBase64(data, callback) {
   var pdfElement = document.getElementById("pdfPrintArea");
@@ -4500,10 +4910,10 @@ function generateInvoicePDFBase64(data, callback) {
   pdfElement.style.display = "block";
 
   var opt = {
-    margin:        [0.1, 0.1, 0.1, 0.1],
+    margin:        [0.15, 0.15, 0.15, 0.15],
     filename:      'Invoice_' + (data.invNo || 'Doc') + '.pdf',
     image:         { type: 'jpeg', quality: 0.98 },
-    html2canvas:   { scale: 2, useCORS: true, scrollY: 0 },
+    html2canvas:   { scale: 1.8, useCORS: true, scrollY: 0, scrollX: 0 },
     jsPDF:         { unit: 'in', format: 'a4', orientation: 'portrait' }
   };
 
@@ -4521,10 +4931,253 @@ function generateInvoicePDFBase64(data, callback) {
     }
   }, 450);
 }
+// 📄 1. CUSTOMER INDIVIDUAL PDF REPORT GENERATOR
+    function downloadCustomerReportPDF(mobile, name) {
+      if (!mobile) return alert("⚠️ ग्राहक का मोबाइल नंबर नहीं मिला!");
+
+      var cInvoices = (globalInvoiceHistory || []).filter(function(i){ return i.mobile === mobile; });
+      var cTxns = (globalTxnHistory || []).filter(function(t){ return t.mobile === mobile; });
+
+      if (cInvoices.length === 0 && cTxns.length === 0) {
+        return alert("⚠️ इस ग्राहक का कोई पुराना रिकॉर्ड नहीं है!");
+      }
+
+      var rows = [];
+      
+      // Invoices
+      cInvoices.forEach(function(inv) {
+        rows.push([
+          inv.date || '-',
+          'Invoice (' + (inv.invNo || '-') + ')',
+          inv.summary || 'बिक्री',
+          'Rs. ' + (inv.total || 0),
+          'Rs. ' + (inv.paid || 0),
+          'Rs. ' + (inv.balance || 0)
+        ]);
+      });
+
+      // Transactions
+      cTxns.forEach(function(txn) {
+        rows.push([
+          txn.date || '-',
+          'Transaction (' + (txn.type || '-') + ')',
+          (txn.gateway || '-') + ' / UTR:' + (txn.txnId || '-'),
+          'Rs. ' + (txn.amount || 0),
+          'Rs. ' + (txn.amount || 0),
+          'Rs. 0'
+        ]);
+      });
+
+      try {
+        var { jsPDF } = window.jspdf;
+        var doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+
+        doc.setFontSize(15);
+        doc.setTextColor(15, 23, 42);
+        doc.text("Maa Ganga Jan Seva Kendra & Electronics", 14, 15);
+
+        doc.setFontSize(10);
+        doc.setTextColor(37, 99, 235);
+        doc.text("CUSTOMER REPORT: " + name.toUpperCase() + " (Mo: " + mobile + ")", 14, 22);
+
+        doc.setFontSize(8);
+        doc.setTextColor(100, 116, 139);
+        doc.text("Generated Date & Time: " + new Date().toLocaleString('en-IN'), 14, 27);
+
+        doc.autoTable({
+          head: [["Date", "Entry Type", "Details / Summary", "Total Amt", "Paid", "Balance"]],
+          body: rows,
+          startY: 32,
+          theme: 'grid',
+          headStyles: { fillColor: [15, 23, 42], textColor: [255, 255, 255], fontSize: 9, fontStyle: 'bold' },
+          bodyStyles: { fontSize: 8, textColor: [0, 0, 0] },
+          alternateRowStyles: { fillColor: [248, 250, 252] },
+          margin: { top: 32, left: 14, right: 14 }
+        });
+
+        var fileName = "Report_" + name.replace(/\s+/g, '_') + "_" + mobile + ".pdf";
+
+        if (window.AndroidApp && typeof window.AndroidApp.savePdfFile === "function") {
+          var pdfBase64 = doc.output('datauristring');
+          window.AndroidApp.savePdfFile(pdfBase64, fileName);
+        } else {
+          doc.save(fileName);
+        }
+      } catch (err) {
+        alert("❌ PDF जनरेट करने में त्रुटि: " + err.message);
+      }
+    }
+
+    // 📊 2. CUSTOMER INDIVIDUAL EXCEL REPORT GENERATOR
+    function downloadCustomerReportExcel(mobile, name) {
+      if (!mobile) return alert("⚠️ ग्राहक का मोबाइल नंबर नहीं मिला!");
+
+      var cInvoices = (globalInvoiceHistory || []).filter(function(i){ return i.mobile === mobile; });
+      var cTxns = (globalTxnHistory || []).filter(function(t){ return t.mobile === mobile; });
+
+      if (cInvoices.length === 0 && cTxns.length === 0) {
+        return alert("⚠️ इस ग्राहक का कोई पुराना रिकॉर्ड नहीं है!");
+      }
+
+      var csvRows = [];
+      csvRows.push(['"Customer Name"', '"' + name + '"']);
+      csvRows.push(['"Mobile Number"', '"' + mobile + '"']);
+      csvRows.push(['"Report Date"', '"' + new Date().toLocaleString('en-IN') + '"']);
+      csvRows.push([]); // Khali row
+      csvRows.push(['"Date"', '"Entry Type"', '"Details / Summary"', '"Total Amt"', '"Paid"', '"Balance"']);
+
+      cInvoices.forEach(function(inv) {
+        csvRows.push([
+          '"' + (inv.date || '-') + '"',
+          '"Invoice (' + (inv.invNo || '-') + ')"',
+          '"' + (inv.summary || 'बिक्री').replace(/"/g, '""') + '"',
+          '"Rs. ' + (inv.total || 0) + '"',
+          '"Rs. ' + (inv.paid || 0) + '"',
+          '"Rs. ' + (inv.balance || 0) + '"'
+        ]);
+      });
+
+      cTxns.forEach(function(txn) {
+        csvRows.push([
+          '"' + (txn.date || '-') + '"',
+          '"Transaction (' + (txn.type || '-') + ')"',
+          '"' + (txn.gateway || '-') + ' / UTR:' + (txn.txnId || '-') + '"',
+          '"Rs. ' + (txn.amount || 0) + '"',
+          '"Rs. ' + (txn.amount || 0) + '"',
+          '"Rs. 0"'
+        ]);
+      });
+
+      var csvString = "\uFEFF" + csvRows.map(e => e.join(",")).join("\r\n");
+      var fileName = "Report_" + name.replace(/\s+/g, '_') + "_" + mobile + ".csv";
+
+      if (window.AndroidApp && typeof window.AndroidApp.saveCsvFile === "function") {
+        window.AndroidApp.saveCsvFile(csvString, fileName);
+      } else {
+        var blob = new Blob([csvString], { type: "text/csv;charset=utf-8;" });
+        var link = document.createElement("a");
+        var url = URL.createObjectURL(blob);
+        link.setAttribute("href", url);
+        link.setAttribute("download", fileName);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        setTimeout(function() { URL.revokeObjectURL(url); }, 1000);
+      }
+    }
+    // 📊 Top Selling Items Report Generator
+    function showTopSellingItemsReport() {
+      var itemSalesCount = {};
+
+      (globalInvoiceHistory || []).forEach(function(inv) {
+        if (inv.items && Array.isArray(inv.items)) {
+          inv.items.forEach(function(item) {
+            var itemName = (item.desc || '').trim();
+            var qty = parseInt(item.qty) || 1;
+            if (itemName) {
+              itemSalesCount[itemName] = (itemSalesCount[itemName] || 0) + qty;
+            }
+          });
+        }
+      });
+
+      // सोर्ट करके टॉप 5 आइटम निकालना
+      var sortedItems = Object.keys(itemSalesCount).map(function(key) {
+        return { name: key, count: itemSalesCount[key] };
+      }).sort(function(a, b) { return b.count - a.count; });
+
+      if (sortedItems.length === 0) {
+        return alert("⚠️ अभी बिक्री की पर्याप्त हिस्ट्री उपलब्ध नहीं है!");
+      }
+
+      var html = '<div class="card p-2 border-0 bg-white" style="font-size:12px;">' +
+        '<strong class="text-primary d-block mb-2 border-bottom pb-1">🏆 सबसे ज़्यादा बिकने वाले सामान (Top Selling):</strong>' +
+        '<ul class="list-group list-group-flush">';
+
+      sortedItems.slice(0, 5).forEach(function(item, idx) {
+        html += '<li class="list-group-item d-flex justify-content-between align-items-center p-2" style="font-size:11px;">' +
+          '<span><b>#' + (idx + 1) + '</b> ' + item.name + '</span>' +
+          '<span class="badge bg-success rounded-pill">' + item.count + ' Sold</span>' +
+        '</li>';
+      });
+
+      html += '</ul></div>';
+
+      showModalPopup("📊 Top Selling Stock Report", html);
+    }
+    // 📢 Customer Greeting & Festival Message Sender
+    function sendFestivalGreeting(mobile, name) {
+      if (!mobile || mobile.length !== 10) return alert("⚠️ वैध मोबाइल नंबर दर्ज करें!");
+
+      var greetings = [
+        "🎉 *माँ गंगा जन सेवा केंद्र व इलेक्ट्रॉनिक्स* की ओर से आपको एवं आपके परिवार को *त्योहार की हार्दिक शुभकामनाएं!* 🌸\n\nआपकी सेवा में सदैव तत्पर! 🙏",
+        "🎂 *जन्मदिन की बहुत-बहुत बधाई एवं शुभकामनाएं!* 💐\nईश्वर आपको उत्तम स्वास्थ्य एवं दीर्घायु प्रदान करे।\n\n— *अनुराग शाक्य (माँ गंगा CSC)*",
+        "🚩 *नमस्कार " + name + " जी!* 🚩\nमाँ गंगा जन सेवा केंद्र व इलेक्ट्रॉनिक्स में आपका स्वागत है। किसी भी ऑनलाइन फॉर्म, बैंकिंग व इलेक्ट्रॉनिक्स सेवा के लिए संपर्क करें।\n📞 9761414105"
+      ];
+
+      var selectedMsg = prompt("मैसेज चुनें (1, 2 या 3 नंबर टाइप करें):\n\n1. त्योहार की शुभकामनाएं\n2. जन्मदिन की बधाई\n3. सामान्य सेवा प्रचार", "1");
+      
+      if (selectedMsg && (selectedMsg === "1" || selectedMsg === "2" || selectedMsg === "3")) {
+        var msgIndex = parseInt(selectedMsg) - 1;
+        var finalMsg = greetings[msgIndex];
+        window.open("https://wa.me/91" + mobile + "?text=" + encodeURIComponent(finalMsg), "_blank");
+      }
+    }
+    // 📂 Automatically extract unique groups from user's Google Sheet and populate dropdown
+    function populateSheetGroupDropdown(stockItems) {
+      var selectEl = document.getElementById("stockCategoryFilter");
+      if (!selectEl) return;
+
+      // पहले से चुनी हुई वैल्यू को याद रखें
+      var currentVal = selectEl.value;
+
+      // शीट के डेटा से सभी अनोखे (Unique) ग्रुप्स निकालना
+      var groupSet = {};
+      (stockItems || []).forEach(function(item) {
+        var g = (item.group || item.Group || '').trim();
+        if (g) {
+          groupSet[g.toUpperCase()] = g; // सही केसिंग बनाए रखने के लिए
+        }
+      });
+
+      var uniqueGroups = Object.values(groupSet).sort();
+
+      // HTML ड्रॉपडाउन तैयार करना
+      var html = '<option value="ALL">📂 सभी ग्रुप (All Categories)</option>';
+      uniqueGroups.forEach(function(grp) {
+        html += '<option value="' + grp.toUpperCase() + '">' + grp + '</option>';
+      });
+
+      selectEl.innerHTML = html;
+
+      // यदि पहले कुछ चुना था तो उसे बनाए रखें
+      if (currentVal) {
+        selectEl.value = currentVal;
+      }
+    }
+    function filterStockTable() {
+      var q = document.getElementById("stockSearchInput").value.toLowerCase();
+      var selectedGroup = document.getElementById("stockCategoryFilter") ? document.getElementById("stockCategoryFilter").value : "ALL";
+
+      var filtered = globalStockData.filter(function(i) {
+        // नाम या अन्य विवरण से सर्च मैच करना
+        var itemName = String(i.name || '').toLowerCase();
+        var itemDetails = String(i.otherDetails || '').toLowerCase();
+        var matchName = itemName.indexOf(q) !== -1 || itemDetails.indexOf(q) !== -1;
+
+        // शीट के डेटा का ग्रुप नाम साफ़ करके मिलाना (Space और Case की समस्या खत्म)
+        var itemGroup = String(i.group || i.Group || 'GENERAL').trim().toUpperCase();
+        var matchGroup = (selectedGroup === "ALL" || itemGroup === selectedGroup);
+
+        return matchName && matchGroup;
+      });
+
+      renderStockTable(filtered);
+    }
   </script>
 
  <!-- Full Page Fitted Printable Invoice Layout with Round Logo & Sheet Bank Settings -->
-  <div id="pdfPrintArea" style="display: none; padding: 25px 30px; font-family: 'Poppins', Arial, sans-serif; background: #ffffff; color: #000000; box-sizing: border-box; width: 100%; max-width: 800px; margin: 0 auto; page-break-inside: avoid;">
+  <div id="pdfPrintArea" style="display: none; padding: 15px; font-family: 'Poppins', Arial, sans-serif; background: #ffffff; color: #000000; box-sizing: border-box; width: 750px; margin: 0 auto; overflow: hidden;">
     
     <!-- Top Navy Accent Bar -->
     <div style="background: #0b132b; height: 10px; margin: -25px -30px 15px -30px;"></div>
@@ -4669,7 +5322,6 @@ function generateInvoicePDFBase64(data, callback) {
     </div>
 
   </div>
-
   <!-- Offline Sync Handler Tag Fix -->
   <script>
     // 1. 1-CLICK ALL-DATA OFFLINE BACKUP FUNCTION
