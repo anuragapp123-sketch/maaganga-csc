@@ -262,23 +262,31 @@
       transform: scale(0.97);
     }
 
-    /* Modern Cards & Form Styles */
+    /* Modern Ultra-Compact Cards & Form Styles */
     .card {
-      border-radius: 20px !important;
+      border-radius: 16px !important;
       border: 1px solid var(--card-border) !important;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03), 0 2px 4px -1px rgba(0, 0, 0, 0.02) !important;
+      box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.03) !important;
       background: #ffffff !important;
-      padding: 16px !important;
-      margin-bottom: 14px !important;
+      padding: 10px 12px !important; /* पैडिंग घटाई गई */
+      margin-bottom: 10px !important;
     }
 
     .form-control, .form-select {
-      border-radius: 12px !important;
+      border-radius: 8px !important;
       border: 1px solid #cbd5e1 !important;
       background-color: #f8fafc !important;
-      padding: 10px 14px !important;
-      font-size: 0.88rem !important;
+      padding: 5px 8px !important; /* इनपुट की ऊंचाई कम करने के लिए */
+      font-size: 0.78rem !important;
       font-weight: 500;
+      height: 32px !important;
+    }
+
+    .form-label, label {
+      font-size: 10px !important;
+      font-weight: 700 !important;
+      margin-bottom: 2px !important; /* लेबल का गैप कम किया */
+      color: #475569 !important;
     }
 
     .form-control:focus, .form-select:focus {
@@ -684,64 +692,70 @@
 
         </div>
 
-        <!-- 1. TRANSACTION TAB -->
+        <!-- 1. TRANSACTION TAB (COMPACT GRID) -->
         <div class="tab-pane" id="transaction-sec">
-          <div class="d-flex align-items-center mb-2">
-            <button class="btn app-back-btn py-1 px-3 fw-bold" onclick="openAppSection('dashboard-home-sec')" style="font-size: 11px;">⬅️ Dashboard</button>
+          <div class="d-flex align-items-center mb-1">
+            <button class="btn app-back-btn py-1 px-2.5 fw-bold" onclick="openAppSection('dashboard-home-sec')" style="font-size: 10px;">⬅️ Dashboard</button>
           </div>
 
-          <div class="card p-3 shadow-sm border-0">
-            <h6 class="fw-bold mb-3 text-dark border-bottom pb-2">📝 नया लेन-देन करें</h6>
-            <div class="row g-2">
+          <div class="card p-2 shadow-sm border-0">
+            <h6 class="fw-bold mb-2 text-dark border-bottom pb-1" style="font-size: 12px;">📝 नया लेन-देन करें</h6>
+            <div class="row g-1.5 compact-grid-form">
               <div class="col-12">
-                <label class="small fw-bold mb-1">लेन-देन का प्रकार (Type)</label>
+                <label>लेन-देन का प्रकार (Type)</label>
                 <select id="txnType" class="form-select form-select-sm fw-bold text-primary" onchange="toggleAadhaarField()">
-  <option value="AePS Withdrawal">AePS Cash Withdrawal (आधार से नकद निकासी)</option>
-  <option value="Bank Cash Deposit">Cash Deposit To Bank (बैंक खाते में नकद जमा)</option>
-  <option value="UPI Sent">Money Sent Through UPI App (UPI से पैसा भेजा)</option>
-  <option value="UPI Received">Money Received Through UPI App (UPI से पैसा प्राप्त हुआ)</option>
-</select>
+                  <option value="AePS Withdrawal">AePS Cash Withdrawal (आधार से नकद निकासी)</option>
+                  <option value="Bank Cash Deposit">Cash Deposit To Bank (बैंक खाते में जमा)</option>
+                  <option value="UPI Sent">Money Sent Through UPI (पैसा भेजा)</option>
+                  <option value="UPI Received">Money Received Through UPI (पैसा मिला)</option>
+                </select>
               </div>
               <div class="col-6">
-  <label class="small fw-bold">राशि (Amount)</label>
-  <input type="number" id="txnAmount" class="form-control form-control-sm fw-bold" placeholder="0.00">
-</div>
-<div class="col-6">
-  <label class="small fw-bold">गेटवे (Gateway)</label>
-  <select id="txnGateway" class="form-select form-select-sm fw-bold text-primary">
-    <option>RealiPay</option>
-    <option>Google Pay (GPay)</option>
-    <option>Paytm</option>
-    <option>PhonePe</option>
-    <option>Navi</option>
-    <option>BHIM UPI</option>
-    <option>CSC DigiPay</option>
-    <option>PayNearby</option>
-    <option>Vidcom</option>
-    <option>Other</option>
-  </select>
-</div>
+                <label>राशि (Amount ₹)</label>
+                <input type="number" id="txnAmount" class="form-control form-control-sm fw-bold" placeholder="0.00">
+              </div>
+              <div class="col-6">
+                <label>गेटवे (Gateway)</label>
+                <select id="txnGateway" class="form-select form-select-sm fw-bold text-primary" onchange="toggleOtherGatewayInput()">
+                  <option value="Google Pay (GPay)">Google Pay (GPay)</option>
+                  <option value="Paytm">Paytm</option>
+                  <option value="PhonePe">PhonePe</option>
+                  <option value="Navi">Navi</option>
+                  <option value="BHIM UPI">BHIM UPI</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+              <!-- 'Other' चुनने पर यह नया बॉक्स दिखेगा -->
+              <div class="col-12 d-none" id="otherGatewayBox">
+                <label class="text-danger">ऐप / पोर्टल का नाम दर्ज करें (App Name) *</label>
+                <input type="text" id="txnGatewayOtherInput" class="form-control form-control-sm fw-bold border-danger" placeholder="e.g. Spice Money, SBI UPI">
+              </div>
               <div class="col-12">
-                <div class="p-2 border rounded bg-light">
-                  <label class="small fw-bold text-dark d-block border-bottom pb-1 mb-2">👤 ग्राहक की जानकारी</label>
-                  <div class="row g-2 align-items-center">
-                    <div class="col-4 text-center border-end pe-1">
-                      <!-- Direct Live Camera Input -->
+                <div class="p-1.5 border rounded bg-light">
+                  <label class="text-dark d-block border-bottom pb-1 mb-1">👤 ग्राहक जानकारी</label>
+                  <div class="row g-1 align-items-center">
+                    <div class="col-3 text-center border-end pe-1">
                       <input type="file" id="nativeCameraInput" accept="image/*" capture="user" class="d-none" onchange="handleNativeCamera(this)">
-                      <!-- Gallery Pick Input -->
                       <input type="file" id="nativeGalleryInput" accept="image/*" class="d-none" onchange="handleNativeCamera(this)">
-                      
                       <div class="position-relative d-inline-block cursor-pointer" onclick="selectPhotoSource()">
-                        <div class="rounded-circle bg-white border d-flex align-items-center justify-content-center shadow-sm overflow-hidden" style="width: 54px; height: 54px; margin: 0 auto;">
+                        <div class="rounded-circle bg-white border d-flex align-items-center justify-content-center shadow-sm overflow-hidden" style="width: 44px; height: 44px; margin: 0 auto;">
                           <img id="nativePreviewImg" src="https://cdn-icons-png.flaticon.com/512/847/847969.png" style="width: 100%; height: 100%; object-fit: cover;">
                         </div>
                       </div>
-                      <small class="d-block text-muted fw-bold" style="font-size: 9px;">Add Photo 📷</small>
+                      <small class="d-block text-muted fw-bold" style="font-size: 8px;">Photo 📷</small>
                     </div>
-                    <div class="col-8">
-                      <input type="tel" id="txnMobile" class="form-control form-control-sm mb-1" placeholder="📱 Mobile No" maxlength="10" oninput="checkCRM(this.value, 'txnName', 'txnAadhaar', null)">
-                      <input type="text" id="txnName" class="form-control form-control-sm mb-1" placeholder="👤 Customer Name">
-                      <input type="text" id="txnAadhaar" class="form-control form-control-sm" placeholder="🏦 Bank Account Number">
+                    <div class="col-9">
+                      <div class="row g-1">
+                        <div class="col-6">
+                          <input type="tel" id="txnMobile" class="form-control form-control-sm" placeholder="📱 Mobile No" maxlength="10" oninput="checkCRM(this.value, 'txnName', 'txnAadhaar', null)">
+                        </div>
+                        <div class="col-6">
+                          <input type="text" id="txnName" class="form-control form-control-sm" placeholder="👤 Customer Name">
+                        </div>
+                        <div class="col-12">
+                          <input type="text" id="txnAadhaar" class="form-control form-control-sm" placeholder="🏦 Bank Account Number">
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1045,29 +1059,29 @@
 
         </div>
 
-        <!-- 4. DOCUMENT RECEIVING TAB -->
+        <!-- 4. DOCUMENT RECEIVING TAB (SLIM GRID) -->
         <div class="tab-pane" id="doc-receive-sec">
-          <button class="btn app-back-btn mb-2 w-100" onclick="openAppSection('dashboard-home-sec')">⬅️ Back To Dashboard</button>
-          <div class="card p-3 shadow-sm border-0">
-            <h6 class="fw-bold mb-3 text-dark border-bottom pb-2">📁 Document Receiving Entry</h6>
-            <div class="row g-2">
-              <div class="col-6"><label class="small fw-bold">Customer Name</label><input type="text" id="docCustName" class="form-control form-control-sm" placeholder="Name"></div>
-              <div class="col-6"><label class="small fw-bold">Mobile No.</label><input type="tel" id="docCustMobile" class="form-control form-control-sm" placeholder="10 digits" maxlength="10" oninput="checkCRM(this.value, 'docCustName', null, 'docCustAddress')"></div>
-              <div class="col-12"><label class="small fw-bold">Address (पता)</label><input type="text" id="docCustAddress" class="form-control form-control-sm" placeholder="Address / Village"></div>
-              <div class="col-6"><label class="small fw-bold">Document Type</label>
+          <button class="btn app-back-btn mb-1.5 w-100 py-1" onclick="openAppSection('dashboard-home-sec')" style="font-size:10px;">⬅️ Back To Dashboard</button>
+          <div class="card p-2 shadow-sm border-0">
+            <h6 class="fw-bold mb-2 text-dark border-bottom pb-1" style="font-size: 12px;">📁 Document Receiving Entry</h6>
+            <div class="row g-1.5 compact-grid-form">
+              <div class="col-6"><label>Customer Name</label><input type="text" id="docCustName" class="form-control form-control-sm" placeholder="Name"></div>
+              <div class="col-6"><label>Mobile No.</label><input type="tel" id="docCustMobile" class="form-control form-control-sm" placeholder="10 digits" maxlength="10" oninput="checkCRM(this.value, 'docCustName', null, 'docCustAddress')"></div>
+              <div class="col-6"><label>Document Type</label>
                 <select id="docType" class="form-select form-select-sm">
                   <option>PAN Card</option><option>आय प्रमाण पत्र</option><option>निवास प्रमाण पत्र</option><option>जाति प्रमाण पत्र</option><option>Driving License</option><option>Voter ID</option><option>Other Document</option>
                 </select>
               </div>
-              <div class="col-6"><label class="small fw-bold">Status (स्थिति)</label>
+              <div class="col-6"><label>Service Charge (₹)</label><input type="number" id="docCharge" class="form-control form-control-sm" placeholder="0"></div>
+              <div class="col-6"><label>Status (स्थिति)</label>
                 <select id="docStatus" class="form-select form-select-sm fw-bold text-primary">
-                  <option value="Pending">⏳ Pending (प्रक्रिया में)</option>
-                  <option value="Ready">✅ Ready (बन गया है)</option>
-                  <option value="Delivered">📦 Delivered (दे दिया)</option>
+                  <option value="Pending">⏳ Pending</option>
+                  <option value="Ready">✅ Ready</option>
+                  <option value="Delivered">📦 Delivered</option>
                 </select>
               </div>
-              <div class="col-12"><label class="small fw-bold">Service Charge (Rs.)</label><input type="number" id="docCharge" class="form-control form-control-sm" placeholder="0"></div>
-              <div class="col-12"><label class="small fw-bold">Remarks / Description</label><textarea id="docRemarks" class="form-control form-control-sm" rows="2" placeholder="Tracking info or notes..."></textarea></div>
+              <div class="col-6"><label>Address (पता)</label><input type="text" id="docCustAddress" class="form-control form-control-sm" placeholder="Village / City"></div>
+              <div class="col-12"><label>Remarks / Description</label><textarea id="docRemarks" class="form-control form-control-sm" rows="1" placeholder="Tracking info or notes..."></textarea></div>
               <div class="col-6"><label class="small fw-bold text-primary">Document File/Photo</label><input type="file" id="docFileRef" accept="image/*,application/pdf" class="form-control form-control-sm"></div>
               <div class="col-6"><label class="small fw-bold text-success">Customer Photo</label><input type="file" id="docCustPhoto" accept="image/*" class="form-control form-control-sm"></div>
               
@@ -1230,7 +1244,7 @@
       <!-- Developer Info Footer -->
       <div class="text-center py-2 mt-2 border-top">
         <small class="text-muted d-block fw-bold" style="font-size: 10px;">Developed By :- Anurag Shakya</small>
-        <small class="text-secondary d-block fw-bold" style="font-size: 9px;">Version:-2.0.11</small>
+        <small class="text-secondary d-block fw-bold" style="font-size: 9px;">Version:-2.0.12</small>
         <a href="tel:9761414105" class="text-decoration-none fw-bold text-primary" style="font-size: 10px;">📞 9761414105</a>
       </div>
     </div>
@@ -1291,6 +1305,43 @@
   <script>
     // Deploy kiye gaye Web App ka URL yahan dalein (REST API fallback ke liye)
     var SCRIPT_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbytcFEHKMMgoSJcy6cZrOpa5Z2jqxhv3OGn2y4efuRwhF_EWUyXpHuH-0WLG1bq9DLe/exec";
+    // 🚨 GLOBAL REAL-TIME ERROR LOGGER FUNCTION
+    function sendErrorToSheet(errorType, clickAction, impactText, errorObj) {
+      var errData = {
+        userName: (typeof currentLoggedInUser !== 'undefined' && currentLoggedInUser && currentLoggedInUser.name) ? currentLoggedInUser.name : "Maa Ganga User",
+        mobile: (typeof currentLoggedInUser !== 'undefined' && currentLoggedInUser && currentLoggedInUser.mobile) ? currentLoggedInUser.mobile : "N/A",
+        errorType: errorType || "JavaScript Exception",
+        clickAction: clickAction || "Auto-detected Crash",
+        impact: impactText || "UI Component Failed",
+        errorMessage: (errorObj && errorObj.message) ? errorObj.message : String(errorObj),
+        device: navigator.userAgent.indexOf("Android") !== -1 ? "Android APK" : "Web Browser"
+      };
+
+      console.error("🚨 Logging App Error:", errData);
+
+      // Google Sheet Backend Sync
+      if (typeof google !== 'undefined' && google.script && google.script.run) {
+        google.script.run.logAppError(errData);
+      } else if (typeof SCRIPT_WEB_APP_URL !== 'undefined' && SCRIPT_WEB_APP_URL) {
+        fetch(SCRIPT_WEB_APP_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain" },
+          body: JSON.stringify({ action: "logError", data: errData })
+        }).catch(function(e){});
+      }
+    }
+
+    // 🛡️ 1. ग्लोबल जावास्क्रिप्ट अनहैन्डल एरर कैचर (Automatic Error Catcher)
+    window.onerror = function(msg, url, lineNo, columnNo, error) {
+      var details = msg + " (Line: " + lineNo + ")";
+      sendErrorToSheet("Uncaught Crash Error", "Automatic Code Catcher", "App Screen Unresponsive / Glitch", details);
+      return false; // कंसोल में एरर दिखने दें
+    };
+
+    // 🛡️ 2. प्रॉमिस / API फेल्योर कैचर
+    window.addEventListener('unhandledrejection', function(event) {
+      sendErrorToSheet("Promise Rejection / API Fail", "Network/Fetch Call", "Data Sync Failed", event.reason);
+    });
     var currentLocation = "N/A";
     var slipImageBase64 = null;
     var receiverImageBase64 = null;
@@ -2680,7 +2731,7 @@ function downloadModalAsImage() {
     alert("❌ इमेज डाउनलोड में त्रुटि: " + err);
   });
 }
-// मोडल के अंदर दिख रहे विवरण की इमेज/रसीद को सीधे व्हाट्सएप पर भेजने का फ़ंक्शन
+// मोडल के अंदर दिख रहे विवरण की रसीद को सही PDF फॉर्मेट और डायरेक्ट व्हाट्सएप चैट पर भेजने का फ़ंक्शन
 function sendModalDetailsToWhatsApp() {
   var modalBody = document.getElementById("modalBodyContent");
   var modalTitleEl = document.getElementById("modalTitle");
@@ -2698,9 +2749,12 @@ function sendModalDetailsToWhatsApp() {
     if (!targetMobile || targetMobile.length !== 10) return alert("⚠️ व्हाट्सएप मैसेज भेजने के लिए सही मोबाइल नंबर अनिवार्य है!");
   }
 
+  // 10 डिजिट नंबर को साफ़ करके 91 कंट्री कोड सुनिश्चित करना
+  targetMobile = targetMobile.replace(/\D/g, '').slice(-10);
+  var formattedMobile = "91" + targetMobile;
+
   var now = new Date();
   var headerTitle = modalTitleEl ? modalTitleEl.innerText : "Transaction Receipt";
-  var fileName = rawCustName.replace(/\s+/g, '_') + "_Receipt.jpg";
 
   var message = "*🚩 माँ गंगा जन सेवा केंद्र व इलेक्ट्रॉनिक्स 🚩*\n" +
                 "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" +
@@ -2712,39 +2766,6 @@ function sendModalDetailsToWhatsApp() {
 
   var bodyClone = modalBody.cloneNode(true);
   bodyClone.querySelectorAll('button').forEach(function(btn) { btn.remove(); });
-  bodyClone.querySelectorAll('img').forEach(function(img) {
-    img.style.maxWidth = '100px';
-    img.style.maxHeight = '100px';
-    img.style.objectFit = 'contain';
-    img.style.borderRadius = '8px';
-  });
-
-  // 🌟 ब्रांडिंग एवं प्रचार बॉक्स
-  var brandingHtml = 
-    '<div style="margin-top:14px; background: #f1f5f9; border: 1.5px solid #cbd5e1; border-radius: 10px; padding: 10px 14px; font-family: Arial, sans-serif;">' +
-      '<div style="text-align: center; font-size: 11px; font-weight: 800; color: #0f172a; margin-bottom: 6px; text-transform: uppercase; border-bottom:1px solid #cbd5e1; padding-bottom:4px;">' +
-        '🌟 हमारी प्रमुख ऑनलाइन व जन सेवा केंद्र की सेवाएँ 🌟' +
-      '</div>' +
-      '<div style="display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; font-size: 9px; font-weight: 700;">' +
-        '<span style="background: #dbeafe; color: #1e40af; border: 1px solid #93c5fd; padding: 3px 7px; border-radius: 6px;">📄 आय प्रमाण पत्र</span>' +
-        '<span style="background: #dcfce7; color: #166534; border: 1px solid #86efac; padding: 3px 7px; border-radius: 6px;">🏡 निवास प्रमाण पत्र</span>' +
-        '<span style="background: #fef3c7; color: #92400e; border: 1px solid #fde047; padding: 3px 7px; border-radius: 6px;">📑 जाति प्रमाण पत्र</span>' +
-        '<span style="background: #fce7f3; color: #9d174d; border: 1px solid #fbcfe8; padding: 3px 7px; border-radius: 6px;">💳 पैन कार्ड (PAN)</span>' +
-        '<span style="background: #e0e7ff; color: #3730a3; border: 1px solid #c7d2fe; padding: 3px 7px; border-radius: 6px;">🗳️ वोटर ID कार्ड</span>' +
-        '<span style="background: #ccfbf1; color: #115e59; border: 1px solid #99f6e4; padding: 3px 7px; border-radius: 6px;">🆔 आधार कार्ड प्रिंट</span>' +
-        '<span style="background: #ffedd5; color: #9a3412; border: 1px solid #fed7aa; padding: 3px 7px; border-radius: 6px;">📝 सभी ऑनलाइन फॉर्म</span>' +
-        '<span style="background: #f1f5f9; color: #334155; border: 1px solid #cbd5e1; padding: 3px 7px; border-radius: 6px;">💸 मनी ट्रांसफर</span>' +
-      '</div>' +
-    '</div>' +
-    '<div style="margin-top:8px; background: #fffbebf8; border: 1.5px dashed #d97706; border-radius: 10px; padding: 10px 12px; font-size: 9.5px; color: #78350f; font-family: Arial, sans-serif;">' +
-      '<div style="font-weight: 800; font-size: 10.5px; color: #b45309; border-bottom: 1px solid #fcd34d; padding-bottom: 3px; margin-bottom: 6px; text-transform: uppercase; text-align: center;">' +
-        '⚡ विशेष सूचना एवं रिपेयरिंग/बिक्री सेवाएँ ⚡' +
-      '</div>' +
-      '<div style="line-height: 1.4;">' +
-        '<div style="margin-bottom: 4px;">📌 <strong>नोट 1 (इलेक्ट्रॉनिक्स व वाइंडिंग):</strong> हमारे यहाँ सभी प्रकार के <strong>पंखे (Fan) एवं कूलर की मोटर की बाइंडिंग (Motor Winding)</strong> तसल्लीबख्श की जाती है। साथ ही सभी इलेक्ट्रॉनिक उपकरण उचित दामों पर उपलब्ध हैं।</div>' +
-        '<div>📌 <strong>नोट 2 (मोबाइल व एक्सेसरीज़):</strong> हमारे यहाँ <strong>कीपैड मोबाइल (Keypad Phones)</strong> एवं मोबाइल से संबंधित ओरिजिनल एक्सेसरीज़ जैसे इयरबड्स, इयरफोन, चार्जर इत्यादि उपलब्ध हैं।</div>' +
-      '</div>' +
-    '</div>';
 
   var container = document.createElement('div');
   container.style.cssText = 'position:fixed; top:-9999px; left:-9999px; width:580px; background:#ffffff; color:#000000; padding:22px; font-family:Arial, sans-serif; box-sizing:border-box; z-index:999999; display:block; border: 2px solid #0f172a; border-radius: 12px;';
@@ -2763,33 +2784,31 @@ function sendModalDetailsToWhatsApp() {
         '<small style="color:#64748b; font-size:9px; font-weight:600;">' + now.toLocaleDateString('en-IN') + ' ' + now.toLocaleTimeString('en-IN') + '</small>' +
       '</div>' +
     '</div>' +
-    '<div style="background:#ffffff; color:#000000;">' + bodyClone.innerHTML + '</div>' +
-    brandingHtml;
+    '<div style="background:#ffffff; color:#000000;">' + bodyClone.innerHTML + '</div>';
 
   document.body.appendChild(container);
 
-  html2canvas(container, { scale: 2, useCORS: true, allowTaint: true, backgroundColor: '#ffffff' }).then(function(canvas) {
+  // छवि (Image) की जगह असल PDF DataURL तैयार करके APK को भेजना
+  var opt = {
+    margin: 0.2,
+    filename: 'Receipt_' + targetMobile + '.pdf',
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2, useCORS: true },
+    jsPDF: { unit: 'in', format: 'a5', orientation: 'portrait' }
+  };
+
+  html2pdf().set(opt).from(container).outputPdf('datauristring').then(function(pdfBase64) {
     container.remove();
-    var imgData = canvas.toDataURL('image/jpeg', 0.95);
-
     if (window.AndroidApp && typeof window.AndroidApp.sharePdfToWhatsApp === "function") {
-      window.AndroidApp.sharePdfToWhatsApp(imgData, targetMobile, message);
+      window.AndroidApp.sharePdfToWhatsApp(pdfBase64, targetMobile, message);
     } else {
-      var link = document.createElement('a');
-      link.href = imgData;
-      link.download = fileName;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-
-      setTimeout(function() {
-        var waUrl = "https://wa.me/91" + targetMobile + "?text=" + encodeURIComponent(message + "\n\n(नोट: डाउनलोड की गई रसीद की फोटो को शेयर करें)");
-        window.open(waUrl, '_blank');
-      }, 500);
+      var waUrl = "https://api.whatsapp.com/send?phone=" + formattedMobile + "&text=" + encodeURIComponent(message);
+      window.open(waUrl, '_blank');
     }
   }).catch(function(err) {
     if (document.body.contains(container)) container.remove();
-    alert("❌ इमेज जनरेट करने में त्रुटि: " + err);
+    var waUrl = "https://api.whatsapp.com/send?phone=" + formattedMobile + "&text=" + encodeURIComponent(message);
+    window.open(waUrl, '_blank');
   });
 }
     function exportTableToExcel(tbodyId, reportName) {
@@ -2819,6 +2838,7 @@ function sendModalDetailsToWhatsApp() {
 
   if (window.AndroidApp && typeof window.AndroidApp.saveCsvFile === "function") {
     window.AndroidApp.saveCsvFile(csvData, fullFileName);
+    alert("📥 " + fullFileName + " डाउनलोड फ़ोल्डर में सेव हो गई है!");
   } else {
     var blob = new Blob([csvData], { type: "text/csv;charset=utf-8;" });
     var link = document.createElement("a");
@@ -4334,10 +4354,21 @@ function captureAndUploadStockPhoto(inputEl, itemName) {
       var sigPreviewEl = document.getElementById('sigPreviewImg');
       var sigData = (sigPreviewEl && sigPreviewEl.src && !sigPreviewEl.classList.contains('d-none')) ? sigPreviewEl.src : "";
 
+      // Gateway logic: अगर Other चुना है तो यूज़र के टाइप किए गए नाम को Google Sheet में भेजा जाएगा
+      var selectedGateway = document.getElementById('txnGateway').value;
+      var otherGatewayVal = document.getElementById('txnGatewayOtherInput') ? document.getElementById('txnGatewayOtherInput').value.trim() : "";
+
+      if (selectedGateway === "Other") {
+        if (!otherGatewayVal) {
+          return alert("⚠️ कृपया ऐप / पोर्टल का नाम (App Name) दर्ज करें!");
+        }
+        selectedGateway = otherGatewayVal; // Google Sheet में अब 'Other' की जगह ऐप का नाम जाएगा
+      }
+
       var data = {
         type: document.getElementById('txnType').value,
         amount: document.getElementById('txnAmount').value.trim(),
-        gateway: document.getElementById('txnGateway').value,
+        gateway: selectedGateway,
         method: document.getElementById('txnMethod') ? document.getElementById('txnMethod').value : "",
         name: document.getElementById('txnName').value.trim(),
         mobile: document.getElementById('txnMobile').value.trim(),
@@ -4412,6 +4443,7 @@ function captureAndUploadStockPhoto(inputEl, itemName) {
       clearSignature();
       slipImageBase64 = null;
       receiverImageBase64 = null;
+      toggleOtherGatewayInput(); // Other वाले बॉक्स को वापस डिफ़ॉल्ट रूप से छिपाने के लिए
       var previewImg = document.getElementById("nativePreviewImg");
       if(previewImg) previewImg.src = "https://cdn-icons-png.flaticon.com/512/847/847969.png";
       var ocrSt = document.getElementById("ocrStatus");
@@ -4437,23 +4469,64 @@ function captureAndUploadStockPhoto(inputEl, itemName) {
     function toggleAadhaarField() {
   var selectedType = document.getElementById("txnType").value;
   var aadhaarInput = document.getElementById("txnAadhaar");
+  var gatewaySelect = document.getElementById("txnGateway");
   
-  if (!aadhaarInput) return;
+  // 1. Aadhaar/Account Field Visibility Logic
+  if (aadhaarInput) {
+    if (selectedType === "Bank Cash Deposit") {
+      aadhaarInput.classList.remove("d-none");
+      aadhaarInput.placeholder = "🏦 Bank Account Number";
+      aadhaarInput.removeAttribute("maxlength");
+    } else if (selectedType === "AePS Withdrawal") {
+      aadhaarInput.classList.remove("d-none");
+      aadhaarInput.placeholder = "🪪 Aadhaar (Last 4 Digits)";
+      aadhaarInput.setAttribute("maxlength", "4");
+    } else {
+      aadhaarInput.classList.add("d-none");
+      aadhaarInput.value = "";
+    }
+  }
 
-  if (selectedType === "Bank Cash Deposit") {
-    // केवल बैंक में नकद जमा पर अकाउंट नंबर मांगेगा
-    aadhaarInput.classList.remove("d-none");
-    aadhaarInput.placeholder = "🏦 Bank Account Number";
-    aadhaarInput.removeAttribute("maxlength");
-  } else if (selectedType === "AePS Withdrawal") {
-    // केवल AePS नकद निकासी पर आधार के अंतिम 4 अंक मांगेगा
-    aadhaarInput.classList.remove("d-none");
-    aadhaarInput.placeholder = "🪪 Aadhaar (Last 4 Digits)";
-    aadhaarInput.setAttribute("maxlength", "4");
-  } else {
-    // UPI Sent / UPI Received आदि में यह बॉक्स छुप जाएगा
-    aadhaarInput.classList.add("d-none");
-    aadhaarInput.value = "";
+  // 2. Gateway Dropdown Filtering Logic
+  if (gatewaySelect) {
+    var gatewayOptions = "";
+    
+    if (selectedType === "AePS Withdrawal") {
+      // AePS सर्विस के लिए केवल AePS वाले पोर्टल
+      gatewayOptions += '<option value="ReliPay">ReliPay</option>';
+      gatewayOptions += '<option value="CSC DigiPay">CSC DigiPay</option>';
+      gatewayOptions += '<option value="PayNearby">PayNearby</option>';
+      gatewayOptions += '<option value="Vidcom">Vidcom</option>';
+      gatewayOptions += '<option value="Other">Other</option>';
+    } else {
+      // अन्य सभी (UPI Sent / Received / Cash Deposit) के लिए UPI एप्स
+      gatewayOptions += '<option value="Google Pay (GPay)">Google Pay (GPay)</option>';
+      gatewayOptions += '<option value="Paytm">Paytm</option>';
+      gatewayOptions += '<option value="PhonePe">PhonePe</option>';
+      gatewayOptions += '<option value="Navi">Navi</option>';
+      gatewayOptions += '<option value="BHIM UPI">BHIM UPI</option>';
+      gatewayOptions += '<option value="Other">Other</option>';
+    }
+
+    gatewaySelect.innerHTML = gatewayOptions;
+    toggleOtherGatewayInput(); // Dropdown बदलने पर Other की स्थिति भी चेक होगी
+  }
+}
+
+// 'Other' सेलेक्ट होने पर नया इनपुट बॉक्स दिखाने/छिपाने का फ़ंक्शन
+function toggleOtherGatewayInput() {
+  var gatewaySelect = document.getElementById("txnGateway");
+  var otherBox = document.getElementById("otherGatewayBox");
+  var otherInput = document.getElementById("txnGatewayOtherInput");
+
+  if (gatewaySelect && otherBox) {
+    if (gatewaySelect.value === "Other") {
+      otherBox.classList.remove("d-none");
+      if (otherInput) otherInput.focus();
+    } else {
+      otherBox.classList.add("d-none");
+      if (otherInput) otherInput.value = "";
+    }
   }
 }
 
