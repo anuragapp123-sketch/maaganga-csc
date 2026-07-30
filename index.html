@@ -1276,7 +1276,7 @@
 
   <script>
     // Deploy kiye gaye Web App ka URL yahan dalein (REST API fallback ke liye)
-    var SCRIPT_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyABQOYxI-kR_BH6F9hJ_8AYFItGXECEMrFuNBwjLco_gw1mHY0P_sAFwtAOgm4SELC/exec";
+    var SCRIPT_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzmoXr0ckt7-L9NnzVJsFVzXHKx1oAaFwbBZVta_NBOLfSx1EOKAdPMj8wAQTpL5WH9/exec";
     var currentLocation = "N/A";
     var slipImageBase64 = null;
     var receiverImageBase64 = null;
@@ -2350,18 +2350,15 @@ function downloadTxnReceiptPDF(index) {
   var modalTitleEl = document.getElementById("modalTitle");
   if (!modalBody) return alert("⚠️ कोई विवरण उपलब्ध नहीं है!");
 
-  // 1. ग्राहक का नाम निकालना
   var custNameEl = modalBody.querySelector("h6.text-dark, h6, strong");
   var rawCustName = custNameEl ? custNameEl.innerText.replace(/[^a-zA-Z0-9]/g, '_').trim() : "Customer";
   if (!rawCustName || rawCustName.length < 2) rawCustName = "Customer";
 
-  // 2. दिनांक व समय फ़ॉर्मेटिंग
   var now = new Date();
   var dateStr = String(now.getDate()).padStart(2, '0') + "-" + String(now.getMonth() + 1).padStart(2, '0') + "-" + now.getFullYear();
   var timeStr = String(now.getHours()).padStart(2, '0') + "-" + String(now.getMinutes()).padStart(2, '0') + "-" + String(now.getSeconds()).padStart(2, '0');
   var fileName = rawCustName + "_Payment_Receipt_" + dateStr + "_" + timeStr + ".pdf";
 
-  // 3. GitHub Safe Inline-Styled Container
   var cloneContainer = document.createElement('div');
   cloneContainer.id = 'tempModalPdfContainer';
   cloneContainer.style.cssText = 'position:fixed; top:0; left:0; width:550px; background:#ffffff; color:#000000; padding:20px; font-family:Arial, sans-serif; box-sizing:border-box; z-index:999999; visibility:visible;';
@@ -2369,20 +2366,20 @@ function downloadTxnReceiptPDF(index) {
   var headerTitle = modalTitleEl ? modalTitleEl.innerText : "Payment Receipt";
   cloneContainer.innerHTML = 
     '<div style="text-align:center; border-bottom:2px solid #0f172a; padding-bottom:8px; margin-bottom:12px; background:#ffffff;">' +
-      '<h2 style="margin:0; color:#0f172a; font-size:16px; font-weight:bold; font-family:Arial, sans-serif;">Maa Ganga Jan Seva Kendra</h2>' +
-      '<h4 style="margin:4px 0 0 0; color:#2563eb; font-size:13px; font-family:Arial, sans-serif;">' + headerTitle.toUpperCase() + '</h4>' +
-      '<small style="color:#64748b; font-size:9px; font-family:Arial, sans-serif;">Generated Date: ' + now.toLocaleString('en-IN') + '</small>' +
+      '<h2 style="margin:0; color:#0f172a; font-size:16px; font-weight:bold;">Maa Ganga Jan Seva Kendra</h2>' +
+      '<h4 style="margin:4px 0 0 0; color:#2563eb; font-size:13px;">' + headerTitle.toUpperCase() + '</h4>' +
+      '<small style="color:#64748b; font-size:9px;">Generated Date: ' + now.toLocaleString('en-IN') + '</small>' +
     '</div>' +
-    '<div style="background:#ffffff; color:#000000; font-family:Arial, sans-serif;">' + modalBody.innerHTML + '</div>';
+    '<div style="background:#ffffff; color:#000000;">' + modalBody.innerHTML + '</div>';
 
-  // बटनों और इमेजेस का सुरक्षित सफ़ाई
+  // सभी बटनों को हटाना
   cloneContainer.querySelectorAll('button').forEach(function(btn) { btn.remove(); });
   
-  // CORS Error रोकने के लिए बाहरी इमेजेस पर क्रॉस-ओरिजिन एट्रीब्यूट सेट करें
+  // इमेजेस के लिए CORS सपोर्ट सेट करना
   cloneContainer.querySelectorAll('img').forEach(function(img) {
     img.setAttribute('crossOrigin', 'anonymous');
-    img.style.maxWidth = '100px';
-    img.style.maxHeight = '100px';
+    img.style.maxWidth = '120px';
+    img.style.maxHeight = '120px';
   });
 
   document.body.appendChild(cloneContainer);
@@ -2395,7 +2392,6 @@ function downloadTxnReceiptPDF(index) {
     jsPDF: { unit: 'in', format: 'a5', orientation: 'portrait' }
   };
 
-  // 4. GitHub Pages रेंडरिंग डिले (400ms)
   setTimeout(function() {
     if (window.AndroidApp && typeof window.AndroidApp.savePdfFile === "function") {
       html2pdf().set(opt).from(cloneContainer).outputPdf('datauristring').then(function(pdfBase64) {
@@ -2405,7 +2401,7 @@ function downloadTxnReceiptPDF(index) {
       }).catch(function(err) {
         var el = document.getElementById('tempModalPdfContainer');
         if (el) el.remove();
-        alert("❌ PDF जनरेट करने में विफलता!");
+        alert("❌ रसीद PDF बनाने में त्रुटि!");
       });
     } else if (typeof html2pdf !== 'undefined') {
       html2pdf().set(opt).from(cloneContainer).save().then(function() {
@@ -2421,7 +2417,7 @@ function downloadTxnReceiptPDF(index) {
       var el = document.getElementById('tempModalPdfContainer');
       if (el) el.remove();
     }
-  }, 400);
+  }, 700);
 }
 
     function exportTableToPDF(tbodyId, reportName) {
@@ -2433,74 +2429,39 @@ function downloadTxnReceiptPDF(index) {
 
   var tableHtml = "";
 
-  // 1. Transaction History PDF
-  if (tbodyId === 'txnHistoryTableBody') {
-    tableHtml = '<table style="width:100%; border-collapse:collapse; font-size:10px; font-family:Arial, sans-serif; margin-top:10px; background:#ffffff;">' +
+  // 1. Transaction History Table (फोटो के साथ)
+  if (tbodyId === 'txnHistoryTableBody' && typeof globalTxnHistory !== 'undefined' && globalTxnHistory.length > 0) {
+    tableHtml = '<table style="width:100%; border-collapse:collapse; font-size:10px; font-family:Arial, sans-serif; margin-top:10px;">' +
       '<thead style="background-color:#0f172a; color:#ffffff;">' +
         '<tr>' +
-          '<th style="border:1px solid #334155; padding:6px; text-align:left; background:#0f172a; color:#ffffff;">Date</th>' +
-          '<th style="border:1px solid #334155; padding:6px; text-align:left; background:#0f172a; color:#ffffff;">Name</th>' +
-          '<th style="border:1px solid #334155; padding:6px; text-align:left; background:#0f172a; color:#ffffff;">Mobile</th>' +
-          '<th style="border:1px solid #334155; padding:6px; text-align:center; background:#0f172a; color:#ffffff;">Type</th>' +
-          '<th style="border:1px solid #334155; padding:6px; text-align:right; background:#0f172a; color:#ffffff;">Amount</th>' +
-          '<th style="border:1px solid #334155; padding:6px; text-align:left; background:#0f172a; color:#ffffff;">Gateway</th>' +
-          '<th style="border:1px solid #334155; padding:6px; text-align:left; background:#0f172a; color:#ffffff;">Aadhaar</th>' +
-          '<th style="border:1px solid #334155; padding:6px; text-align:left; background:#0f172a; color:#ffffff;">Txn ID / UTR</th>' +
+          '<th style="border:1px solid #334155; padding:6px; text-align:center;">Photo</th>' +
+          '<th style="border:1px solid #334155; padding:6px; text-align:left;">Date</th>' +
+          '<th style="border:1px solid #334155; padding:6px; text-align:left;">Name</th>' +
+          '<th style="border:1px solid #334155; padding:6px; text-align:left;">Mobile</th>' +
+          '<th style="border:1px solid #334155; padding:6px; text-align:center;">Type</th>' +
+          '<th style="border:1px solid #334155; padding:6px; text-align:right;">Amount</th>' +
+          '<th style="border:1px solid #334155; padding:6px; text-align:left;">Gateway</th>' +
+          '<th style="border:1px solid #334155; padding:6px; text-align:left;">Txn ID / UTR</th>' +
         '</tr>' +
       '</thead><tbody>';
 
-    if (typeof globalTxnHistory !== 'undefined' && globalTxnHistory.length > 0) {
-      globalTxnHistory.forEach(function(row) {
-        tableHtml += '<tr>' +
-          '<td style="border:1px solid #cbd5e1; padding:5px; color:#000000; background:#ffffff;">' + (row.date || '-') + '</td>' +
-          '<td style="border:1px solid #cbd5e1; padding:5px; font-weight:bold; color:#000000; background:#ffffff;">' + (row.name || '-') + '</td>' +
-          '<td style="border:1px solid #cbd5e1; padding:5px; color:#000000; background:#ffffff;">' + (row.mobile || '-') + '</td>' +
-          '<td style="border:1px solid #cbd5e1; padding:5px; text-align:center; color:#000000; background:#ffffff;">' + (row.type || '-') + '</td>' +
-          '<td style="border:1px solid #cbd5e1; padding:5px; text-align:right; font-weight:bold; color:#2563eb; background:#ffffff;">Rs.' + (row.amount || '0') + '</td>' +
-          '<td style="border:1px solid #cbd5e1; padding:5px; color:#000000; background:#ffffff;">' + (row.gateway || '-') + '</td>' +
-          '<td style="border:1px solid #cbd5e1; padding:5px; color:#000000; background:#ffffff;">' + (row.aadhaar || '-') + '</td>' +
-          '<td style="border:1px solid #cbd5e1; padding:5px; font-weight:bold; color:#16a34a; background:#ffffff;">' + (row.txnId || '-') + '</td>' +
-        '</tr>';
-      });
-    } else {
-      tableHtml += '<tr><td colspan="8" style="border:1px solid #cbd5e1; padding:15px; text-align:center; color:#64748b; font-weight:bold; background:#ffffff;">⚠️ इस श्रेणी में कोई ट्रांजैक्शन रिकॉर्ड उपलब्ध नहीं है।</td></tr>';
-    }
+    globalTxnHistory.forEach(function(row) {
+      var photoUrl = fixDriveImageUrl(row.receiverPhoto);
+      tableHtml += '<tr>' +
+        '<td style="border:1px solid #cbd5e1; padding:4px; text-align:center;"><img src="' + photoUrl + '" crossorigin="anonymous" style="width:28px; height:28px; border-radius:50%; object-fit:cover;"></td>' +
+        '<td style="border:1px solid #cbd5e1; padding:5px; color:#000000;">' + (row.date || '-') + '</td>' +
+        '<td style="border:1px solid #cbd5e1; padding:5px; font-weight:bold; color:#000000;">' + (row.name || '-') + '</td>' +
+        '<td style="border:1px solid #cbd5e1; padding:5px; color:#000000;">' + (row.mobile || '-') + '</td>' +
+        '<td style="border:1px solid #cbd5e1; padding:5px; text-align:center; color:#000000;">' + (row.type || '-') + '</td>' +
+        '<td style="border:1px solid #cbd5e1; padding:5px; text-align:right; font-weight:bold; color:#2563eb;">Rs.' + (row.amount || '0') + '</td>' +
+        '<td style="border:1px solid #cbd5e1; padding:5px; color:#000000;">' + (row.gateway || '-') + '</td>' +
+        '<td style="border:1px solid #cbd5e1; padding:5px; font-weight:bold; color:#16a34a;">' + (row.txnId || '-') + '</td>' +
+      '</tr>';
+    });
 
     tableHtml += '</tbody></table>';
-  } 
-  // 2. Invoice History PDF
-  else if (tbodyId === 'invoiceHistoryTableBody') {
-    tableHtml = '<table style="width:100%; border-collapse:collapse; font-size:10px; font-family:Arial, sans-serif; margin-top:10px; background:#ffffff;">' +
-      '<thead style="background-color:#0f172a; color:#ffffff;">' +
-        '<tr>' +
-          '<th style="border:1px solid #334155; padding:6px; text-align:left; background:#0f172a; color:#ffffff;">Inv No</th>' +
-          '<th style="border:1px solid #334155; padding:6px; text-align:left; background:#0f172a; color:#ffffff;">Client Name</th>' +
-          '<th style="border:1px solid #334155; padding:6px; text-align:left; background:#0f172a; color:#ffffff;">Mobile</th>' +
-          '<th style="border:1px solid #334155; padding:6px; text-align:right; background:#0f172a; color:#ffffff;">Total</th>' +
-          '<th style="border:1px solid #334155; padding:6px; text-align:right; background:#0f172a; color:#ffffff;">Paid</th>' +
-          '<th style="border:1px solid #334155; padding:6px; text-align:right; background:#0f172a; color:#ffffff;">Balance</th>' +
-        '</tr>' +
-      '</thead><tbody>';
-
-    if (typeof globalInvoiceHistory !== 'undefined' && globalInvoiceHistory.length > 0) {
-      globalInvoiceHistory.forEach(function(row) {
-        tableHtml += '<tr>' +
-          '<td style="border:1px solid #cbd5e1; padding:5px; font-weight:bold; color:#2563eb; background:#ffffff;">' + (row.invNo || '-') + '</td>' +
-          '<td style="border:1px solid #cbd5e1; padding:5px; font-weight:bold; color:#000000; background:#ffffff;">' + (row.name || '-') + '</td>' +
-          '<td style="border:1px solid #cbd5e1; padding:5px; color:#000000; background:#ffffff;">' + (row.mobile || '-') + '</td>' +
-          '<td style="border:1px solid #cbd5e1; padding:5px; text-align:right; font-weight:bold; color:#000000; background:#ffffff;">Rs.' + (row.total || '0') + '</td>' +
-          '<td style="border:1px solid #cbd5e1; padding:5px; text-align:right; color:#16a34a; background:#ffffff;">Rs.' + (row.paid || '0') + '</td>' +
-          '<td style="border:1px solid #cbd5e1; padding:5px; text-align:right; font-weight:bold; color:#dc2626; background:#ffffff;">Rs.' + (row.balance || '0') + '</td>' +
-        '</tr>';
-      });
-    } else {
-      tableHtml += '<tr><td colspan="6" style="border:1px solid #cbd5e1; padding:15px; text-align:center; color:#64748b; font-weight:bold; background:#ffffff;">⚠️ इस श्रेणी में कोई इनवॉइस रिकॉर्ड उपलब्ध नहीं है।</td></tr>';
-    }
-
-    tableHtml += '</tbody></table>';
-  } 
-  // 3. अन्य सामान्य टेबल्स
-  else {
+  } else {
+    // बैकअप लेआउट
     if (tbody && tbody.rows.length > 0) {
       var tableEl = tbody.closest('table');
       var cleanTable = tableEl.cloneNode(true);
@@ -2515,25 +2476,26 @@ function downloadTxnReceiptPDF(index) {
           cell.style.padding = '6px';
           cell.style.color = rIdx === 0 ? '#ffffff' : '#000000';
           cell.style.backgroundColor = rIdx === 0 ? '#0f172a' : '#ffffff';
-          cell.querySelectorAll('button, img, svg').forEach(function(el) { el.remove(); });
+          cell.querySelectorAll('button, svg').forEach(function(el) { el.remove(); });
+          cell.querySelectorAll('img').forEach(function(img) { img.setAttribute('crossOrigin', 'anonymous'); });
         });
       });
       tableHtml = cleanTable.outerHTML;
     } else {
-      tableHtml = '<div style="border:1px solid #cbd5e1; padding:15px; text-align:center; color:#64748b; font-weight:bold; margin-top:10px; background:#ffffff;">⚠️ कोई डेटा रिकॉर्ड उपलब्ध नहीं है।</div>';
+      tableHtml = '<div style="border:1px solid #cbd5e1; padding:15px; text-align:center; color:#64748b; font-weight:bold; margin-top:10px;">⚠️ कोई डेटा रिकॉर्ड उपलब्ध नहीं है।</div>';
     }
   }
 
-  // 4. GitHub Safe Visible Container
+  // 2. प्रिंट wrapper (स्क्रीन पर अस्थायी रूप से दिखेगा ताकि Canvas इमेज रेंडर कर सके)
   var printWrapper = document.createElement('div');
   printWrapper.id = 'tempPdfPrintContainer';
-  printWrapper.style.cssText = 'position:fixed; top:0; left:0; width:790px; background:#ffffff; color:#000000; padding:20px; font-family:Arial, sans-serif; box-sizing:border-box; z-index:999999; visibility:visible;';
+  printWrapper.style.cssText = 'position:fixed; top:0; left:0; width:800px; background:#ffffff; color:#000000; padding:20px; font-family:Arial, sans-serif; box-sizing:border-box; z-index:999999; visibility:visible;';
 
   printWrapper.innerHTML = 
     '<div style="text-align:center; border-bottom:2px solid #0f172a; padding-bottom:8px; margin-bottom:12px; background:#ffffff;">' +
-      '<h2 style="margin:0; color:#0f172a; font-size:16px; font-weight:bold; font-family:Arial, sans-serif;">Maa Ganga Jan Seva Kendra & Electronics</h2>' +
-      '<h4 style="margin:4px 0 0 0; color:#2563eb; font-size:13px; font-family:Arial, sans-serif;">REPORT: ' + reportName.replace(/_/g, ' ').toUpperCase() + '</h4>' +
-      '<small style="color:#64748b; font-size:9px; font-family:Arial, sans-serif;">Generated Date & Time: ' + now.toLocaleString('en-IN') + '</small>' +
+      '<h2 style="margin:0; color:#0f172a; font-size:16px; font-weight:bold;">Maa Ganga Jan Seva Kendra & Electronics</h2>' +
+      '<h4 style="margin:4px 0 0 0; color:#2563eb; font-size:13px;">REPORT: ' + reportName.replace(/_/g, ' ').toUpperCase() + '</h4>' +
+      '<small style="color:#64748b; font-size:9px;">Generated Date & Time: ' + now.toLocaleString('en-IN') + '</small>' +
     '</div>' + tableHtml;
 
   document.body.appendChild(printWrapper);
@@ -2546,7 +2508,7 @@ function downloadTxnReceiptPDF(index) {
     jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' }
   };
 
-  // 5. Render Delay
+  // 3. फोटो पूरी तरह लोड होने के लिए 700ms का समय दिया गया है
   setTimeout(function() {
     if (window.AndroidApp && typeof window.AndroidApp.savePdfFile === "function") {
       html2pdf().set(opt).from(printWrapper).outputPdf('datauristring').then(function(pdfBase64) {
@@ -2556,7 +2518,7 @@ function downloadTxnReceiptPDF(index) {
       }).catch(function(err) {
         var container = document.getElementById('tempPdfPrintContainer');
         if (container) container.remove();
-        alert("❌ PDF जनरेट करने में विफलता!");
+        alert("❌ PDF जनरेट करने में त्रुटि!");
       });
     } else if (typeof html2pdf !== 'undefined') {
       html2pdf().set(opt).from(printWrapper).save().then(function() {
@@ -2572,7 +2534,7 @@ function downloadTxnReceiptPDF(index) {
       var container = document.getElementById('tempPdfPrintContainer');
       if (container) container.remove();
     }
-  }, 400);
+  }, 700);
 }
 
     function exportTableToExcel(tbodyId, reportName) {
