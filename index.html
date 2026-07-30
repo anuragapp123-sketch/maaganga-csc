@@ -1217,7 +1217,7 @@
       <!-- Developer Info Footer -->
       <div class="text-center py-2 mt-2 border-top">
         <small class="text-muted d-block fw-bold" style="font-size: 10px;">Developed By :- Anurag Shakya</small>
-        <small class="text-secondary d-block fw-bold" style="font-size: 9px;">Version:-2.0.9</small>
+        <small class="text-secondary d-block fw-bold" style="font-size: 9px;">Version:-2.0.10</small>
         <a href="tel:9761414105" class="text-decoration-none fw-bold text-primary" style="font-size: 10px;">📞 9761414105</a>
       </div>
     </div>
@@ -1276,7 +1276,7 @@
 
   <script>
     // Deploy kiye gaye Web App ka URL yahan dalein (REST API fallback ke liye)
-    var SCRIPT_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwgJ-VDRxL6s8TEyLJrVULq-pCvBXNohca8euNfmjX_SHxRJvlMhBuM7az-W_Vh054/exec";
+    var SCRIPT_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxcsNCADL6Txc1e_28FAgjc5bzKkkHUgEOSVwJN7wwryCMkXtq2fKyVYpcGNc7ogPpb/exec";
     var currentLocation = "N/A";
     var slipImageBase64 = null;
     var receiverImageBase64 = null;
@@ -2357,11 +2357,11 @@ function downloadTxnReceiptPDF(index) {
   var now = new Date();
   var dateStr = String(now.getDate()).padStart(2, '0') + "-" + String(now.getMonth() + 1).padStart(2, '0') + "-" + now.getFullYear();
   var timeStr = String(now.getHours()).padStart(2, '0') + "-" + String(now.getMinutes()).padStart(2, '0') + "-" + String(now.getSeconds()).padStart(2, '0');
-  var fileName = rawCustName + "_Payment_Receipt_" + dateStr + "_" + timeStr;
+  var fileName = rawCustName + "_Payment_Receipt_" + dateStr + "_" + timeStr + ".pdf";
 
   var bodyClone = modalBody.cloneNode(true);
   bodyClone.querySelectorAll('button').forEach(function(btn) { btn.remove(); });
-  
+
   bodyClone.querySelectorAll('img').forEach(function(img) {
     img.style.maxWidth = '100px';
     img.style.maxHeight = '100px';
@@ -2369,40 +2369,49 @@ function downloadTxnReceiptPDF(index) {
     img.style.borderRadius = '8px';
   });
 
+  var container = document.createElement('div');
+  container.style.cssText = 'position:absolute; top:0; left:0; width:550px; background:#ffffff; color:#000000; padding:20px; font-family:Arial, sans-serif; box-sizing:border-box; z-index:999999; display:block;';
+
   var headerTitle = modalTitleEl ? modalTitleEl.innerText : "Payment Receipt";
+  container.innerHTML = 
+    '<div style="text-align:center; border-bottom:2px solid #0f172a; padding-bottom:8px; margin-bottom:12px; background:#ffffff;">' +
+      '<h2 style="margin:0; color:#0f172a; font-size:16px; font-weight:bold;">Maa Ganga Jan Seva Kendra</h2>' +
+      '<h4 style="margin:4px 0 0 0; color:#2563eb; font-size:13px;">' + headerTitle.toUpperCase() + '</h4>' +
+      '<small style="color:#64748b; font-size:9px;">Generated Date & Time: ' + now.toLocaleString('en-IN') + '</small>' +
+    '</div>' +
+    '<div style="background:#ffffff; color:#000000;">' + bodyClone.innerHTML + '</div>';
 
-  var printContent = 
-    '<div style="padding:20px; font-family:Arial, sans-serif; background:#ffffff; color:#000000; max-width:600px; margin:0 auto;">' +
-      '<div style="text-align:center; border-bottom:2px solid #0f172a; padding-bottom:8px; margin-bottom:12px;">' +
-        '<h2 style="margin:0; color:#0f172a; font-size:18px; font-weight:bold;">Maa Ganga Jan Seva Kendra</h2>' +
-        '<h4 style="margin:4px 0 0 0; color:#2563eb; font-size:13px;">' + headerTitle.toUpperCase() + '</h4>' +
-        '<small style="color:#64748b; font-size:9px;">Generated Date & Time: ' + now.toLocaleString('en-IN') + '</small>' +
-      '</div>' +
-      '<div style="font-size:12px; line-height:1.5;">' +
-        bodyClone.innerHTML +
-      '</div>' +
-    '</div>';
+  document.body.appendChild(container);
 
-  triggerModalPrintWindow(printContent, fileName);
-}
+  var opt = {
+    margin: 0.2,
+    filename: fileName,
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2, useCORS: true, allowTaint: true, backgroundColor: '#ffffff' },
+    jsPDF: { unit: 'in', format: 'a5', orientation: 'portrait' }
+  };
 
-function triggerModalPrintWindow(htmlContent, title) {
-  var printWin = window.open('', '_blank', 'width=700,height=600');
-  if (printWin) {
-    printWin.document.write(
-      '<html><head><title>' + title + '</title>' +
-      '<style>@page { size: A5 portrait; margin: 10mm; } body { margin:0; padding:0; background:#fff; font-family:Arial, sans-serif; }</style>' +
-      '</head><body>' + htmlContent + '</body></html>'
-    );
-    printWin.document.close();
-    printWin.focus();
-    setTimeout(function() {
-      printWin.print();
-      printWin.close();
-    }, 300);
-  } else {
-    window.print();
-  }
+  setTimeout(function() {
+    if (window.AndroidApp && typeof window.AndroidApp.savePdfFile === "function") {
+      html2pdf().set(opt).from(container).outputPdf('datauristring').then(function(pdfBase64) {
+        if (container) container.remove();
+        window.AndroidApp.savePdfFile(pdfBase64, fileName);
+      }).catch(function(err) {
+        if (container) container.remove();
+        alert("❌ PDF जनरेट करने में त्रुटि: " + err);
+      });
+    } else if (typeof html2pdf !== 'undefined') {
+      html2pdf().set(opt).from(container).save().then(function() {
+        if (container) container.remove();
+      }).catch(function() {
+        if (container) container.remove();
+        window.print();
+      });
+    } else {
+      window.print();
+      if (container) container.remove();
+    }
+  }, 400);
 }
 
     function exportTableToPDF(tbodyId, reportName) {
@@ -2412,65 +2421,73 @@ function triggerModalPrintWindow(htmlContent, title) {
   var now = new Date();
   var dateStr = String(now.getDate()).padStart(2, '0') + "-" + String(now.getMonth() + 1).padStart(2, '0') + "-" + now.getFullYear();
   var timeStr = String(now.getHours()).padStart(2, '0') + "-" + String(now.getMinutes()).padStart(2, '0') + "-" + String(now.getSeconds()).padStart(2, '0');
-  var fileName = reportName + "_" + dateStr + "_" + timeStr;
+  var fileName = reportName + "_" + dateStr + "_" + timeStr + ".pdf";
 
-  // ओरिजिनल टेबल का साफ़ क्लोन बनाना
   var tableEl = tbody.closest('table');
   var cleanTable = tableEl.cloneNode(true);
-  
+
   cleanTable.style.width = '100%';
   cleanTable.style.borderCollapse = 'collapse';
-  cleanTable.style.fontSize = '11px';
+  cleanTable.style.fontSize = '10px';
   cleanTable.style.fontFamily = 'Arial, sans-serif';
 
   cleanTable.querySelectorAll('tr').forEach(function(row, rIdx) {
     row.querySelectorAll('th, td').forEach(function(cell) {
       cell.style.border = '1px solid #cbd5e1';
-      cell.style.padding = '6px 8px';
+      cell.style.padding = '6px';
       cell.style.color = rIdx === 0 ? '#ffffff' : '#000000';
       cell.style.backgroundColor = rIdx === 0 ? '#0f172a' : '#ffffff';
-      
       cell.querySelectorAll('button, svg').forEach(function(el) { el.remove(); });
-      
       cell.querySelectorAll('img').forEach(function(img) {
-        img.style.width = '30px';
-        img.style.height = '30px';
+        img.style.width = '26px';
+        img.style.height = '26px';
         img.style.borderRadius = '50%';
         img.style.objectFit = 'cover';
       });
     });
   });
 
-  var printContent = 
-    '<div style="padding:20px; font-family:Arial, sans-serif; background:#ffffff; color:#000000;">' +
-      '<div style="text-align:center; border-bottom:2px solid #0f172a; padding-bottom:8px; margin-bottom:12px;">' +
-        '<h2 style="margin:0; color:#0f172a; font-size:18px; font-weight:bold;">Maa Ganga Jan Seva Kendra & Electronics</h2>' +
-        '<h4 style="margin:4px 0 0 0; color:#2563eb; font-size:14px;">REPORT: ' + reportName.replace(/_/g, ' ').toUpperCase() + '</h4>' +
-        '<small style="color:#64748b; font-size:10px;">Generated Date & Time: ' + now.toLocaleString('en-IN') + '</small>' +
-      '</div>' +
-      cleanTable.outerHTML +
-    '</div>';
+  var container = document.createElement('div');
+  container.style.cssText = 'position:absolute; top:0; left:0; width:790px; background:#ffffff; color:#000000; padding:20px; font-family:Arial, sans-serif; box-sizing:border-box; z-index:999999; display:block;';
 
-  triggerAndroidNativePrint(printContent, fileName);
-}
+  container.innerHTML = 
+    '<div style="text-align:center; border-bottom:2px solid #0f172a; padding-bottom:8px; margin-bottom:12px; background:#ffffff;">' +
+      '<h2 style="margin:0; color:#0f172a; font-size:16px; font-weight:bold;">Maa Ganga Jan Seva Kendra & Electronics</h2>' +
+      '<h4 style="margin:4px 0 0 0; color:#2563eb; font-size:13px;">REPORT: ' + reportName.replace(/_/g, ' ').toUpperCase() + '</h4>' +
+      '<small style="color:#64748b; font-size:9px;">Generated Date & Time: ' + now.toLocaleString('en-IN') + '</small>' +
+    '</div>' + cleanTable.outerHTML;
 
-function triggerAndroidNativePrint(htmlContent, title) {
-  var printWin = window.open('', '_blank', 'width=900,height=600');
-  if (printWin) {
-    printWin.document.write(
-      '<html><head><title>' + title + '</title>' +
-      '<style>@page { size: A4 landscape; margin: 10mm; } body { margin:0; padding:0; background:#fff; font-family:Arial, sans-serif; }</style>' +
-      '</head><body>' + htmlContent + '</body></html>'
-    );
-    printWin.document.close();
-    printWin.focus();
-    setTimeout(function() {
-      printWin.print();
-      printWin.close();
-    }, 300);
-  } else {
-    window.print();
-  }
+  document.body.appendChild(container);
+
+  var opt = {
+    margin: 0.2,
+    filename: fileName,
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2, useCORS: true, allowTaint: true, backgroundColor: '#ffffff' },
+    jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' }
+  };
+
+  setTimeout(function() {
+    if (window.AndroidApp && typeof window.AndroidApp.savePdfFile === "function") {
+      html2pdf().set(opt).from(container).outputPdf('datauristring').then(function(pdfBase64) {
+        if (container) container.remove();
+        window.AndroidApp.savePdfFile(pdfBase64, fileName);
+      }).catch(function(err) {
+        if (container) container.remove();
+        alert("❌ PDF Export Error: " + err);
+      });
+    } else if (typeof html2pdf !== 'undefined') {
+      html2pdf().set(opt).from(container).save().then(function() {
+        if (container) container.remove();
+      }).catch(function() {
+        if (container) container.remove();
+        window.print();
+      });
+    } else {
+      window.print();
+      if (container) container.remove();
+    }
+  }, 400);
 }
     function exportTableToExcel(tbodyId, reportName) {
   var tbody = document.getElementById(tbodyId);
