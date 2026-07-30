@@ -2399,42 +2399,54 @@ function downloadTxnReceiptPDF(index) {
   var tableEl = tbody.closest('table');
   if (!tableEl) return;
 
+  // 1. टेबल की कॉपी बनाएं
   var cleanTable = tableEl.cloneNode(true);
   cleanTable.style.width = '100%';
   cleanTable.style.borderCollapse = 'collapse';
-  cleanTable.style.fontSize = '10px';
+  cleanTable.style.fontSize = '9px';
   cleanTable.style.fontFamily = 'Arial, sans-serif';
 
-  cleanTable.querySelectorAll('tr').forEach(function(row, rIdx) {
-    row.querySelectorAll('th, td').forEach(function(cell) {
+  // 2. फोटो वाले कॉलम/इमेज, बटन और स्पैन को हटाना (ताकि CORS ब्लॉक न हो)
+  var rows = cleanTable.querySelectorAll('tr');
+  rows.forEach(function(row, rIdx) {
+    var cells = row.querySelectorAll('th, td');
+    cells.forEach(function(cell, cIdx) {
+      // बॉर्डर और स्टाइलिंग दें
       cell.style.border = '1px solid #334155';
-      cell.style.padding = '6px';
+      cell.style.padding = '5px 4px';
       cell.style.color = rIdx === 0 ? '#ffffff' : '#000000';
       cell.style.backgroundColor = rIdx === 0 ? '#0f172a' : '#ffffff';
-      cell.querySelectorAll('button, img, svg').forEach(el => el.remove());
+
+      // अगर सेल में इमेजेस या बटन्स हैं तो सिर्फ उनका टेक्स्ट रखें
+      var imgs = cell.querySelectorAll('img, svg, button, input');
+      imgs.forEach(function(el) { el.remove(); });
     });
   });
 
+  // 3. फ़ाइल का नाम (Name_Date_Time)
   var now = new Date();
   var dateStr = String(now.getDate()).padStart(2, '0') + "-" + String(now.getMonth() + 1).padStart(2, '0') + "-" + now.getFullYear();
   var timeStr = String(now.getHours()).padStart(2, '0') + "-" + String(now.getMinutes()).padStart(2, '0') + "-" + String(now.getSeconds()).padStart(2, '0');
   var fileName = reportName + "_" + dateStr + "_" + timeStr + ".pdf";
 
+  // 4. प्रिंट रैपर कंटेनर (ऑफ-स्क्रीन लेआउट)
   var printWrapper = document.createElement('div');
+  printWrapper.style.position = 'fixed';
+  printWrapper.style.top = '0';
+  printWrapper.style.left = '0';
+  printWrapper.style.zIndex = '-9999';
   printWrapper.style.padding = '15px';
   printWrapper.style.backgroundColor = '#ffffff';
   printWrapper.style.color = '#000000';
-  printWrapper.style.width = '100%';
-  printWrapper.style.maxWidth = '800px';
-  printWrapper.style.margin = '0 auto';
+  printWrapper.style.width = '750px'; // फिक्स्ड A4 पोर्ट्रेट/लैंडस्केप चौड़ाई
 
-  printWrapper.innerHTML = `
-    <div style="text-align:center; border-bottom:2px solid #0f172a; padding-bottom:8px; margin-bottom:12px;">
-      <h2 style="margin:0; color:#0f172a; font-size:16px; font-weight:bold;">Maa Ganga Jan Seva Kendra & Electronics</h2>
-      <h4 style="margin:4px 0 0 0; color:#2563eb; font-size:13px;">REPORT: ${reportName.replace(/_/g, ' ').toUpperCase()}</h4>
-      <small style="color:#64748b; font-size:9px;">Generated Date & Time: ${now.toLocaleString('en-IN')}</small>
-    </div>
-  `;
+  printWrapper.innerHTML = 
+    '<div style="text-align:center; border-bottom:2px solid #0f172a; padding-bottom:6px; margin-bottom:10px;">' +
+      '<h2 style="margin:0; color:#0f172a; font-size:15px; font-weight:bold;">Maa Ganga Jan Seva Kendra & Electronics</h2>' +
+      '<h4 style="margin:3px 0 0 0; color:#2563eb; font-size:12px;">REPORT: ' + reportName.replace(/_/g, ' ').toUpperCase() + '</h4>' +
+      '<small style="color:#64748b; font-size:8px;">Generated Date & Time: ' + now.toLocaleString('en-IN') + '</small>' +
+    '</div>';
+
   printWrapper.appendChild(cleanTable);
   document.body.appendChild(printWrapper);
 
@@ -2442,23 +2454,24 @@ function downloadTxnReceiptPDF(index) {
     margin: 0.2,
     filename: fileName,
     image: { type: 'jpeg', quality: 0.98 },
-    html2canvas: { scale: 2, useCORS: true, allowTaint: true, logging: false },
+    html2canvas: { scale: 2, useCORS: false, allowTaint: true, logging: false },
     jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' }
   };
 
+  // 5. 500ms का डिले दिया गया है ताकि लेआउट DOM में सही से रेंडर हो जाए
   setTimeout(function() {
     if (window.AndroidApp && typeof window.AndroidApp.savePdfFile === "function") {
       html2pdf().set(opt).from(printWrapper).outputPdf('datauristring').then(function(pdfBase64) {
         printWrapper.remove();
         window.AndroidApp.savePdfFile(pdfBase64, fileName);
-      }).catch(function() {
+      }).catch(function(err) {
         printWrapper.remove();
-        alert("❌ PDF जनरेट करने में विफलता!");
+        alert("❌ PDF जनरेट करने में समस्या आई!");
       });
     } else if (typeof html2pdf !== 'undefined') {
       html2pdf().set(opt).from(printWrapper).save().then(function() {
         printWrapper.remove();
-      }).catch(function() {
+      }).catch(function(err) {
         printWrapper.remove();
         window.print();
       });
@@ -2466,7 +2479,7 @@ function downloadTxnReceiptPDF(index) {
       window.print();
       printWrapper.remove();
     }
-  }, 400);
+  }, 500);
 }
 
     function exportTableToExcel(tbodyId, reportName) {
