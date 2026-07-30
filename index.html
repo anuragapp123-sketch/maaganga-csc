@@ -1432,7 +1432,9 @@ function renderTxnHistoryTable() {
     function sendHistoryInvoiceWhatsApp(idx) {
       var data = globalInvoiceHistory[idx];
       if (!data) return;
-      if (!data.mobile || data.mobile.length !== 10) return alert("⚠️ ग्राहक का मोबाइल नंबर सही नहीं है!");
+      
+      var mob = data.mobile ? String(data.mobile).replace(/\D/g, '').slice(-10) : "";
+      if (mob.length !== 10) return alert("⚠️ ग्राहक का मोबाइल नंबर सही नहीं है!");
 
       var upi = (typeof globalShopSettings !== 'undefined' && globalShopSettings.upiId) ? globalShopSettings.upiId : "anuragkumarshakya@ptaxis";
       var msg = "*🚩 माँ गंगा जन सेवा केंद्र व इलेक्ट्रॉनिक्स 🚩*\n" +
@@ -1444,12 +1446,22 @@ function renderTxnHistoryTable() {
                 (parseFloat(data.balance) > 0 ? "💳 *ऑनलाइन पेमेंट UPI ID:* `" + upi + "`\n\n" : "") +
                 "धन्यवाद! 🙏";
 
-      if (window.AndroidApp && typeof window.AndroidApp.sharePdfToWhatsApp === "function") {
-        generateInvoicePDFBase64(data, function(base64Pdf) {
-          window.AndroidApp.sharePdfToWhatsApp(base64Pdf, data.mobile, msg);
-        });
+      // यदि फोटो/इमेज (JPG/PNG/Base64) उपलब्ध है तो सीधे इमेज/डाटा भेजा जाएगा
+      if (data.proofUrl && (data.proofUrl.indexOf("data:image") === 0 || data.proofUrl.indexOf("http") === 0)) {
+        if (window.AndroidApp && typeof window.AndroidApp.sharePdfToWhatsApp === "function") {
+          window.AndroidApp.sharePdfToWhatsApp(data.proofUrl, mob, msg);
+        } else {
+          window.open("https://api.whatsapp.com/send?phone=91" + mob + "&text=" + encodeURIComponent(msg), "_blank");
+        }
       } else {
-        window.open("https://wa.me/91" + data.mobile + "?text=" + encodeURIComponent(msg), "_blank");
+        // यदि इनवॉइस बिल है तो असली A4 PDF जनरेट होकर शेयर होगा
+        if (window.AndroidApp && typeof window.AndroidApp.sharePdfToWhatsApp === "function") {
+          generateInvoicePDFBase64(data, function(base64Pdf) {
+            window.AndroidApp.sharePdfToWhatsApp(base64Pdf, mob, msg);
+          });
+        } else {
+          window.open("https://api.whatsapp.com/send?phone=91" + mob + "&text=" + encodeURIComponent(msg), "_blank");
+        }
       }
     }
 
@@ -2731,7 +2743,7 @@ function downloadModalAsImage() {
     alert("❌ इमेज डाउनलोड में त्रुटि: " + err);
   });
 }
-// मोडल के अंदर दिख रहे विवरण की रसीद को सही PDF फॉर्मेट और डायरेक्ट व्हाट्सएप चैट पर भेजने का फ़ंक्शन
+// ट्रांजैक्शन/मोडल डिटेल्स की साफ़ रसीद (Image) बनाकर सीधे ग्राहक के व्हाट्सएप नंबर पर भेजने का फ़ंक्शन
 function sendModalDetailsToWhatsApp() {
   var modalBody = document.getElementById("modalBodyContent");
   var modalTitleEl = document.getElementById("modalTitle");
@@ -2749,9 +2761,8 @@ function sendModalDetailsToWhatsApp() {
     if (!targetMobile || targetMobile.length !== 10) return alert("⚠️ व्हाट्सएप मैसेज भेजने के लिए सही मोबाइल नंबर अनिवार्य है!");
   }
 
-  // 10 डिजिट नंबर को साफ़ करके 91 कंट्री कोड सुनिश्चित करना
+  // 10 डिजिट का शुद्ध नंबर निकालना
   targetMobile = targetMobile.replace(/\D/g, '').slice(-10);
-  var formattedMobile = "91" + targetMobile;
 
   var now = new Date();
   var headerTitle = modalTitleEl ? modalTitleEl.innerText : "Transaction Receipt";
@@ -2759,13 +2770,33 @@ function sendModalDetailsToWhatsApp() {
   var message = "*🚩 माँ गंगा जन सेवा केंद्र व इलेक्ट्रॉनिक्स 🚩*\n" +
                 "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" +
                 "नमस्कार *" + rawCustName + " जी*,\n" +
-                "आपकी विवरण रसीद (" + headerTitle + ") संलग्न है।\n\n" +
-                "📅 *दिनांक:* " + now.toLocaleDateString('en-IN') + "\n" +
+                "आपकी " + headerTitle + " की रसीद संलग्न है।\n\n" +
+                "📅 *दिनांक:* " + now.toLocaleDateString('en-IN') + " " + now.toLocaleTimeString('en-IN') + "\n" +
                 "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" +
+                "👤 *Pro:* अनुराग शाक्य (Anurag Shakya)\n" +
+                "📞 *संपर्क/WhatsApp:* 9761414105\n" +
                 "धन्यवाद! 🙏";
 
   var bodyClone = modalBody.cloneNode(true);
   bodyClone.querySelectorAll('button').forEach(function(btn) { btn.remove(); });
+
+  // 🌟 ब्रांडिंग एवं प्रचार बॉक्स
+  var brandingHtml = 
+    '<div style="margin-top:14px; background: #f1f5f9; border: 1.5px solid #cbd5e1; border-radius: 10px; padding: 10px 14px; font-family: Arial, sans-serif;">' +
+      '<div style="text-align: center; font-size: 11px; font-weight: 800; color: #0f172a; margin-bottom: 6px; text-transform: uppercase; border-bottom:1px solid #cbd5e1; padding-bottom:4px;">' +
+        '🌟 हमारी प्रमुख ऑनलाइन व जन सेवा केंद्र की सेवाएँ 🌟' +
+      '</div>' +
+      '<div style="display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; font-size: 9px; font-weight: 700;">' +
+        '<span style="background: #dbeafe; color: #1e40af; border: 1px solid #93c5fd; padding: 3px 7px; border-radius: 6px;">📄 आय प्रमाण पत्र</span>' +
+        '<span style="background: #dcfce7; color: #166534; border: 1px solid #86efac; padding: 3px 7px; border-radius: 6px;">🏡 निवास प्रमाण पत्र</span>' +
+        '<span style="background: #fef3c7; color: #92400e; border: 1px solid #fde047; padding: 3px 7px; border-radius: 6px;">📑 जाति प्रमाण पत्र</span>' +
+        '<span style="background: #fce7f3; color: #9d174d; border: 1px solid #fbcfe8; padding: 3px 7px; border-radius: 6px;">💳 पैन कार्ड (PAN)</span>' +
+        '<span style="background: #e0e7ff; color: #3730a3; border: 1px solid #c7d2fe; padding: 3px 7px; border-radius: 6px;">🗳️ वोटर ID कार्ड</span>' +
+        '<span style="background: #ccfbf1; color: #115e59; border: 1px solid #99f6e4; padding: 3px 7px; border-radius: 6px;">🆔 आधार कार्ड प्रिंट</span>' +
+        '<span style="background: #ffedd5; color: #9a3412; border: 1px solid #fed7aa; padding: 3px 7px; border-radius: 6px;">📝 सभी ऑनलाइन फॉर्म</span>' +
+        '<span style="background: #f1f5f9; color: #334155; border: 1px solid #cbd5e1; padding: 3px 7px; border-radius: 6px;">💸 मनी ट्रांसफर</span>' +
+      '</div>' +
+    '</div>';
 
   var container = document.createElement('div');
   container.style.cssText = 'position:fixed; top:-9999px; left:-9999px; width:580px; background:#ffffff; color:#000000; padding:22px; font-family:Arial, sans-serif; box-sizing:border-box; z-index:999999; display:block; border: 2px solid #0f172a; border-radius: 12px;';
@@ -2784,31 +2815,25 @@ function sendModalDetailsToWhatsApp() {
         '<small style="color:#64748b; font-size:9px; font-weight:600;">' + now.toLocaleDateString('en-IN') + ' ' + now.toLocaleTimeString('en-IN') + '</small>' +
       '</div>' +
     '</div>' +
-    '<div style="background:#ffffff; color:#000000;">' + bodyClone.innerHTML + '</div>';
+    '<div style="background:#ffffff; color:#000000;">' + bodyClone.innerHTML + '</div>' +
+    brandingHtml;
 
   document.body.appendChild(container);
 
-  // छवि (Image) की जगह असल PDF DataURL तैयार करके APK को भेजना
-  var opt = {
-    margin: 0.2,
-    filename: 'Receipt_' + targetMobile + '.pdf',
-    image: { type: 'jpeg', quality: 0.98 },
-    html2canvas: { scale: 2, useCORS: true },
-    jsPDF: { unit: 'in', format: 'a5', orientation: 'portrait' }
-  };
-
-  html2pdf().set(opt).from(container).outputPdf('datauristring').then(function(pdfBase64) {
+  // html2canvas के ज़रिए इमेज (JPG/PNG) Base64 बनाएँ ताकि व्हाट्सप्प पर ब्लैंक PDF न जाए
+  html2canvas(container, { scale: 2, useCORS: true, allowTaint: true, backgroundColor: '#ffffff' }).then(function(canvas) {
     container.remove();
+    var imgBase64 = canvas.toDataURL('image/jpeg', 0.95);
+
     if (window.AndroidApp && typeof window.AndroidApp.sharePdfToWhatsApp === "function") {
-      window.AndroidApp.sharePdfToWhatsApp(pdfBase64, targetMobile, message);
+      window.AndroidApp.sharePdfToWhatsApp(imgBase64, targetMobile, message);
     } else {
-      var waUrl = "https://api.whatsapp.com/send?phone=" + formattedMobile + "&text=" + encodeURIComponent(message);
+      var waUrl = "https://api.whatsapp.com/send?phone=91" + targetMobile + "&text=" + encodeURIComponent(message);
       window.open(waUrl, '_blank');
     }
   }).catch(function(err) {
     if (document.body.contains(container)) container.remove();
-    var waUrl = "https://api.whatsapp.com/send?phone=" + formattedMobile + "&text=" + encodeURIComponent(message);
-    window.open(waUrl, '_blank');
+    alert("❌ रसीद इमेज जनरेट करने में त्रुटि: " + err);
   });
 }
     function exportTableToExcel(tbodyId, reportName) {
