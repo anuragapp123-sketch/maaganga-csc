@@ -1276,7 +1276,7 @@
 
   <script>
     // Deploy kiye gaye Web App ka URL yahan dalein (REST API fallback ke liye)
-    var SCRIPT_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzmoXr0ckt7-L9NnzVJsFVzXHKx1oAaFwbBZVta_NBOLfSx1EOKAdPMj8wAQTpL5WH9/exec";
+    var SCRIPT_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxB9oiCEccOE5JhpesRWX8ms_krAKJllbNiW3OYIxQG1TtJ65EAVxWFXgpEbI6_cn9y/exec";
     var currentLocation = "N/A";
     var slipImageBase64 = null;
     var receiverImageBase64 = null;
@@ -2372,10 +2372,8 @@ function downloadTxnReceiptPDF(index) {
     '</div>' +
     '<div style="background:#ffffff; color:#000000;">' + modalBody.innerHTML + '</div>';
 
-  // सभी बटनों को हटाना
   cloneContainer.querySelectorAll('button').forEach(function(btn) { btn.remove(); });
   
-  // इमेजेस के लिए CORS सपोर्ट सेट करना
   cloneContainer.querySelectorAll('img').forEach(function(img) {
     img.setAttribute('crossOrigin', 'anonymous');
     img.style.maxWidth = '120px';
@@ -2383,6 +2381,19 @@ function downloadTxnReceiptPDF(index) {
   });
 
   document.body.appendChild(cloneContainer);
+
+  // सभी इमेजेस का लोड होना पक्का करना
+  var images = cloneContainer.getElementsByTagName('img');
+  var imagePromises = Array.from(images).map(function(img) {
+    return new Promise(function(resolve) {
+      if (img.complete && img.naturalHeight !== 0) {
+        resolve();
+      } else {
+        img.onload = function() { resolve(); };
+        img.onerror = function() { resolve(); };
+      }
+    });
+  });
 
   var opt = {
     margin: 0.2,
@@ -2392,32 +2403,34 @@ function downloadTxnReceiptPDF(index) {
     jsPDF: { unit: 'in', format: 'a5', orientation: 'portrait' }
   };
 
-  setTimeout(function() {
-    if (window.AndroidApp && typeof window.AndroidApp.savePdfFile === "function") {
-      html2pdf().set(opt).from(cloneContainer).outputPdf('datauristring').then(function(pdfBase64) {
-        var el = document.getElementById('tempModalPdfContainer');
-        if (el) el.remove();
-        window.AndroidApp.savePdfFile(pdfBase64, fileName);
-      }).catch(function(err) {
-        var el = document.getElementById('tempModalPdfContainer');
-        if (el) el.remove();
-        alert("❌ रसीद PDF बनाने में त्रुटि!");
-      });
-    } else if (typeof html2pdf !== 'undefined') {
-      html2pdf().set(opt).from(cloneContainer).save().then(function() {
-        var el = document.getElementById('tempModalPdfContainer');
-        if (el) el.remove();
-      }).catch(function(err) {
-        var el = document.getElementById('tempModalPdfContainer');
-        if (el) el.remove();
+  Promise.all(imagePromises).then(function() {
+    setTimeout(function() {
+      if (window.AndroidApp && typeof window.AndroidApp.savePdfFile === "function") {
+        html2pdf().set(opt).from(cloneContainer).outputPdf('datauristring').then(function(pdfBase64) {
+          var el = document.getElementById('tempModalPdfContainer');
+          if (el) el.remove();
+          window.AndroidApp.savePdfFile(pdfBase64, fileName);
+        }).catch(function(err) {
+          var el = document.getElementById('tempModalPdfContainer');
+          if (el) el.remove();
+          alert("❌ रसीद PDF बनाने में त्रुटि!");
+        });
+      } else if (typeof html2pdf !== 'undefined') {
+        html2pdf().set(opt).from(cloneContainer).save().then(function() {
+          var el = document.getElementById('tempModalPdfContainer');
+          if (el) el.remove();
+        }).catch(function(err) {
+          var el = document.getElementById('tempModalPdfContainer');
+          if (el) el.remove();
+          window.print();
+        });
+      } else {
         window.print();
-      });
-    } else {
-      window.print();
-      var el = document.getElementById('tempModalPdfContainer');
-      if (el) el.remove();
-    }
-  }, 700);
+        var el = document.getElementById('tempModalPdfContainer');
+        if (el) el.remove();
+      }
+    }, 300);
+  });
 }
 
     function exportTableToPDF(tbodyId, reportName) {
@@ -2429,9 +2442,9 @@ function downloadTxnReceiptPDF(index) {
 
   var tableHtml = "";
 
-  // 1. Transaction History Table (फोटो के साथ)
+  // 1. Transaction History Table (इमेजेस के साथ)
   if (tbodyId === 'txnHistoryTableBody' && typeof globalTxnHistory !== 'undefined' && globalTxnHistory.length > 0) {
-    tableHtml = '<table style="width:100%; border-collapse:collapse; font-size:10px; font-family:Arial, sans-serif; margin-top:10px;">' +
+    tableHtml = '<table style="width:100%; border-collapse:collapse; font-size:10px; font-family:Arial, sans-serif; margin-top:10px; background:#ffffff;">' +
       '<thead style="background-color:#0f172a; color:#ffffff;">' +
         '<tr>' +
           '<th style="border:1px solid #334155; padding:6px; text-align:center;">Photo</th>' +
@@ -2461,7 +2474,6 @@ function downloadTxnReceiptPDF(index) {
 
     tableHtml += '</tbody></table>';
   } else {
-    // बैकअप लेआउट
     if (tbody && tbody.rows.length > 0) {
       var tableEl = tbody.closest('table');
       var cleanTable = tableEl.cloneNode(true);
@@ -2486,10 +2498,10 @@ function downloadTxnReceiptPDF(index) {
     }
   }
 
-  // 2. प्रिंट wrapper (स्क्रीन पर अस्थायी रूप से दिखेगा ताकि Canvas इमेज रेंडर कर सके)
+  // 2. अस्थायी रैपर बनाएँ (DOM में जो दृश्यमान रहेगा)
   var printWrapper = document.createElement('div');
   printWrapper.id = 'tempPdfPrintContainer';
-  printWrapper.style.cssText = 'position:fixed; top:0; left:0; width:800px; background:#ffffff; color:#000000; padding:20px; font-family:Arial, sans-serif; box-sizing:border-box; z-index:999999; visibility:visible;';
+  printWrapper.style.cssText = 'position:fixed; top:0; left:0; width:790px; background:#ffffff; color:#000000; padding:20px; font-family:Arial, sans-serif; box-sizing:border-box; z-index:999999; visibility:visible;';
 
   printWrapper.innerHTML = 
     '<div style="text-align:center; border-bottom:2px solid #0f172a; padding-bottom:8px; margin-bottom:12px; background:#ffffff;">' +
@@ -2500,43 +2512,63 @@ function downloadTxnReceiptPDF(index) {
 
   document.body.appendChild(printWrapper);
 
+  // 3. सभी इमेजेस के पूरी तरह लोड होने तक का इंतज़ार करने वाला फ़ंक्शन
+  var images = printWrapper.getElementsByTagName('img');
+  var imagePromises = Array.from(images).map(function(img) {
+    return new Promise(function(resolve) {
+      if (img.complete && img.naturalHeight !== 0) {
+        resolve();
+      } else {
+        img.onload = function() { resolve(); };
+        img.onerror = function() { resolve(); }; // एरर आने पर भी प्रोसेस न रुके
+      }
+    });
+  });
+
   var opt = {
     margin: 0.2,
     filename: fileName,
     image: { type: 'jpeg', quality: 0.98 },
-    html2canvas: { scale: 2, useCORS: true, allowTaint: true, logging: false, backgroundColor: '#ffffff' },
+    html2canvas: { 
+      scale: 2, 
+      useCORS: true, 
+      allowTaint: true, 
+      logging: false, 
+      backgroundColor: '#ffffff' 
+    },
     jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' }
   };
 
-  // 3. फोटो पूरी तरह लोड होने के लिए 700ms का समय दिया गया है
-  setTimeout(function() {
-    if (window.AndroidApp && typeof window.AndroidApp.savePdfFile === "function") {
-      html2pdf().set(opt).from(printWrapper).outputPdf('datauristring').then(function(pdfBase64) {
-        var container = document.getElementById('tempPdfPrintContainer');
-        if (container) container.remove();
-        window.AndroidApp.savePdfFile(pdfBase64, fileName);
-      }).catch(function(err) {
-        var container = document.getElementById('tempPdfPrintContainer');
-        if (container) container.remove();
-        alert("❌ PDF जनरेट करने में त्रुटि!");
-      });
-    } else if (typeof html2pdf !== 'undefined') {
-      html2pdf().set(opt).from(printWrapper).save().then(function() {
-        var container = document.getElementById('tempPdfPrintContainer');
-        if (container) container.remove();
-      }).catch(function(err) {
-        var container = document.getElementById('tempPdfPrintContainer');
-        if (container) container.remove();
+  // 4. सभी इमेजेस लोड हो जाने के बाद ही PDF जनरेट होगी
+  Promise.all(imagePromises).then(function() {
+    setTimeout(function() {
+      if (window.AndroidApp && typeof window.AndroidApp.savePdfFile === "function") {
+        html2pdf().set(opt).from(printWrapper).outputPdf('datauristring').then(function(pdfBase64) {
+          var container = document.getElementById('tempPdfPrintContainer');
+          if (container) container.remove();
+          window.AndroidApp.savePdfFile(pdfBase64, fileName);
+        }).catch(function(err) {
+          var container = document.getElementById('tempPdfPrintContainer');
+          if (container) container.remove();
+          alert("❌ PDF जनरेट करने में त्रुटि!");
+        });
+      } else if (typeof html2pdf !== 'undefined') {
+        html2pdf().set(opt).from(printWrapper).save().then(function() {
+          var container = document.getElementById('tempPdfPrintContainer');
+          if (container) container.remove();
+        }).catch(function(err) {
+          var container = document.getElementById('tempPdfPrintContainer');
+          if (container) container.remove();
+          window.print();
+        });
+      } else {
         window.print();
-      });
-    } else {
-      window.print();
-      var container = document.getElementById('tempPdfPrintContainer');
-      if (container) container.remove();
-    }
-  }, 700);
+        var container = document.getElementById('tempPdfPrintContainer');
+        if (container) container.remove();
+      }
+    }, 300); // 300ms बफर टाइमर
+  });
 }
-
     function exportTableToExcel(tbodyId, reportName) {
   var tbody = document.getElementById(tbodyId);
   if (!tbody || tbody.rows.length === 0) return alert("⚠️ डाउनलोड करने के लिए कोई डेटा नहीं है!");
