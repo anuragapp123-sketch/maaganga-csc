@@ -411,6 +411,66 @@
       body { background: #ffffff !important; color: #000000 !important; }
       .app-mobile-frame, .app-bottom-nav, .fab-btn, .app-header, #addNewStockFormCard, .modal { display: none !important; }
     }
+
+    /* === 📱 SIDE DRAWER MENU STYLES === */
+    .app-side-drawer {
+      position: fixed;
+      top: 0;
+      left: -280px;
+      width: 280px;
+      height: 100vh;
+      background: #0f172a;
+      color: #ffffff;
+      z-index: 999999;
+      transition: left 0.3s ease;
+      box-shadow: 4px 0 20px rgba(0, 0, 0, 0.4);
+      padding: 20px 15px;
+      display: flex;
+      flex-direction: column;
+    }
+    .app-side-drawer.open {
+      left: 0;
+    }
+    .drawer-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 999998;
+      display: none;
+    }
+    .drawer-overlay.active {
+      display: block !important;
+      background: rgba(0, 0, 0, 0.7) !important;
+      backdrop-filter: blur(2px);
+    }
+    /* साइड मेन्यू खुलते ही बॉटम बार को छिपाने के लिए */
+    body.drawer-open .app-bottom-nav {
+      display: none !important;
+    }
+    .drawer-menu-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      color: #cbd5e1;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: 12px;
+      margin-bottom: 6px;
+      background: transparent;
+      border: none;
+      width: 100%;
+      text-align: left;
+      transition: all 0.2s ease;
+    }
+    .drawer-menu-item:hover, .drawer-menu-item:active {
+      background: #1e293b;
+      color: #38bdf8;
+    }
   </style>
 </head>
 <body onload="checkAutoLogin()">
@@ -449,10 +509,60 @@
   <!-- Mobile Frame Container -->
   <div class="app-mobile-frame">
 
-    <!-- Ultra-Compact Mobile Header Bar -->
+    <!-- ☰ Side Drawer Overlay Backdrop -->
+    <div id="sideDrawerOverlay" class="drawer-overlay" onclick="closeSideMenu()"></div>
+
+    <!-- 📱 Slide-out Side Drawer Menu -->
+    <div id="sideDrawerMenu" class="app-side-drawer">
+      <div class="d-flex align-items-center justify-content-between border-bottom border-secondary pb-3 mb-3">
+        <div class="d-flex align-items-center gap-2">
+          <img src="https://lh3.googleusercontent.com/d/1AVhGGj41J973HK0KgI1im5JJwJZsKhJR" style="width:36px; height:34px; border-radius:50%; border:1.5px solid #38bdf8;">
+          <div>
+            <strong class="d-block text-white" style="font-size:12px;">माँ गंगा CSC</strong>
+            <small class="text-info" style="font-size:9px;">Side Menu Options</small>
+          </div>
+        </div>
+        <button type="button" class="btn btn-sm btn-outline-light py-0 px-2 fw-bold" onclick="closeSideMenu()">❌</button>
+      </div>
+
+      <div class="flex-grow-1 overflow-y-auto">
+        <button type="button" class="drawer-menu-item" onclick="openAppSection('dashboard-home-sec'); closeSideMenu();">
+          <span class="fs-5">🏠</span>
+          <span>Home Dashboard</span>
+        </button>
+        <button type="button" class="drawer-menu-item" onclick="openAppSection('repairing-sec'); closeSideMenu();">
+          <span class="fs-5">🛠️</span>
+          <span>रिपेयरिंग जॉब कार्ड (Repair)</span>
+        </button>
+        <button type="button" class="drawer-menu-item" onclick="openAppSection('greeting-sec'); closeSideMenu();">
+          <span class="fs-5">🎉</span>
+          <span>सूचना व शुभकामनाएँ (Greetings)</span>
+        </button>
+        <button type="button" class="drawer-menu-item" onclick="openAppSection('doc-receive-sec'); closeSideMenu();">
+          <span class="fs-5">📁</span>
+          <span>Document Entry</span>
+        </button>
+        <button type="button" class="drawer-menu-item" onclick="openAppSection('udhar-khata-sec'); loadUdharKhataData(); closeSideMenu();">
+          <span class="fs-5">📖</span>
+          <span>डिजिटल खाता (Khata)</span>
+        </button>
+        <button type="button" class="drawer-menu-item" onclick="openAppSection('stock-sec'); fetchStockData(); closeSideMenu();">
+          <span class="fs-5">📦</span>
+          <span>Shop Stock</span>
+        </button>
+      </div>
+
+      <div class="border-top border-secondary pt-2 text-center text-muted" style="font-size:10px;">
+        Developer: Anurag Shakya | v2.0.12
+      </div>
+    </div>
+
+    <!-- Ultra-Compact Mobile Header Bar with Side Menu Toggle -->
     <div class="app-header">
       <div class="d-flex align-items-center justify-content-between">
         <div class="d-flex align-items-center gap-2">
+          <!-- ☰ Side Menu Toggle Button -->
+          <button class="btn btn-sm text-white p-0 me-1" style="font-size: 22px; line-height: 1;" onclick="openSideMenu()">☰</button>
           <img src="https://lh3.googleusercontent.com/d/1AVhGGj41J973HK0KgI1im5JJwJZsKhJR" alt="Logo" class="header-logo">
           <div>
             <h1 class="header-title">माँ गंगा Jan Seva Kendra</h1>
@@ -1059,6 +1169,137 @@
 
         </div>
 
+        <!-- 5. REPAIRING ENTRY TAB -->
+        <div class="tab-pane" id="repairing-sec">
+          <div class="d-flex align-items-center mb-2">
+            <button class="btn app-back-btn py-1 px-3 fw-bold" onclick="openAppSection('dashboard-home-sec')" style="font-size: 11px;">⬅️ Dashboard</button>
+          </div>
+
+          <div class="card p-3 shadow-sm border-0">
+            <h6 class="fw-bold mb-2 text-dark border-bottom pb-2" style="font-size: 13px;">🛠️ रिपेयरिंग जॉब कार्ड (Fan/Motor/Mobile Repair)</h6>
+            <div class="row g-2 compact-grid-form">
+              <div class="col-6">
+                <label>ग्राहक का नाम</label>
+                <input type="text" id="repCustName" class="form-control form-control-sm" placeholder="Name">
+              </div>
+              <div class="col-6">
+                <label>मोबाइल नंबर</label>
+                <input type="tel" id="repCustMobile" class="form-control form-control-sm" placeholder="10 digits" maxlength="10" oninput="checkCRM(this.value, 'repCustName', null, null)">
+              </div>
+              <div class="col-6">
+                <label>सामान (Item Type)</label>
+                <select id="repItemType" class="form-select form-select-sm">
+                  <option>पंखा बाइंडिंग (Fan Winding)</option>
+                  <option>कूलर मोटर (Cooler Motor)</option>
+                  <option>कीपैड/स्मार्टफोन (Mobile Repair)</option>
+                  <option>अन्य इलेक्ट्रॉनिक्स (Other)</option>
+                </select>
+              </div>
+              <div class="col-6">
+                <label>अनुमानित खर्च (₹)</label>
+                <input type="number" id="repCharge" class="form-control form-control-sm" placeholder="0.00">
+              </div>
+              <div class="col-12">
+                <label>समस्या / विवरण (Issue Details)</label>
+                <input type="text" id="repIssue" class="form-control form-control-sm" placeholder="e.g. कॉपर बाइंडिंग + नया बैरिंग">
+              </div>
+            </div>
+            <button class="btn btn-primary mt-3 w-100 fw-bold py-2 shadow-sm" style="border-radius:10px;" onclick="saveRepairingRecord()">💾 रिपेयरिंग एंट्री सेव करें</button>
+          </div>
+
+          <!-- Repairing History List -->
+          <div class="card p-3 shadow-sm border-0 mt-3">
+            <h6 class="fw-bold text-dark mb-2" style="font-size: 12px;">📋 रिपेयरिंग पेंडिंग सूची</h6>
+            <div class="table-responsive" style="max-height: 250px; overflow-y: auto;">
+              <table class="table table-sm table-bordered align-middle mb-0" style="font-size: 10px;">
+                <thead class="table-dark">
+                  <tr>
+                    <th>Date</th>
+                    <th>Name</th>
+                    <th>Item</th>
+                    <th>Charge</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="repairHistoryTableBody">
+                  <tr><td colspan="5" class="text-center text-muted">कोई रिपेयरिंग एंट्री नहीं है।</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- 6. FESTIVAL & GREETINGS TAB (PROFESSIONAL CUSTOM LAYOUT) -->
+        <div class="tab-pane" id="greeting-sec">
+          <div class="d-flex align-items-center mb-2">
+            <button class="btn app-back-btn py-1 px-3 fw-bold" onclick="openAppSection('dashboard-home-sec')" style="font-size: 11px;">⬅️ Dashboard</button>
+          </div>
+
+          <div class="card p-3 shadow-sm border-0 bg-white" style="border-radius:18px;">
+            <h6 class="fw-bold mb-2 text-primary border-bottom pb-2" style="font-size: 13px;">🎉 सूचना व शुभकामनाएँ कार्ड (Custom Sender)</h6>
+
+            <!-- Customer Details Inputs -->
+            <div class="row g-2 mb-2">
+              <div class="col-6">
+                <label class="form-label-sm">📱 ग्राहक का मोबाइल नंबर *</label>
+                <input type="tel" id="greetMobile" class="form-control form-control-sm fw-bold" placeholder="10 अंकों का नंबर" maxlength="10">
+              </div>
+              <div class="col-6">
+                <label class="form-label-sm">👤 ग्राहक का नाम</label>
+                <input type="text" id="greetName" class="form-control form-control-sm fw-bold" placeholder="Customer Name">
+              </div>
+            </div>
+
+            <!-- Quick Template Selector Buttons -->
+            <label class="form-label-sm text-muted mb-1">⚡ रेडीमेड मैसेज टेम्पलेट (Quick Select):</label>
+            <div class="d-flex gap-1.5 mb-3">
+              <button type="button" class="btn btn-sm btn-outline-primary fw-bold py-1 w-33" style="font-size:9.5px; border-radius:8px;" onclick="loadGreetingTemplate('festival')">🎉 त्योहार</button>
+              <button type="button" class="btn btn-sm btn-outline-success fw-bold py-1 w-33" style="font-size:9.5px; border-radius:8px;" onclick="loadGreetingTemplate('birthday')">🎂 जन्मदिन</button>
+              <button type="button" class="btn btn-sm btn-outline-dark fw-bold py-1 w-33" style="font-size:9.5px; border-radius:8px;" onclick="loadGreetingTemplate('promo')">🚩 सेवा प्रचार</button>
+            </div>
+
+            <!-- Custom Message Text Box -->
+            <div class="mb-3">
+              <label class="form-label-sm fw-bold text-dark">✍️ अपना संदेश लिखें (Custom Message):</label>
+              <textarea id="greetCustomMsg" class="form-control fw-medium" rows="4" style="font-size:11px; border-radius:10px; background:#f8fafc;" placeholder="यहाँ अपना शुभकामना या सूचना संदेश लिखें..."></textarea>
+            </div>
+
+            <!-- Card Preview Box with Branding & Services Footer -->
+            <div class="p-2.5 border rounded-3 bg-light mb-3" style="font-size:10px; border-color:#cbd5e1 !important;">
+              <strong class="d-block text-center text-primary border-bottom pb-1 mb-1" style="font-size:11px;">🚩 माँ गंगा जन सेवा केंद्र व इलेक्ट्रॉनिक्स बरनाहल मैनपुरी रोड, कैरावली 🚩</strong>
+              <small class="d-block text-muted text-center mb-2">Pro: अनुराग शाक्य | 📞 9761414105</small>
+
+              <div id="greetPreviewText" class="p-2 bg-white rounded border text-dark fw-bold mb-2" style="white-space: pre-wrap; font-size:10.5px; min-height:50px;">
+                (आपका संदेश यहाँ दिखेगा...)
+              </div>
+
+              <!-- Services Footer Preview -->
+              <div class="p-2 rounded" style="background:#eff6ff; border:1px dashed #bfdbfe; font-size:9px;">
+                <strong class="d-block text-dark mb-1">🌟 हमारी प्रमुख सेवाएँ (Services):</strong>
+                <div class="text-secondary">
+                  • आय, जाति, निवास प्रमाण पत्र, पैन कार्ड, वोटर ID<br>
+                  • पंखा व कूलर मोटर बाइंडिंग एवं सभी इलेक्ट्रॉनिक्स सामान
+                </div>
+              </div>
+            </div>
+
+            <!-- SEND BUTTONS SECTION -->
+            <div class="row g-2">
+              <div class="col-6">
+                <button type="button" class="btn btn-success w-100 fw-bold py-2 shadow-sm d-flex align-items-center justify-content-center gap-1" style="border-radius:10px; background:#25D366; border:none; font-size:11.5px;" onclick="sendCustomGreeting('whatsapp')">
+                  💬 WhatsApp पर भेजें
+                </button>
+              </div>
+              <div class="col-6">
+                <button type="button" class="btn btn-primary w-100 fw-bold py-2 shadow-sm d-flex align-items-center justify-content-center gap-1" style="border-radius:10px; font-size:11.5px;" onclick="sendCustomGreeting('share')">
+                  ✉️ SMS / ऐप से शेयर करें
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
         <!-- 4. DOCUMENT RECEIVING TAB (SLIM GRID) -->
         <div class="tab-pane" id="doc-receive-sec">
           <button class="btn app-back-btn mb-1.5 w-100 py-1" onclick="openAppSection('dashboard-home-sec')" style="font-size:10px;">⬅️ Back To Dashboard</button>
@@ -1272,31 +1513,19 @@
       </div>
     </div>
 
-    <!-- Fixed App Bottom Navigation Bar (6 Tabs Clean Layout) -->
-    <nav class="app-bottom-nav">
-      <button class="nav-btn active" onclick="openAppSection('dashboard-home-sec')">
+    <!-- Fixed App Bottom Navigation Bar (Compact 3 Core Tabs) -->
+    <nav class="app-bottom-nav" style="justify-content: space-around;">
+      <button class="nav-btn active" style="width: 30%;" onclick="openAppSection('dashboard-home-sec')">
         <span class="nav-icon">🏠</span>
         <span>Home</span>
       </button>
-      <button class="nav-btn" onclick="openAppSection('transaction-sec')">
+      <button class="nav-btn" style="width: 30%;" onclick="openAppSection('transaction-sec')">
         <span class="nav-icon">💰</span>
         <span>Trans.</span>
       </button>
-      <button class="nav-btn" onclick="openAppSection('invoice-sec')">
+      <button class="nav-btn" style="width: 30%;" onclick="openAppSection('invoice-sec')">
         <span class="nav-icon">🧾</span>
-        <span>Inv.</span>
-      </button>
-      <button class="nav-btn" onclick="openAppSection('doc-receive-sec')">
-        <span class="nav-icon">📁</span>
-        <span>Doc Entry</span>
-      </button>
-      <button class="nav-btn" onclick="openAppSection('udhar-khata-sec'); loadUdharKhataData();">
-        <span class="nav-icon">📖</span>
-        <span>खाता</span>
-      </button>
-      <button class="nav-btn" onclick="openAppSection('stock-sec'); fetchStockData();">
-        <span class="nav-icon">📦</span>
-        <span>Stock</span>
+        <span>Invoice</span>
       </button>
     </nav>
 
@@ -1304,7 +1533,7 @@
 
   <script>
     // Deploy kiye gaye Web App ka URL yahan dalein (REST API fallback ke liye)
-    var SCRIPT_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbytcFEHKMMgoSJcy6cZrOpa5Z2jqxhv3OGn2y4efuRwhF_EWUyXpHuH-0WLG1bq9DLe/exec";
+    var SCRIPT_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbweDBV1k53sII1Pus87cBMlkoWasnnv0FLnGIOwW4A-ZKSjKj2v3_6agumi2fVdLNPG/exec";
     // 🚨 GLOBAL REAL-TIME ERROR LOGGER FUNCTION
     function sendErrorToSheet(errorType, clickAction, impactText, errorObj) {
       var errData = {
@@ -2452,19 +2681,32 @@ function downloadTxnReceiptPDF(index) {
       }
     }
 
+    // === FEATURE 3: Smart WhatsApp Reminder without QR Link ===
     function sendDirectWhatsAppReminder(mobile, name, balance) {
-      var matchedIdx = (globalInvoiceHistory || []).findIndex(function(i) {
-        return i.mobile === mobile && parseFloat(i.balance) > 0;
-      });
-      if (matchedIdx !== -1) {
-        sendUdharInvoiceWhatsApp(matchedIdx);
-      } else {
-        var upi = (typeof globalShopSettings !== 'undefined' && globalShopSettings.upiId) ? globalShopSettings.upiId : "anuragkumarshakya@ptaxis";
-        var msg = "*Maa Ganga CSC*\n\nNamaskar " + name + " ji,\nAapka ₹" + balance + " balance pending hai.\nUPI: " + upi;
-        window.open("https://wa.me/91" + mobile + "?text=" + encodeURIComponent(msg), "_blank");
-      }
-    }
+      if(!mobile || mobile.length !== 10) return alert("⚠️ वैध मोबाइल नंबर नहीं है!");
+      
+      var upi = (typeof globalShopSettings !== 'undefined' && globalShopSettings.upiId) ? globalShopSettings.upiId : "anuragkumarshakya@ptaxis";
+      var payeeName = "Maa Ganga Jan Seva Kendra";
+      
+      var upiIntent = "upi://pay?pa=" + encodeURIComponent(upi) +
+                      "&pn=" + encodeURIComponent(payeeName) +
+                      "&am=" + encodeURIComponent(balance) +
+                      "&cu=INR";
 
+      var msg = "*🚩 माँ गंगा जन सेवा केंद्र व इलेक्ट्रॉनिक्स बरनाहल मैनपुरी रोड, कैरावली 🚩*\n" +
+                "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" +
+                "नमस्कार *" + name + " जी*,\n\n" +
+                "आपका कुल बकाया भुगतान (Pending Balance): *₹" + balance + "* है।\n\n" +
+                "📲 *भुगतान (Payment) करने का UPI Link:*\n" +
+                upiIntent + "\n\n" +
+                "💳 *UPI ID:* `" + upi + "`\n" +
+                "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" +
+                "👤 *Pro:* अनुराग शाक्य (Anurag Shakya)\n" +
+                "📞 *संपर्क/WhatsApp:* 9761414105\n\n" +
+                "धन्यवाद! 🙏";
+
+      window.open("https://wa.me/91" + mobile + "?text=" + encodeURIComponent(msg), "_blank");
+    }
     function downloadModalAsPDF() {
   var modalBody = document.getElementById("modalBodyContent");
   var modalTitleEl = document.getElementById("modalTitle");
@@ -2743,7 +2985,6 @@ function downloadModalAsImage() {
     alert("❌ इमेज डाउनलोड में त्रुटि: " + err);
   });
 }
-// ट्रांजैक्शन/मोडल डिटेल्स की साफ़ रसीद (Image) बनाकर सीधे ग्राहक के व्हाट्सएप नंबर पर भेजने का फ़ंक्शन
 function sendModalDetailsToWhatsApp() {
   var modalBody = document.getElementById("modalBodyContent");
   var modalTitleEl = document.getElementById("modalTitle");
@@ -2761,7 +3002,6 @@ function sendModalDetailsToWhatsApp() {
     if (!targetMobile || targetMobile.length !== 10) return alert("⚠️ व्हाट्सएप मैसेज भेजने के लिए सही मोबाइल नंबर अनिवार्य है!");
   }
 
-  // 10 डिजिट का शुद्ध नंबर निकालना
   targetMobile = targetMobile.replace(/\D/g, '').slice(-10);
 
   var now = new Date();
@@ -2780,7 +3020,6 @@ function sendModalDetailsToWhatsApp() {
   var bodyClone = modalBody.cloneNode(true);
   bodyClone.querySelectorAll('button').forEach(function(btn) { btn.remove(); });
 
-  // 🌟 ब्रांडिंग एवं प्रचार बॉक्स
   var brandingHtml = 
     '<div style="margin-top:14px; background: #f1f5f9; border: 1.5px solid #cbd5e1; border-radius: 10px; padding: 10px 14px; font-family: Arial, sans-serif;">' +
       '<div style="text-align: center; font-size: 11px; font-weight: 800; color: #0f172a; margin-bottom: 6px; text-transform: uppercase; border-bottom:1px solid #cbd5e1; padding-bottom:4px;">' +
@@ -2820,16 +3059,44 @@ function sendModalDetailsToWhatsApp() {
 
   document.body.appendChild(container);
 
-  // html2canvas के ज़रिए इमेज (JPG/PNG) Base64 बनाएँ ताकि व्हाट्सप्प पर ब्लैंक PDF न जाए
   html2canvas(container, { scale: 2, useCORS: true, allowTaint: true, backgroundColor: '#ffffff' }).then(function(canvas) {
     container.remove();
     var imgBase64 = canvas.toDataURL('image/jpeg', 0.95);
 
-    if (window.AndroidApp && typeof window.AndroidApp.sharePdfToWhatsApp === "function") {
-      window.AndroidApp.sharePdfToWhatsApp(imgBase64, targetMobile, message);
-    } else {
-      var waUrl = "https://api.whatsapp.com/send?phone=91" + targetMobile + "&text=" + encodeURIComponent(message);
-      window.open(waUrl, '_blank');
+    // 1. 10-अंकों का शुद्ध भारतीय नंबर (Country Code +91 के साथ)
+    var cleanPhone = "91" + targetMobile;
+
+    // 2. यदि एंड्रॉइड ऐप (APK) में शेयरिंग मेथड है
+    if (window.AndroidApp && typeof window.AndroidApp.shareImageToWhatsApp === "function") {
+      window.AndroidApp.shareImageToWhatsApp(imgBase64, cleanPhone, message);
+    } 
+    else if (window.AndroidApp && typeof window.AndroidApp.sharePdfToWhatsApp === "function") {
+      window.AndroidApp.sharePdfToWhatsApp(imgBase64, cleanPhone, message);
+    } 
+    // 3. सीधे ग्राहक का व्हाट्सएप चैट ओपन करने वाला डायरेक्ट लिंक फ़ॉलबैक
+    else {
+      fetch(imgBase64)
+        .then(function(res) { return res.blob(); })
+        .then(function(blob) {
+          var fileName = rawCustName + "_Receipt.jpg";
+          var file = new File([blob], fileName, { type: "image/jpeg" });
+          
+          // मोबाइल ऐप / ब्राउज़र वेब शेयर (Direct App Launch)
+          if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+            navigator.share({
+              files: [file],
+              title: headerTitle,
+              text: message
+            }).catch(function(e){
+              // यदि शेयर मेन्यू कैंसिल हो तो सीधे चैट खोलेगा
+              window.open("https://api.whatsapp.com/send?phone=" + cleanPhone + "&text=" + encodeURIComponent(message), '_blank');
+            });
+          } else {
+            window.open("https://api.whatsapp.com/send?phone=" + cleanPhone + "&text=" + encodeURIComponent(message), '_blank');
+          }
+        }).catch(function() {
+          window.open("https://api.whatsapp.com/send?phone=" + cleanPhone + "&text=" + encodeURIComponent(message), '_blank');
+        });
     }
   }).catch(function(err) {
     if (document.body.contains(container)) container.remove();
@@ -3152,70 +3419,7 @@ function sendModalDetailsToWhatsApp() {
         // Safely escape special characters to prevent JavaScript runtime crashes
         var safeName = escapeHtml(c.name).replace(/'/g, "\\'");
 
-        // 3. Smart Universal Auto-Fill for Name, Address, & Aadhaar
-    function checkCRM(mobile, nameFieldId, aadhaarFieldId, addressFieldId) {
-      if (!mobile || mobile.trim().length !== 10) return;
-
-      var mobStr = mobile.trim();
-      var foundName = "", foundAddr = "", foundAadhaar = "";
-
-      // Step A: सबसे पहले स्थानीय (Local History/Cache) डेटा से तेज़ी से चेक करें
-      var allHistory = [
-        ...(globalInvoiceHistory || []),
-        ...(globalTxnHistory || []),
-        ...(globalDocHistory || [])
-      ];
-
-      for (var i = 0; i < allHistory.length; i++) {
-        var item = allHistory[i];
-        if (item.mobile && String(item.mobile).trim() === mobStr) {
-          if (!foundName && item.name) foundName = item.name;
-          if (!foundAddr && item.address && item.address !== 'N/A') foundAddr = item.address;
-          if (!foundAadhaar && item.aadhaar) foundAadhaar = item.aadhaar;
-        }
-        if (foundName && foundAddr && foundAadhaar) break;
-      }
-
-      // यदि स्थानीय डेटा में मिला तो ऑटो-फिल करें
-      if (nameFieldId && document.getElementById(nameFieldId) && foundName) {
-        document.getElementById(nameFieldId).value = foundName;
-      }
-      if (addressFieldId && document.getElementById(addressFieldId) && foundAddr) {
-        document.getElementById(addressFieldId).value = foundAddr;
-      }
-      if (aadhaarFieldId && document.getElementById(aadhaarFieldId) && foundAadhaar) {
-        document.getElementById(aadhaarFieldId).value = foundAadhaar.replace(/\D/g, '').slice(-4);
-      }
-
-      // Step B: Google Sheet बैकएंड से भी सर्च करके ऑटो-फिल सिंक करें
-      if (typeof google !== 'undefined' && google.script && google.script.run) {
-        google.script.run.withSuccessHandler(function(res) {
-          if (res) {
-            if (nameFieldId && document.getElementById(nameFieldId) && res.name) {
-              document.getElementById(nameFieldId).value = res.name;
-            }
-            if (addressFieldId && document.getElementById(addressFieldId) && res.address) {
-              document.getElementById(addressFieldId).value = res.address;
-            }
-            if (aadhaarFieldId && document.getElementById(aadhaarFieldId) && res.aadhaar) {
-              document.getElementById(aadhaarFieldId).value = String(res.aadhaar).replace(/\D/g, '').slice(-4);
-            }
-          }
-        }).getCustomerDetails(mobStr);
-
-        // बकाया राशि (Udhar Balance) अलर्ट भी चेक करें
-        google.script.run.withSuccessHandler(function(res) {
-          var alertBox = document.getElementById("udharKhataAlert");
-          var amtEl = document.getElementById("udharAmount");
-          if (res && parseFloat(res.pendingBalance) > 0) {
-            if(amtEl) amtEl.innerText = "₹" + res.pendingBalance;
-            if(alertBox) alertBox.classList.remove("d-none");
-          } else {
-            if(alertBox) alertBox.classList.add("d-none");
-          }
-        }).getCustomerPendingBalance(mobStr);
-      }
-    }
+        // (इसे loadUdharKhataData से पूरी तरह हटा दें)
 
         html += '<div class="d-flex align-items-center justify-content-between p-3 pe-4 border-bottom cursor-pointer hover-bg-light" onclick="openCustomerPassbookView(\'' + c.mobile + '\', \'' + safeName + '\')">' +
           '<div class="d-flex align-items-center gap-3">' +
@@ -3649,9 +3853,6 @@ function sendModalDetailsToWhatsApp() {
       if(targetSectionId === 'dashboard-home-sec' && navBtns[0]) navBtns[0].classList.add('active');
       if(targetSectionId === 'transaction-sec' && navBtns[1]) navBtns[1].classList.add('active');
       if(targetSectionId === 'invoice-sec' && navBtns[2]) navBtns[2].classList.add('active');
-      if(targetSectionId === 'doc-receive-sec' && navBtns[3]) navBtns[3].classList.add('active');
-      if(targetSectionId === 'udhar-khata-sec' && navBtns[4]) navBtns[4].classList.add('active');
-      if(targetSectionId === 'stock-sec' && navBtns[5]) navBtns[5].classList.add('active');
 
       if (targetSectionId === 'transaction-sec') {
         autoSyncLocation();
@@ -3744,51 +3945,41 @@ function sendModalDetailsToWhatsApp() {
     function autoSyncLocation() {
   if (navigator.geolocation) {
     var geoOptions = {
-      enableHighAccuracy: true, // GPS चिप से सटीक लोकेशन लेने के लिए
-      timeout: 15000,           // 15 सेकंड का समय
-      maximumAge: 0             // पुरानी कैश्ड लोकेशन को पूरी तरह से बायपास करने के लिए
+      enableHighAccuracy: true,
+      timeout: 15000,
+      maximumAge: 0
     };
 
     navigator.geolocation.getCurrentPosition(function(pos) {
       var lat = pos.coords.latitude;
       var lng = pos.coords.longitude;
       
-      // डिफ़ॉल्ट रूप से सटीक अक्षांश-देशांतर सेट करें
-      currentLocation = "Lat: " + lat.toFixed(5) + ", Lng: " + lng.toFixed(5);
+      // डिफ़ॉल्ट रूप से तुरंत GPS स्टैम्प सेट करें
+      currentLocation = "Kerawali, Uttar Pradesh, India | Lat " + lat.toFixed(5) + "° Long " + lng.toFixed(5) + "°";
 
-      // Nominatim OSM API से सटीक पता निकालें
-      fetch("https://nominatim.openstreetmap.org/reverse?format=json&lat=" + lat + "&lon=" + lng + "&zoom=18&addressdetails=1", {
-        headers: { 'Accept-Language': 'hi,en-US,en;q=0.9' }
-      })
+      // BigDataCloud Reverse Geocoding API (Fast & Detailed Location)
+      fetch("https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=" + lat + "&longitude=" + lng + "&localityLanguage=en")
       .then(function(res) { return res.json(); })
       .then(function(data) {
-        if (data && data.address) {
-          var addr = data.address;
-          // सटीक स्थान: मोहल्ला / गाँव / सबअर्ब / सड़क
-          var exactPlace = addr.suburb || addr.neighbourhood || addr.residential || addr.village || addr.road || addr.town || addr.city || "";
-          var district = addr.county || addr.state_district || "";
-          var postcode = addr.postcode || "";
+        if (data) {
+          var village = data.locality || data.city || "Kerawali";
+          var district = data.principalSubdivisionCode ? data.principalSubdivision : "Uttar Pradesh";
+          var postcode = data.postcode || "205261";
+          var country = data.countryName || "India";
 
-          var locationParts = [];
-          if (exactPlace) locationParts.push(exactPlace);
-          if (district) locationParts.push(district);
-          if (postcode) locationParts.push(postcode);
-
-          if (locationParts.length > 0) {
-            currentLocation = locationParts.join(", ");
-          }
+          // इमेज जैसे फ़ॉर्मेट में तैयार करें
+          currentLocation = village + ", " + district + " " + postcode + ", " + country + " | Lat " + lat.toFixed(5) + "° Long " + lng.toFixed(5) + "°";
         }
       })
       .catch(function(e) {
-        console.log("Geocoding Error:", e);
+        console.log("Location Geocoding Fallback:", e);
       });
     }, function(err) { 
       console.warn("Location Error: " + err.message);
-      // लोकेशन परमिशन न मिलने पर डिफ़ॉल्ट
-      currentLocation = "Maa Ganga CSC Center"; 
+      currentLocation = "Kerawali, Mainpuri, Uttar Pradesh 205261, India"; 
     }, geoOptions);
   } else {
-    currentLocation = "Maa Ganga CSC Center";
+    currentLocation = "Kerawali, Mainpuri, Uttar Pradesh 205261, India";
   }
 }
 
@@ -5420,9 +5611,170 @@ function generateInvoicePDFBase64(data, callback) {
     </div>
 
   </div>
-  <!-- Offline Sync Handler Tag Fix -->
+
+  <!-- 🚨 यहाँ छूटा हुआ <script> टैग जोड़ा गया है -->
   <script>
-    // 1. 1-CLICK ALL-DATA OFFLINE BACKUP FUNCTION
+    // === SIDE DRAWER MENU TOGGLE FUNCTIONS ===
+    window.openSideMenu = function() {
+      var drawer = document.getElementById("sideDrawerMenu");
+      var overlay = document.getElementById("sideDrawerOverlay");
+      if (drawer) drawer.classList.add("open");
+      if (overlay) overlay.classList.add("active");
+      document.body.classList.add("drawer-open");
+    };
+
+    window.closeSideMenu = function() {
+      var drawer = document.getElementById("sideDrawerMenu");
+      var overlay = document.getElementById("sideDrawerOverlay");
+      if (drawer) drawer.classList.remove("open");
+      if (overlay) overlay.classList.remove("active");
+      document.body.classList.remove("drawer-open");
+    };
+
+    // === REPAIRING ENTRY LOGIC ===
+    var globalRepairHistory = [];
+
+    function saveRepairingRecord() {
+      var name = document.getElementById("repCustName").value.trim();
+      var mobile = document.getElementById("repCustMobile").value.trim();
+      var item = document.getElementById("repItemType").value;
+      var charge = document.getElementById("repCharge").value || "0";
+      var issue = document.getElementById("repIssue").value.trim() || "-";
+
+      if (!name || mobile.length !== 10) {
+        return alert("⚠️ कृपया ग्राहक का नाम और 10 अंकों का मोबाइल नंबर भरें!");
+      }
+
+      var record = {
+        date: new Date().toLocaleDateString('en-IN'),
+        name: name,
+        mobile: mobile,
+        item: item,
+        charge: charge,
+        issue: issue,
+        status: "⏳ In Repair"
+      };
+
+      globalRepairHistory.unshift(record);
+      renderRepairHistoryTable();
+
+      alert("✅ " + name + " की रिपेयरिंग एंट्री सेव हो गई!");
+      
+      var msg = "*🚩 माँ गंगा जन सेवा केंद्र व इलेक्ट्रॉनिक्स 🚩*\n" +
+                "नमस्कार *" + name + " जी*,\n" +
+                "आपका *" + item + "* रिपेयरिंग के लिए जमा कर लिया गया है।\n" +
+                "🛠️ *विवरण:* " + issue + "\n" +
+                "💰 *अनुमानित खर्च:* ₹" + charge + "\n\n" +
+                "धन्यवाद! 🙏";
+      window.open("https://wa.me/91" + mobile + "?text=" + encodeURIComponent(msg), "_blank");
+
+      document.getElementById("repCustName").value = "";
+      document.getElementById("repCustMobile").value = "";
+      document.getElementById("repCharge").value = "";
+      document.getElementById("repIssue").value = "";
+    }
+
+    function renderRepairHistoryTable() {
+      var tbody = document.getElementById("repairHistoryTableBody");
+      if (!tbody) return;
+      if (globalRepairHistory.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">कोई रिपेयरिंग एंट्री नहीं है।</td></tr>';
+        return;
+      }
+      var html = "";
+      globalRepairHistory.forEach(function(row) {
+        html += '<tr>' +
+          '<td>' + row.date + '</td>' +
+          '<td class="fw-bold">' + row.name + '</td>' +
+          '<td>' + row.item + '</td>' +
+          '<td class="text-primary fw-bold">₹' + row.charge + '</td>' +
+          '<td><span class="badge bg-warning text-dark">' + row.status + '</span></td>' +
+        '</tr>';
+      });
+      tbody.innerHTML = html;
+    }
+
+    // === 🎓 CUSTOM GREETINGS & MESSAGING LOGIC ===
+    function loadGreetingTemplate(type) {
+      var name = document.getElementById("greetName") ? document.getElementById("greetName").value.trim() : "";
+      if (!name) name = "ग्राहक";
+      
+      var msgBox = document.getElementById("greetCustomMsg");
+      if (!msgBox) return;
+
+      if (type === 'festival') {
+        msgBox.value = "आपको एवं आपके परिवार को पावन त्योहार की हार्दिक शुभकामनाएं व बधाई! 🌸\nईश्वर आपके जीवन में सुख, समृद्धि व खुशहाली लाए। 🙏";
+      } else if (type === 'birthday') {
+        msgBox.value = "आपको जन्मदिन की बहुत-बहुत हार्दिक बधाई एवं शुभकामनाएं! 🎂💐\nईश्वर आपको उत्तम स्वास्थ्य एवं दीर्घायु प्रदान करे।";
+      } else if (type === 'promo') {
+        msgBox.value = "नमस्कार " + name + " जी! 🚩\nहमारे यहाँ सभी प्रकार के ऑनलाइन फॉर्म, प्रमाण पत्र (आय/जाति/निवास), पैन कार्ड तथा पंखा व मोटर बाइंडिंग की सुविधा उपलब्ध है।";
+      }
+      updateGreetingPreview();
+    }
+
+    function updateGreetingPreview() {
+      var customText = document.getElementById("greetCustomMsg") ? document.getElementById("greetCustomMsg").value : "";
+      var previewBox = document.getElementById("greetPreviewText");
+      if (previewBox) {
+        previewBox.innerText = customText || "(आपका संदेश यहाँ दिखेगा...)";
+      }
+    }
+
+    document.addEventListener("input", function(e) {
+      if (e.target && (e.target.id === "greetCustomMsg" || e.target.id === "greetName")) {
+        updateGreetingPreview();
+      }
+    });
+
+    function sendCustomGreeting(sendMode) {
+      var mobileInput = document.getElementById("greetMobile");
+      var nameInput = document.getElementById("greetName");
+      var msgInput = document.getElementById("greetCustomMsg");
+
+      var mobile = mobileInput ? mobileInput.value.trim() : "";
+      var name = (nameInput && nameInput.value.trim()) ? nameInput.value.trim() : "ग्राहक";
+      var customText = msgInput ? msgInput.value.trim() : "";
+
+      if (!mobile || mobile.length !== 10) {
+        return alert("⚠️ कृपया 10 अंकों का सही मोबाइल नंबर दर्ज करें!");
+      }
+      if (!customText) {
+        return alert("⚠️ कृपया भेजने के लिए कोई संदेश (Message) लिखें!");
+      }
+
+      var fullMessage = "*🚩 माँ गंगा जन सेवा केंद्र व इलेक्ट्रॉनिक्स बरनाहल मैनपुरी रोड, कैरावली 🚩*\n" +
+                        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" +
+                        "प्रिय *" + name + " जी*,\n\n" +
+                        customText + "\n\n" +
+                        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" +
+                        "🌟 *हमारी प्रमुख सेवाएँ (Services):*\n" +
+                        "• आय, जाति, निवास प्रमाण पत्र, PAN, वोटर ID\n" +
+                        "• पंखा व कूलर मोटर बाइंडिंग एवं इलेक्ट्रॉनिक्स\n" +
+                        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" +
+                        "👤 *Pro:* अनुराग शाक्य (Anurag Shakya)\n" +
+                        "📞 *संपर्क/WhatsApp:* 9761414105\n" +
+                        "धन्यवाद! 🙏";
+
+      var cleanPhone = "91" + mobile;
+
+      if (sendMode === 'whatsapp') {
+        var waUrl = "https://api.whatsapp.com/send?phone=" + cleanPhone + "&text=" + encodeURIComponent(fullMessage);
+        window.open(waUrl, '_blank');
+      } else if (sendMode === 'share') {
+        if (navigator.share) {
+          navigator.share({
+            title: 'माँ गंगा जन सेवा केंद्र',
+            text: fullMessage
+          }).catch(function() {
+            window.open("sms:" + mobile + "?body=" + encodeURIComponent(fullMessage), '_blank');
+          });
+        } else {
+          window.open("sms:" + mobile + "?body=" + encodeURIComponent(fullMessage), '_blank');
+        }
+      }
+    }
+
+    // === 1-CLICK ALL-DATA OFFLINE BACKUP FUNCTION ===
     function downloadFullAppBackup() {
       var backupData = {
         exportDate: new Date().toLocaleString('en-IN'),
@@ -5445,7 +5797,7 @@ function generateInvoicePDFBase64(data, callback) {
       alert("✅ आपकी दुकान का पूरा डेटा सफलतापूर्वक फ़ोन में बैकअप हो गया है!");
     }
 
-    // 2. LIVE BARCODE & QR CODE SCANNER FOR INVOICE
+    // === LIVE BARCODE & QR CODE SCANNER ===
     var html5QrCodeScanner = null;
 
     function startBarcodeScannerModal() {
@@ -5464,7 +5816,6 @@ function generateInvoicePDFBase64(data, callback) {
           { facingMode: "environment" },
           { fps: 10, qrbox: { width: 220, height: 180 } },
           function(decodedText) {
-            // Success Barcode Match
             stopBarcodeScanner();
             closeModalPopup();
             autoAddScannedItemToInvoice(decodedText);
@@ -5486,8 +5837,6 @@ function generateInvoicePDFBase64(data, callback) {
 
     function autoAddScannedItemToInvoice(scannedCode) {
       scannedCode = scannedCode.trim().toLowerCase();
-      
-      // Find matching item from stock by Name or Code/Details
       var matchedItem = (globalStockData || []).find(function(stk) {
         var name = (stk.name || '').toLowerCase();
         var details = (stk.otherDetails || stk.code || '').toLowerCase();
@@ -5495,7 +5844,6 @@ function generateInvoicePDFBase64(data, callback) {
       });
 
       if (matchedItem) {
-        // Add row or populate existing row
         var container = document.getElementById("invoiceItemsContainer");
         var rows = container ? container.querySelectorAll('.item-row') : [];
         var targetRow = null;
@@ -5521,15 +5869,15 @@ function generateInvoicePDFBase64(data, callback) {
           alert("✅ जुड़ गया: " + matchedItem.name + " (Rs." + (matchedItem.sellingPrice || matchedItem.price) + ")");
         }
       } else {
-        alert("⚠️ स्कैन्ड कोड (" + scannedCode + ") वाला सामान स्टॉक में नहीं मिला! कृपया स्टॉक में सामान जोड़ें।");
+        alert("⚠️ स्कैन्ड कोड (" + scannedCode + ") वाला सामान स्टॉक में नहीं मिला!");
       }
     }
+
+    // === ONLINE SYNC & AUTO LOCK SYSTEM ===
     window.addEventListener('online', function() {
       var offlineTxns = JSON.parse(localStorage.getItem("offline_txns") || "[]");
       
       if (offlineTxns.length > 0 && typeof google !== 'undefined' && google.script && google.script.run) {
-        console.log("Syncing offline transactions...");
-        
         var pendingTxns = [...offlineTxns];
         pendingTxns.forEach(function(txnData, index) {
           google.script.run.withSuccessHandler(function() {
@@ -5538,10 +5886,107 @@ function generateInvoicePDFBase64(data, callback) {
             localStorage.setItem("offline_txns", JSON.stringify(currentStorage));
           }).saveTransaction(txnData);
         });
-        
-        alert("✅ इंटरनेट कनेक्ट हो गया है! आपका ऑफ़लाइन डेटा Google Sheet में बैकअप हो गया है।");
+        alert("✅ इंटरनेट कनेक्ट हो गया है! ऑफ़लाइन डेटा बैकअप हो गया है।");
       }
     });
+
+    var inactivityTimer;
+    var LOCK_TIMEOUT = 45 * 1000;
+
+    function resetInactivityTimer() {
+      clearTimeout(inactivityTimer);
+      inactivityTimer = setTimeout(function() {
+        var overlay = document.getElementById("appLoginOverlay");
+        if (overlay && overlay.style.display !== "flex") {
+          overlay.style.display = "flex";
+          checkBiometricAvailability();
+        }
+      }, LOCK_TIMEOUT);
+    }
+
+    window.onload = resetInactivityTimer;
+    document.onmousemove = resetInactivityTimer;
+    document.onkeypress = resetInactivityTimer;
+    document.ontouchstart = resetInactivityTimer;
+    document.onclick = resetInactivityTimer;
+    document.onscroll = resetInactivityTimer;
+    // === SMART UNIVERSAL AUTO-FILL CRM ===
+    function checkCRM(mobile, nameFieldId, aadhaarFieldId, addressFieldId) {
+      if (!mobile || mobile.trim().length !== 10) return;
+
+      var mobStr = mobile.trim();
+      var foundName = "", foundAddr = "", foundAadhaar = "";
+
+      var allHistory = [
+        ...(globalInvoiceHistory || []),
+        ...(globalTxnHistory || []),
+        ...(globalDocHistory || [])
+      ];
+
+      for (var i = 0; i < allHistory.length; i++) {
+        var item = allHistory[i];
+        if (item.mobile && String(item.mobile).trim() === mobStr) {
+          if (!foundName && item.name) foundName = item.name;
+          if (!foundAddr && item.address && item.address !== 'N/A') foundAddr = item.address;
+          if (!foundAadhaar && item.aadhaar) foundAadhaar = item.aadhaar;
+        }
+        if (foundName && foundAddr && foundAadhaar) break;
+      }
+
+      if (nameFieldId && document.getElementById(nameFieldId) && foundName) {
+        document.getElementById(nameFieldId).value = foundName;
+      }
+      if (addressFieldId && document.getElementById(addressFieldId) && foundAddr) {
+        document.getElementById(addressFieldId).value = foundAddr;
+      }
+      if (aadhaarFieldId && document.getElementById(aadhaarFieldId) && foundAadhaar) {
+        document.getElementById(aadhaarFieldId).value = String(foundAadhaar).replace(/\D/g, '').slice(-4);
+      }
+
+      if (typeof google !== 'undefined' && google.script && google.script.run) {
+        google.script.run.withSuccessHandler(function(res) {
+          if (res) {
+            if (nameFieldId && document.getElementById(nameFieldId) && res.name) {
+              document.getElementById(nameFieldId).value = res.name;
+            }
+            if (addressFieldId && document.getElementById(addressFieldId) && res.address) {
+              document.getElementById(addressFieldId).value = res.address;
+            }
+            if (aadhaarFieldId && document.getElementById(aadhaarFieldId) && res.aadhaar) {
+              document.getElementById(aadhaarFieldId).value = String(res.aadhaar).replace(/\D/g, '').slice(-4);
+            }
+          }
+        }).getCustomerDetails(mobStr);
+
+        google.script.run.withSuccessHandler(function(res) {
+          var alertBox = document.getElementById("udharKhataAlert");
+          var amtEl = document.getElementById("udharAmount");
+          if (res && parseFloat(res.pendingBalance) > 0) {
+            if(amtEl) amtEl.innerText = "₹" + res.pendingBalance;
+            if(alertBox) alertBox.classList.remove("d-none");
+          } else {
+            if(alertBox) alertBox.classList.add("d-none");
+          }
+        }).getCustomerPendingBalance(mobStr);
+      }
+    }
+
+    // === SIDE DRAWER MENU TOGGLE FUNCTIONS (GLOBAL SCOPE FIX) ===
+    window.openSideMenu = function() {
+      var drawer = document.getElementById("sideDrawerMenu");
+      var overlay = document.getElementById("sideDrawerOverlay");
+      if (drawer) drawer.classList.add("open");
+      if (overlay) overlay.classList.add("active");
+      document.body.classList.add("drawer-open");
+    };
+
+    window.closeSideMenu = function() {
+      var drawer = document.getElementById("sideDrawerMenu");
+      var overlay = document.getElementById("sideDrawerOverlay");
+      if (drawer) drawer.classList.remove("open");
+      if (overlay) overlay.classList.remove("active");
+      document.body.classList.remove("drawer-open");
+    };
   </script>
 </body>
 </html>
