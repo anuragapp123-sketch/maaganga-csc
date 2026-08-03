@@ -264,35 +264,46 @@
 
     /* Modern Ultra-Compact Cards & Form Styles */
     .card {
-      border-radius: 16px !important;
+      border-radius: 22px !important; /* कार्ड्स के लिए और गोल (Round) कॉर्नर */
       border: 1px solid var(--card-border) !important;
       box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.03) !important;
       background: #ffffff !important;
-      padding: 10px 12px !important; /* पैडिंग घटाई गई */
+      padding: 10px 12px !important;
       margin-bottom: 10px !important;
     }
 
     .form-control, .form-select {
-      border-radius: 8px !important;
+      border-radius: 14px !important; /* ज्यादा राउंड कॉर्नर के लिए 14px */
       border: 1px solid #cbd5e1 !important;
       background-color: #f8fafc !important;
-      padding: 5px 8px !important; /* इनपुट की ऊंचाई कम करने के लिए */
+      padding: 6px 10px !important;
       font-size: 0.78rem !important;
       font-weight: 500;
-      height: 32px !important;
+      height: 34px !important;
     }
 
     .form-label, label {
       font-size: 10px !important;
       font-weight: 700 !important;
-      margin-bottom: 2px !important; /* लेबल का गैप कम किया */
-      color: #475569 !important;
+      margin-bottom: 3px !important;
+      color: #334155 !important;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
     }
 
     .form-control:focus, .form-select:focus {
       background-color: #ffffff !important;
       border-color: var(--primary-blue) !important;
-      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12) !important;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15) !important;
+    }
+
+    /* Soft Search Bar Card Styling */
+    .search-card-wrapper {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 3px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      border: 1px solid #e2e8f0;
     }
 
     .fab-btn {
@@ -454,22 +465,26 @@
       display: flex;
       align-items: center;
       gap: 12px;
-      padding: 12px 14px;
-      color: #cbd5e1;
+      padding: 11px 14px;
+      color: #e2e8f0;
       text-decoration: none;
       font-size: 13px;
       font-weight: 600;
       border-radius: 12px;
-      margin-bottom: 6px;
+      margin-bottom: 4px;
       background: transparent;
       border: none;
       width: 100%;
       text-align: left;
-      transition: all 0.2s ease;
+      transition: all 0.15s ease-in-out;
     }
     .drawer-menu-item:hover, .drawer-menu-item:active {
       background: #1e293b;
       color: #38bdf8;
+      transform: translateX(3px);
+    }
+    .btn {
+      border-radius: 12px !important;
     }
   </style>
 </head>
@@ -550,6 +565,31 @@
           <span class="fs-5">📦</span>
           <span>Shop Stock</span>
         </button>
+        <!-- 📑 Document Hub Button -->
+        <button type="button" class="drawer-menu-item" onclick="openAppSection('doc-hub-sec'); closeSideMenu();">
+          <span class="fs-5">📑</span>
+          <span>सरकारी फॉर्म हब (Form Hub)</span>
+        </button>
+        <!-- 📌 Quick Notes Hub Button (Keep Style) -->
+        <button type="button" class="drawer-menu-item" onclick="openAppSection('quick-notes-sec'); closeSideMenu();">
+          <span class="fs-5">📌</span>
+          <span>क्विक नोट्स / रिमाइंडर (Notes)</span>
+        </button>
+        <!-- 🎨 Theme & Color Changer Button -->
+        <button type="button" class="drawer-menu-item" onclick="openThemeSelectorModal(); closeSideMenu();">
+          <span class="fs-5">🎨</span>
+          <span>थीम व कलर बदलें (Theme Settings)</span>
+        </button>
+        <!-- 🔒 Instant Lock App Button -->
+        <button type="button" class="drawer-menu-item text-warning" onclick="lockAppInstantly(); closeSideMenu();">
+          <span class="fs-5">🔒</span>
+          <span>ऐप लॉक करें (Lock App)</span>
+        </button>
+        <!-- 🚪 Logout Button -->
+        <button type="button" class="drawer-menu-item text-danger border-top border-secondary mt-1 pt-2" onclick="logoutUserSession(); closeSideMenu();">
+          <span class="fs-5">🚪</span>
+          <span>लॉगआउट करें (Logout)</span>
+        </button>
       </div>
 
       <div class="border-top border-secondary pt-2 text-center text-muted" style="font-size:10px;">
@@ -569,7 +609,13 @@
             <p class="header-subtitle">Digital Seva & Electronics Center</p>
           </div>
         </div>
-        <span class="badge bg-warning text-dark fw-bold px-1.5 py-0.5" style="font-size: 9px;">LIVE</span>
+        <div class="d-flex align-items-center gap-1.5">
+          <!-- 🔒 Quick Lock Icon in Header -->
+          <button type="button" class="btn btn-sm btn-outline-light py-0.5 px-2 fw-bold d-flex align-items-center gap-1" style="font-size: 10px; border-radius: 8px; border-color: rgba(255,255,255,0.3);" onclick="lockAppInstantly()" title="ऐप तुरंत लॉक करें">
+            🔒
+          </button>
+          <span class="badge bg-warning text-dark fw-bold px-1.5 py-0.5" style="font-size: 9px;">LIVE</span>
+        </div>
       </div>
 
       <!-- Ultra-Slim Date, Time & Network Sync Strip -->
@@ -1228,6 +1274,53 @@
             </div>
           </div>
         </div>
+        <!-- 📌 GOOGLE KEEP STYLE QUICK NOTES TAB -->
+        <div class="tab-pane" id="quick-notes-sec">
+          <div class="d-flex align-items-center justify-content-between mb-2">
+            <button class="btn app-back-btn py-1 px-3 fw-bold" onclick="openAppSection('dashboard-home-sec')" style="font-size: 11px;">⬅️ Dashboard</button>
+            <button type="button" class="btn btn-sm btn-warning text-dark fw-bold py-1 px-2.5" style="font-size:11px; border-radius:8px;" onclick="toggleAddNoteForm()">➕ नया नोट लिखें</button>
+          </div>
+
+          <!-- ✍️ New Note Creation Box (Keep Style Input) -->
+          <div id="addNoteFormCard" class="card p-3 mb-3 border-0 shadow-sm bg-white d-none" style="border-radius:18px !important; border-left: 4px solid #f59e0b !important;">
+            <div class="d-flex justify-content-between align-items-center mb-2 border-bottom pb-1">
+              <h6 class="fw-bold text-dark m-0" style="font-size:12px;" id="noteFormTitle">📝 नया नोट तैयार करें</h6>
+              <button type="button" class="btn-close" style="font-size:10px;" onclick="toggleAddNoteForm()"></button>
+            </div>
+            <input type="hidden" id="editNoteIdx" value="">
+            <div class="mb-2">
+              <input type="text" id="newNoteTitle" class="form-control form-control-sm fw-bold border-0 bg-light" placeholder="टाइटल (Title)... e.g. कल का ज़रूरी काम">
+            </div>
+            <div class="mb-2">
+              <textarea id="newNoteContent" class="form-control form-control-sm border-0 bg-light" rows="3" placeholder="यहाँ विवरण या याद रखने वाली बातें लिखें..."></textarea>
+            </div>
+            <div class="d-flex justify-content-between align-items-center">
+              <div class="d-flex gap-1.5 align-items-center">
+                <small class="fw-bold text-muted" style="font-size:9px;">कलर:</small>
+                <input type="color" id="newNoteColor" value="#fef3c7" style="border:none; width:26px; height:24px; cursor:pointer; background:transparent;">
+              </div>
+              <div class="d-flex gap-1">
+                <button type="button" class="btn btn-sm btn-secondary fw-bold px-2 py-1" style="font-size:10px; border-radius:6px;" onclick="toggleAddNoteForm()">रद्द करें</button>
+                <button type="button" class="btn btn-sm btn-warning text-dark fw-bold px-3 py-1" style="font-size:10px; border-radius:6px;" onclick="saveQuickNoteItem()">💾 सेव करें</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="card p-3 shadow-sm border-0 bg-white" style="border-radius:18px;">
+            <div class="d-flex justify-content-between align-items-center mb-2 border-bottom pb-2">
+              <div>
+                <h6 class="fw-bold text-dark m-0" style="font-size: 0.95rem;">📌 दुकान के क्विक नोट्स (Keep Notes)</h6>
+                <small class="text-muted" style="font-size: 9.5px;">ज़रूरी काम व याद रखने योग्य बातें यहाँ पिन करें</small>
+              </div>
+              <span class="badge bg-warning text-dark">Notes</span>
+            </div>
+
+            <!-- Notes Grid Container -->
+            <div class="row g-2" id="notesGridContainer" style="max-height: 65vh; overflow-y: auto;">
+              <!-- Dynamic Note Cards Inserted via JS -->
+            </div>
+          </div>
+        </div>
 
         <!-- 6. FESTIVAL & GREETINGS TAB (PROFESSIONAL CUSTOM LAYOUT) -->
         <div class="tab-pane" id="greeting-sec">
@@ -1252,10 +1345,12 @@
 
             <!-- Quick Template Selector Buttons -->
             <label class="form-label-sm text-muted mb-1">⚡ रेडीमेड मैसेज टेम्पलेट (Quick Select):</label>
-            <div class="d-flex gap-1.5 mb-3">
-              <button type="button" class="btn btn-sm btn-outline-primary fw-bold py-1 w-33" style="font-size:9.5px; border-radius:8px;" onclick="loadGreetingTemplate('festival')">🎉 त्योहार</button>
-              <button type="button" class="btn btn-sm btn-outline-success fw-bold py-1 w-33" style="font-size:9.5px; border-radius:8px;" onclick="loadGreetingTemplate('birthday')">🎂 जन्मदिन</button>
-              <button type="button" class="btn btn-sm btn-outline-dark fw-bold py-1 w-33" style="font-size:9.5px; border-radius:8px;" onclick="loadGreetingTemplate('promo')">🚩 सेवा प्रचार</button>
+            <div class="d-flex flex-wrap gap-1 mb-3">
+              <button type="button" class="btn btn-sm btn-outline-primary fw-bold py-1 px-2" style="font-size:9.5px; border-radius:8px;" onclick="loadGreetingTemplate('festival')">🎉 त्योहार</button>
+              <button type="button" class="btn btn-sm btn-outline-success fw-bold py-1 px-2" style="font-size:9.5px; border-radius:8px;" onclick="loadGreetingTemplate('birthday')">🎂 जन्मदिन</button>
+              <button type="button" class="btn btn-sm btn-outline-dark fw-bold py-1 px-2" style="font-size:9.5px; border-radius:8px;" onclick="loadGreetingTemplate('promo')">🚩 सेवा प्रचार</button>
+              <button type="button" class="btn btn-sm btn-outline-warning text-dark fw-bold py-1 px-2" style="font-size:9.5px; border-radius:8px;" onclick="loadGreetingTemplate('ready')">✅ काम तैयार है</button>
+              <button type="button" class="btn btn-sm btn-outline-danger fw-bold py-1 px-2" style="font-size:9.5px; border-radius:8px;" onclick="loadGreetingTemplate('due_rem')">💳 उधारी रिमाइंडर</button>
             </div>
 
             <!-- Custom Message Text Box -->
@@ -1299,7 +1394,62 @@
 
           </div>
         </div>
+        <!-- 📄 DYNAMIC CUSTOMIZABLE DOCUMENT HUB TAB -->
+        <div class="tab-pane" id="doc-hub-sec">
+          <div class="d-flex align-items-center justify-content-between mb-2">
+            <button class="btn app-back-btn py-1 px-3 fw-bold" onclick="openAppSection('dashboard-home-sec')" style="font-size: 11px;">⬅️ Dashboard</button>
+            <button type="button" class="btn btn-sm btn-success fw-bold py-1 px-2.5" style="font-size:11px; border-radius:8px;" onclick="toggleAddCustomDocForm()">➕ नया फॉर्म जोड़ें / अपलोड करें</button>
+          </div>
 
+          <!-- ➕ Form Upload / Edit Card (Hidden by Default) -->
+          <div id="addDocHubFormCard" class="card p-3 mb-3 border-0 shadow bg-light d-none" style="border-radius: 16px !important;">
+            <div class="d-flex justify-content-between align-items-center mb-2 border-bottom pb-2">
+              <h6 class="fw-bold text-primary m-0" style="font-size: 12px;" id="docHubFormTitle">📑 नया सरकारी फॉर्म अपलोड करें</h6>
+              <button type="button" class="btn-close" style="font-size:10px;" onclick="toggleAddCustomDocForm()"></button>
+            </div>
+            <div class="row g-2">
+              <input type="hidden" id="editDocHubId" value="">
+              <div class="col-12">
+                <label class="form-label-sm">फॉर्म का नाम (Form Title) *</label>
+                <input type="text" id="newDocHubTitle" class="form-control form-control-sm fw-bold" placeholder="e.g. नया राशन कार्ड फॉर्म">
+              </div>
+              <div class="col-12">
+                <label class="form-label-sm">विवरण / नोट (Description)</label>
+                <input type="text" id="newDocHubDesc" class="form-control form-control-sm" placeholder="e.g. ग्रामीण व शहरी क्षेत्र हेतु">
+              </div>
+              <div class="col-12">
+                <label class="form-label-sm text-primary">📄 फ़ाइल चुनें (PDF या Image Upload) *</label>
+                <input type="file" id="newDocHubFile" accept="application/pdf,image/*" class="form-control form-control-sm">
+                <small class="text-muted" style="font-size:8.5px;" id="docHubFileStatus">यदि फ़ाइल नहीं चुनेंगे तो पुराना लिंक/फ़ाइल बना रहेगा।</small>
+              </div>
+              <div class="col-12 d-flex gap-2 mt-2">
+                <button type="button" class="btn btn-sm btn-primary w-50 fw-bold py-1.5" onclick="saveCustomDocHubItem()">💾 फॉर्म सेव करें</button>
+                <button type="button" class="btn btn-sm btn-secondary w-50 fw-bold py-1.5" onclick="toggleAddCustomDocForm()">❌ रद्द करें</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="card p-3 shadow-sm border-0 bg-white" style="border-radius:18px;">
+            <div class="d-flex justify-content-between align-items-center mb-2 border-bottom pb-2">
+              <div>
+                <h6 class="fw-bold text-dark m-0" style="font-size: 0.95rem;">📑 सरकारी फॉर्म मैनेजर (CSC Document Hub)</h6>
+                <small class="text-muted" style="font-size: 9.5px;">फॉर्म अपलोड करें, नाम बदलें या डाउनलोड/प्रिंट करें</small>
+              </div>
+              <span class="badge bg-primary">Dynamic Manager</span>
+            </div>
+
+            <!-- Fast Search Bar -->
+            <div class="input-group input-group-sm mb-3">
+              <span class="input-group-text bg-light border-0 fw-bold">🔍</span>
+              <input type="text" id="docHubSearchInput" class="form-control border-0 bg-light fw-bold" placeholder="फॉर्म का नाम खोजें..." oninput="filterDocHubForms(this.value)">
+            </div>
+
+            <!-- Dynamic List Container for Forms -->
+            <div class="row g-2" id="docHubFormsContainer" style="max-height: 60vh; overflow-y: auto;">
+              <!-- Dynamic Cards inserted via JS -->
+            </div>
+          </div>
+        </div>
         <!-- 4. DOCUMENT RECEIVING TAB (SLIM GRID) -->
         <div class="tab-pane" id="doc-receive-sec">
           <button class="btn app-back-btn mb-1.5 w-100 py-1" onclick="openAppSection('dashboard-home-sec')" style="font-size:10px;">⬅️ Back To Dashboard</button>
@@ -2479,6 +2629,39 @@ function downloadTxnReceiptPDF(index) {
       }
     }
 
+    // 🔒 ऐप को तुरंत लॉक करने का फ़ंक्शन (PIN / फ़िंगरप्रिंट स्क्रीन दिखाएगा)
+    function lockAppInstantly() {
+      var overlay = document.getElementById("appLoginOverlay");
+      if (overlay) {
+        overlay.style.display = "flex";
+        if (typeof checkBiometricAvailability === 'function') {
+          checkBiometricAvailability();
+        }
+      }
+    }
+
+    // 🚪 यूजर को पूरी तरह लॉगआउट करने का फ़ंक्शन (Session खत्म करेगा)
+    function logoutUserSession() {
+      if (confirm("⚠️ क्या आप निश्चित रूप से ऐप से लॉगआउट करना चाहते हैं?")) {
+        localStorage.removeItem("mg_csc_user_session");
+        currentLoggedInUser = null;
+
+        var nameEl = document.getElementById("appLoggedInUserName");
+        if (nameEl) nameEl.innerText = "Maa Ganga CSC User";
+
+        var mobInput = document.getElementById("loginMobileInput");
+        var pinInput = document.getElementById("loginPinInput");
+        if (mobInput) mobInput.value = "";
+        if (pinInput) pinInput.value = "";
+
+        var bioBtn = document.getElementById("biometricLoginBtn");
+        if (bioBtn) bioBtn.classList.add("d-none");
+
+        showLoginScreen();
+        alert("✅ आप सफलतापूर्वक लॉगआउट हो गए हैं!");
+      }
+    }
+
     function showLoginScreen() {
       document.getElementById("appLoginOverlay").style.display = "flex";
       checkBiometricAvailability();
@@ -3086,13 +3269,11 @@ function sendModalDetailsToWhatsApp() {
     // 1. 10-अंकों का शुद्ध भारतीय नंबर (Country Code +91 के साथ)
     var cleanPhone = "91" + targetMobile;
 
-    // 2. Direct Call Native Android Image Share Handler
+    // 2. Direct Call Native Android Image Share Handler (APK Mode)
     if (window.AndroidApp && typeof window.AndroidApp.shareImageToWhatsApp === "function") {
       window.AndroidApp.shareImageToWhatsApp(imgBase64, targetMobile, message);
-    } else {
-      window.open("https://api.whatsapp.com/send?phone=" + cleanPhone + "&text=" + encodeURIComponent(message), '_blank');
-    }
-    // 3. सीधे ग्राहक का व्हाट्सएप चैट ओपन करने वाला डायरेक्ट लिंक फ़ॉलबैक
+    } 
+    // 3. Browser Mode Fallback (Web Share API or Direct WhatsApp Link)
     else {
       fetch(imgBase64)
         .then(function(res) { return res.blob(); })
@@ -3100,14 +3281,12 @@ function sendModalDetailsToWhatsApp() {
           var fileName = rawCustName + "_Receipt.jpg";
           var file = new File([blob], fileName, { type: "image/jpeg" });
           
-          // मोबाइल ऐप / ब्राउज़र वेब शेयर (Direct App Launch)
           if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
             navigator.share({
               files: [file],
               title: headerTitle,
               text: message
             }).catch(function(e){
-              // यदि शेयर मेन्यू कैंसिल हो तो सीधे चैट खोलेगा
               window.open("https://api.whatsapp.com/send?phone=" + cleanPhone + "&text=" + encodeURIComponent(message), '_blank');
             });
           } else {
@@ -5751,21 +5930,58 @@ function generateInvoicePDFBase64(data, callback) {
       tbody.innerHTML = html;
     }
 
-    // === 🎓 PREMIUM HIGH-CONVERSION CUSTOM GREETINGS LOGIC ===
+    // === 🎨 ADVANCED & CATEGORIZED CUSTOM GREETINGS LOGIC ===
     function loadGreetingTemplate(type) {
       var name = document.getElementById("greetName") ? document.getElementById("greetName").value.trim() : "";
-      var nameText = name ? " *" + name + " जी*," : "";
+      var nameText = name ? " *" + name + " जी*," : " *आदरणीय ग्राहक जी*,";
 
       var msgBox = document.getElementById("greetCustomMsg");
       if (!msgBox) return;
 
       if (type === 'festival') {
-        msgBox.value = "आदरणीय" + nameText + " 🙏\n\nआपको एवं आपके समस्त परिवार को इस पावन पर्व की हार्दिक बधाई एवं ढेर सारी शुभकामनाएँ! 🌸\n\nमाँ का आशीर्वाद आप पर सदैव बना रहे और आपका जीवन सुख, समृद्धि, शांति एवं उत्तम स्वास्थ्य से परिपूर्ण हो। 🎉✨";
+        msgBox.value = "🌸 *पावन पर्व की हार्दिक शुभकामनाएँ!* 🌸\n\n" +
+                       "नमस्कार" + nameText + " 🙏\n\n" +
+                       "आपको एवं आपके समस्त परिवार को इस पावन पर्व की अनंत बधाई एवं शुभकामनाएँ! 🎆\n\n" +
+                       "ईश्वर से प्रार्थना है कि यह पर्व आपके जीवन में अपार सुख, शांति, समृद्धि और उत्तम स्वास्थ्य लेकर आए। ✨\n\n" +
+                       "🌸 *शुभकाँक्षी:* अनुराग शाक्य\n" +
+                       "🚩 *माँ गंगा जन सेवा केंद्र व इलेक्ट्रॉनिक्स, कैरावली*";
+
       } else if (type === 'birthday') {
-        msgBox.value = "प्रिय" + nameText + " 🎂🎉\n\nआपको जन्मदिवस की अनंत हार्दिक बधाई एवं शुभकामनाएँ! 💐✨\n\nईश्वर से प्रार्थना है कि आने वाला नया वर्ष आपके जीवन में अपार सफलता, उत्तम स्वास्थ्य और ढेर सारी खुशियाँ लेकर आए। 🌟🎁";
+        msgBox.value = "🎂 *जन्मदिन की हार्दिक बधाई एवं शुभकामनाएँ!* 🎉\n\n" +
+                       "प्रिय" + nameText + " 💐✨\n\n" +
+                       "आपको जन्मदिवस की अनंत शुभकामनाएँ! ईश्वर से प्रार्थना है कि आपका आने वाला वर्ष सफलता, खुशहाली और उत्तम स्वास्थ्य से भरा हो। 🎁🌟\n\n" +
+                       "🌸 *शुभकाँक्षी:* अनुराग शाक्य\n" +
+                       "🚩 *माँ गंगा जन सेवा केंद्र व इलेक्ट्रॉनिक्स*";
+
       } else if (type === 'promo') {
-        msgBox.value = "नमस्कार" + nameText + " 🚩\n\n*माँ गंगा जन सेवा केंद्र व इलेक्ट्रॉनिक्स* में आपका हार्दिक स्वागत है!\n\nहमारी प्रमुख त्वरित सेवाएँ:\n✅ ऑनलाइन फॉर्म, आयुष्मान कार्ड व सभी प्रमाण पत्र\n✅ पैन कार्ड, वोटर ID व बैंकिंग (मनी ट्रांसफर / नकद निकासी)\n✅ पंखा व कूलर मोटर बाइंडिंग तथा ओरिजिनल इलेक्ट्रॉनिक्स सामान\n\nउचित दाम और भरोसेमंद सेवा के लिए आज ही संपर्क करें! 📞 9761414105";
+        msgBox.value = "🚩 *विशेष सेवा सूचना* 🚩\n\n" +
+                       "नमस्कार" + nameText + " 🙏\n\n" +
+                       "*माँ गंगा जन सेवा केंद्र व इलेक्ट्रॉनिक्स* में आपकी सेवा के लिए हम सदैव तत्पर हैं।\n\n" +
+                       "🌟 *हमारी प्रमुख त्वरित सेवाएँ:*\n" +
+                       "✅ आय, जाति, निवास प्रमाण पत्र व आयुष्मान कार्ड\n" +
+                       "✅ नए पैन कार्ड, वोटर ID व आधार कार्ड प्रिंट\n" +
+                       "✅ बैंकिंग (नकद निकासी, जमा व मनी ट्रांसफर)\n" +
+                       "✅ पंखा/कूलर मोटर बाइंडिंग व ओरिजिनल इलेक्ट्रॉनिक्स सामान\n\n" +
+                       "उचित दाम और भरोसेमंद सेवा के लिए आज ही पधारें! 🤝\n" +
+                       "📞 *संपर्क/WhatsApp:* 9761414105";
+
+      } else if (type === 'ready') {
+        msgBox.value = "✅ *आपका कार्य / डॉक्यूमेंट तैयार है!* 📦\n\n" +
+                       "नमस्कार" + nameText + " 🙏\n\n" +
+                       "आपको सूचित किया जाता है कि आपका जमा किया गया कार्य / डॉक्यूमेंट / रिपेयरिंग का सामान *माँ गंगा जन सेवा केंद्र* पर बनकर/सही होकर तैयार है। 📄🛠️\n\n" +
+                       "कृपया दुकान पर आकर प्राप्त कर लें।\n\n" +
+                       "📍 *पता:* बरनाहल मैनपुरी रोड, कैरावली\n" +
+                       "📞 *संपर्क:* 9761414105";
+
+      } else if (type === 'due_rem') {
+        msgBox.value = "💳 *बकाया भुगतान (Payment Reminder)* 📄\n\n" +
+                       "नमस्कार" + nameText + " 🙏\n\n" +
+                       "माँ गंगा जन सेवा केंद्र व इलेक्ट्रॉनिक्स पर आपका पिछला कुछ बकाया भुगतान शेष है। 💸\n\n" +
+                       "आपसे विनम्र अनुरोध है कि समय पर भुगतान करके सहयोग प्रदान करें। आप दुकान पर आकर या ऑनलाइन UPI द्वारा भी भुगतान कर सकते हैं। 🙏\n\n" +
+                       "💳 *UPI ID:* `anuragkumarshakya@ptaxis`\n" +
+                       "📞 *संपर्क:* 9761414105";
       }
+
       updateGreetingPreview();
     }
 
@@ -5783,6 +5999,7 @@ function generateInvoicePDFBase64(data, callback) {
       }
     });
 
+    // === 🎨 PREMIUM IMAGE + TEXT WHATSAPP GREETINGS SENDER ===
     function sendCustomGreeting(sendMode) {
       var mobileInput = document.getElementById("greetMobile");
       var nameInput = document.getElementById("greetName");
@@ -5799,36 +6016,104 @@ function generateInvoicePDFBase64(data, callback) {
         return alert("⚠️ कृपया भेजने के लिए कोई संदेश (Message) लिखें!");
       }
 
-      var fullMessage = "*🚩 माँ गंगा जन सेवा केंद्र व इलेक्ट्रॉनिक्स बरनाहल मैनपुरी रोड, कैरावली 🚩*\n" +
-                        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" +
-                        "प्रिय *" + name + " जी*,\n\n" +
-                        customText + "\n\n" +
-                        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" +
-                        "🌟 *हमारी प्रमुख सेवाएँ (Services):*\n" +
-                        "• आय, जाति, निवास प्रमाण पत्र, PAN, वोटर ID\n" +
-                        "• पंखा व कूलर मोटर बाइंडिंग एवं इलेक्ट्रॉनिक्स\n" +
-                        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" +
-                        "👤 *Pro:* अनुराग शाक्य (Anurag Shakya)\n" +
-                        "📞 *संपर्क/WhatsApp:* 9761414105\n" +
-                        "धन्यवाद! 🙏";
-
       var cleanPhone = "91" + mobile;
+      var now = new Date();
 
-      if (sendMode === 'whatsapp') {
-        var waUrl = "https://api.whatsapp.com/send?phone=" + cleanPhone + "&text=" + encodeURIComponent(fullMessage);
-        window.open(waUrl, '_blank');
-      } else if (sendMode === 'share') {
+      // 📝 व्हाट्सएप मैसेज के नीचे जाने वाला कैप्शन टेक्स्ट
+      var captionMsg = "*🚩 माँ गंगा जन सेवा केंद्र व इलेक्ट्रॉनिक्स 🚩*\n" +
+                       "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" +
+                       "नमस्कार *" + name + " जी*,\n\n" +
+                       customText + "\n\n" +
+                       "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" +
+                       "🌟 *हमारी प्रमुख सेवाएँ (Services):*\n" +
+                       "• आय, जाति, निवास प्रमाण पत्र, PAN, वोटर ID\n" +
+                       "• पंखा व कूलर मोटर बाइंडिंग एवं इलेक्ट्रॉनिक्स\n" +
+                       "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" +
+                       "👤 *Pro:* अनुराग शाक्य (Anurag Shakya)\n" +
+                       "📞 *संपर्क/WhatsApp:* 9761414105\n" +
+                       "धन्यवाद! 🙏";
+
+      // यदि केवल SMS / ऐप्स से शेयर करना हो
+      if (sendMode === 'share') {
         if (navigator.share) {
-          navigator.share({
-            title: 'माँ गंगा जन सेवा केंद्र',
-            text: fullMessage
-          }).catch(function() {
-            window.open("sms:" + mobile + "?body=" + encodeURIComponent(fullMessage), '_blank');
-          });
+          navigator.share({ title: 'माँ गंगा जन सेवा केंद्र', text: captionMsg }).catch(function(){});
         } else {
-          window.open("sms:" + mobile + "?body=" + encodeURIComponent(fullMessage), '_blank');
+          window.open("sms:" + mobile + "?body=" + encodeURIComponent(captionMsg), '_blank');
         }
+        return;
       }
+
+      // 🎨 HD DIGITAL GREETING BANNER CONTAINER
+      var banner = document.createElement("div");
+      banner.style.cssText = "position:fixed; top:-9999px; left:-9999px; width:520px; background:linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color:#ffffff; padding:22px; font-family:'Poppins', Arial, sans-serif; box-sizing:border-box; border-radius:18px; border:3px solid #38bdf8; z-index:999999;";
+
+      banner.innerHTML = 
+        '<div style="text-align:center; border-bottom:2px dashed #38bdf8; padding-bottom:12px; margin-bottom:14px;">' +
+          '<img src="https://lh3.googleusercontent.com/d/1AVhGGj41J973HK0KgI1im5JJwJZsKhJR" style="width:55px; height:55px; border-radius:50%; border:2.5px solid #38bdf8; object-fit:cover; margin-bottom:6px;">' +
+          '<h2 style="margin:0; color:#ffffff; font-size:16.5px; font-weight:800; letter-spacing:0.5px; text-transform:uppercase;">माँ गंगा जन सेवा केंद्र व इलेक्ट्रॉनिक्स</h2>' +
+          '<small style="color:#38bdf8; font-size:10.5px; font-weight:700;">बरनाहल मैनपुरी रोड, कैरावली | Pro: अनुराग शाक्य (9761414105)</small>' +
+        '</div>' +
+
+        '<!-- Message Box -->' +
+        '<div style="background:#ffffff; color:#0f172a; padding:16px; border-radius:14px; margin-bottom:14px; font-size:12.5px; font-weight:600; line-height:1.6; white-space:pre-wrap; border-left:5px solid #2563eb; box-shadow:0 4px 12px rgba(0,0,0,0.15);">' +
+          customText +
+        '</div>' +
+
+        '<!-- Services Footer Grid -->' +
+        '<div style="background:rgba(255,255,255,0.07); border:1px solid #334155; border-radius:12px; padding:10px; font-size:9.5px;">' +
+          '<div style="text-align:center; color:#fbbf24; font-weight:800; font-size:10.5px; margin-bottom:6px; text-transform:uppercase;">🌟 हमारी प्रमुख सेवाएँ (Services) 🌟</div>' +
+          '<div style="display:flex; flex-wrap:wrap; gap:5px; justify-content:center; font-weight:700;">' +
+            '<span style="background:#1e3a8a; color:#bfdbfe; padding:3px 7px; border-radius:6px; border:1px solid #3b82f6;">📄 आय/जाति/निवास</span>' +
+            '<span style="background:#065f46; color:#a7f3d0; padding:3px 7px; border-radius:6px; border:1px solid #10b981;">💳 पैन व आयुष्मान कार्ड</span>' +
+            '<span style="background:#831843; color:#fbcfe8; padding:3px 7px; border-radius:6px; border:1px solid #ec4899;">🗳️ वोटर ID व आधार प्रिंट</span>' +
+            '<span style="background:#78350f; color:#fde68a; padding:3px 7px; border-radius:6px; border:1px solid #f59e0b;">💸 मनी ट्रांसफर / नकद निकासी</span>' +
+            '<span style="background:#312e81; color:#c7d2fe; padding:3px 7px; border-radius:6px; border:1px solid #6366f1;">⚙️ पंखा/कूलर मोटर बाइंडिंग</span>' +
+          '</div>' +
+        '</div>' +
+
+        '<div style="display:flex; justify-content:space-between; align-items:center; margin-top:12px; font-size:9px; color:#94a3b8; border-top:1px solid #334155; padding-top:6px;">' +
+          '<span>📅 Date: ' + now.toLocaleDateString('en-IN') + '</span>' +
+          '<span>🚩 कैरावली (मैनपुरी)</span>' +
+        '</div>';
+
+      document.body.appendChild(banner);
+
+      // 📸 HTML2CANVAS Rendering
+      html2canvas(banner, { scale: 2, useCORS: true, allowTaint: true, backgroundColor: '#0f172a' }).then(function(canvas) {
+        banner.remove();
+        var imgBase64 = canvas.toDataURL('image/jpeg', 0.95);
+
+        // 🚀 1. Android APK Native Environment (Image + Text Caption Both)
+        if (window.AndroidApp && typeof window.AndroidApp.shareImageToWhatsApp === "function") {
+          window.AndroidApp.shareImageToWhatsApp(imgBase64, mobile, captionMsg);
+        } 
+        // 🌐 2. Web Browser Fallback
+        else {
+          fetch(imgBase64)
+            .then(function(res){ return res.blob(); })
+            .then(function(blob){
+              var fileName = "Greeting_" + name.replace(/\s+/g, '_') + ".jpg";
+              var file = new File([blob], fileName, { type: "image/jpeg" });
+
+              if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+                navigator.share({
+                  files: [file],
+                  title: 'माँ गंगा जन सेवा केंद्र',
+                  text: captionMsg
+                }).catch(function(){
+                  window.open("https://api.whatsapp.com/send?phone=" + cleanPhone + "&text=" + encodeURIComponent(captionMsg), '_blank');
+                });
+              } else {
+                window.open("https://api.whatsapp.com/send?phone=" + cleanPhone + "&text=" + encodeURIComponent(captionMsg), '_blank');
+              }
+            }).catch(function(){
+              window.open("https://api.whatsapp.com/send?phone=" + cleanPhone + "&text=" + encodeURIComponent(captionMsg), '_blank');
+            });
+        }
+      }).catch(function(err) {
+        if (document.body.contains(banner)) banner.remove();
+        alert("❌ कार्ड इमेज जनरेट करने में त्रुटि: " + err);
+      });
     }
 
     // === 1-CLICK ALL-DATA OFFLINE BACKUP FUNCTION ===
@@ -6044,6 +6329,484 @@ function generateInvoicePDFBase64(data, callback) {
       if (overlay) overlay.classList.remove("active");
       document.body.classList.remove("drawer-open");
     };
+    // === 🎨 DYNAMIC MULTICOLOR & THEME MANAGER SYSTEM ===
+    var DEFAULT_THEME = {
+      primary: '#2563eb',
+      headerGradient: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+      bgSlate: '#f8fafc',
+      bgBody: '#0f172a',
+      cardBg: '#ffffff',
+      textDark: '#0f172a'
+    };
+
+    // 1. ऐप खुलते ही सेव्ड थीम अप्लाई करने का फ़ंक्शन
+    function applySavedTheme() {
+      var savedThemeJson = localStorage.getItem("mg_csc_app_theme");
+      var theme = DEFAULT_THEME;
+
+      if (savedThemeJson) {
+        try {
+          theme = JSON.parse(savedThemeJson);
+        } catch(e) {
+          theme = DEFAULT_THEME;
+        }
+      }
+
+      // CSS Variables अपडेट करें
+      var root = document.documentElement;
+      root.style.setProperty('--primary-blue', theme.primary || '#2563eb');
+      root.style.setProperty('--navy-header', theme.bgBody || '#0f172a');
+
+      // हेडर का कलर/ग्रेडिएंट बदलें
+      var headerEl = document.querySelector('.app-header');
+      if (headerEl) {
+        headerEl.style.background = theme.headerGradient || 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)';
+      }
+
+      // बॉडी और मोबाइल फ़्रेम का बैकग्राउंड बदलें
+      document.body.style.backgroundColor = theme.bgBody || '#0f172a';
+      var frameEl = document.querySelector('.app-mobile-frame');
+      if (frameEl) {
+        frameEl.style.backgroundColor = theme.bgSlate || '#f8fafc';
+      }
+
+      // लॉगिन स्क्रीन का थीम ग्रेडिएंट सेट करें
+      var loginOverlay = document.getElementById("appLoginOverlay");
+      if (loginOverlay) {
+        loginOverlay.style.background = theme.headerGradient || 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)';
+      }
+    }
+
+    // Page Load होते ही तुरंत थीम अप्लाई करें
+    window.addEventListener('DOMContentLoaded', applySavedTheme);
+    document.addEventListener('DOMContentLoaded', applySavedTheme);
+
+    // 2. साइड ड्रावर से थीम मॉडलो (Popup) खोलने का फ़ंक्शन
+    function openThemeSelectorModal() {
+      var modalHtml = '<div class="p-2">' +
+        '<small class="fw-bold text-muted d-block mb-3" style="font-size:11px;">अपनी पसंद का लुक व कलर चुनें (लॉगिन से लेकर पूरे ऐप पर लागू होगा):</small>' +
+
+        '<!-- Pre-defined Theme Cards -->' +
+        '<div class="row g-2 mb-3">' +
+          '<div class="col-6">' +
+            '<button type="button" class="btn btn-outline-dark w-100 fw-bold py-2 shadow-sm text-start d-flex align-items-center gap-2" style="font-size:10.5px; border-radius:10px;" onclick="applyPredefinedTheme(\'default\')">' +
+              '<span style="width:18px; height:18px; border-radius:50%; background:#2563eb; display:inline-block;"></span> Classic Slate' +
+            '</button>' +
+          '</div>' +
+          '<div class="col-6">' +
+            '<button type="button" class="btn btn-outline-success w-100 fw-bold py-2 shadow-sm text-start d-flex align-items-center gap-2" style="font-size:10.5px; border-radius:10px;" onclick="applyPredefinedTheme(\'emerald\')">' +
+              '<span style="width:18px; height:18px; border-radius:50%; background:#059669; display:inline-block;"></span> Emerald Green' +
+            '</button>' +
+          '</div>' +
+          '<div class="col-6">' +
+            '<button type="button" class="btn btn-outline-primary w-100 fw-bold py-2 shadow-sm text-start d-flex align-items-center gap-2" style="font-size:10.5px; border-radius:10px;" onclick="applyPredefinedTheme(\'purple\')">' +
+              '<span style="width:18px; height:18px; border-radius:50%; background:#7c3aed; display:inline-block;"></span> Royal Purple' +
+            '</button>' +
+          '</div>' +
+          '<div class="col-6">' +
+            '<button type="button" class="btn btn-outline-danger w-100 fw-bold py-2 shadow-sm text-start d-flex align-items-center gap-2" style="font-size:10.5px; border-radius:10px;" onclick="applyPredefinedTheme(\'sunset\')">' +
+              '<span style="width:18px; height:18px; border-radius:50%; background:#ea580c; display:inline-block;"></span> Sunset Orange' +
+            '</button>' +
+          '</div>' +
+        '</div>' +
+
+        '<!-- Custom Color Picker -->' +
+        '<div class="p-2.5 border rounded-3 bg-light mb-3">' +
+          '<strong class="d-block text-dark mb-2" style="font-size:11px;">🎨 कस्टम मल्टीकलर चुनें (Custom Pick):</strong>' +
+          '<div class="d-flex align-items-center justify-content-between mb-2">' +
+            '<span style="font-size:10px;" class="fw-bold">मुख्य कलर (Primary Accent):</span>' +
+            '<input type="color" id="customPrimaryColor" value="#2563eb" style="border:none; width:35px; height:28px; cursor:pointer; background:transparent;">' +
+          '</div>' +
+          '<div class="d-flex align-items-center justify-content-between">' +
+            '<span style="font-size:10px;" class="fw-bold">हेडर/बैकग्राउंड कलर:</span>' +
+            '<input type="color" id="customHeaderColor" value="#0f172a" style="border:none; width:35px; height:28px; cursor:pointer; background:transparent;">' +
+          '</div>' +
+          '<button type="button" class="btn btn-sm btn-primary w-100 fw-bold mt-2.5 py-1.5" style="font-size:10.5px; border-radius:8px;" onclick="saveCustomPickedColor()">💾 कस्टम थीम लागू करें</button>' +
+        '</div>' +
+
+        '<button type="button" class="btn btn-secondary w-100 fw-bold py-2" style="font-size:11px; border-radius:10px;" onclick="closeModalPopup()">❌ बंद करें</button>' +
+      '</div>';
+
+      showModalPopup("🎨 थीम व मल्टीकलर सेटिंग्स", modalHtml);
+    }
+
+    // 3. रेडीमेड थीम लागू करने का फ़ंक्शन
+    function applyPredefinedTheme(themeName) {
+      var themeObj = DEFAULT_THEME;
+
+      if (themeName === 'emerald') {
+        themeObj = {
+          primary: '#059669',
+          headerGradient: 'linear-gradient(135deg, #064e3b 0%, #022c22 100%)',
+          bgSlate: '#f0fdf4',
+          bgBody: '#064e3b',
+          cardBg: '#ffffff',
+          textDark: '#022c22'
+        };
+      } else if (themeName === 'purple') {
+        themeObj = {
+          primary: '#7c3aed',
+          headerGradient: 'linear-gradient(135deg, #3b0764 0%, #1e1b4b 100%)',
+          bgSlate: '#faf5ff',
+          bgBody: '#3b0764',
+          cardBg: '#ffffff',
+          textDark: '#1e1b4b'
+        };
+      } else if (themeName === 'sunset') {
+        themeObj = {
+          primary: '#ea580c',
+          headerGradient: 'linear-gradient(135deg, #7c2d12 0%, #451a03 100%)',
+          bgSlate: '#fff7ed',
+          bgBody: '#7c2d12',
+          cardBg: '#ffffff',
+          textDark: '#451a03'
+        };
+      }
+
+      localStorage.setItem("mg_csc_app_theme", JSON.stringify(themeObj));
+      applySavedTheme();
+      closeModalPopup();
+      alert("✅ थीम सफलतापूर्वक बदल गई है!");
+    }
+
+    // 4. कलर पिकर से कस्टम कलर सेव करने का फ़ंक्शन
+    function saveCustomPickedColor() {
+      var prim = document.getElementById("customPrimaryColor").value;
+      var head = document.getElementById("customHeaderColor").value;
+
+      var customTheme = {
+        primary: prim,
+        headerGradient: 'linear-gradient(135deg, ' + head + ' 0%, #000000 100%)',
+        bgSlate: '#f8fafc',
+        bgBody: head,
+        cardBg: '#ffffff',
+        textDark: '#0f172a'
+      };
+
+      localStorage.setItem("mg_csc_app_theme", JSON.stringify(customTheme));
+      applySavedTheme();
+      closeModalPopup();
+      alert("✅ आपकी पसंदीदा कस्टम थीम सेव हो गई है!");
+    }
+    // === 📑 DOCUMENT HUB HELPER FUNCTIONS ===
+    function filterDocHubForms(query) {
+      var q = query.toLowerCase().trim();
+      var items = document.querySelectorAll(".doc-hub-card-item");
+      items.forEach(function(item) {
+        var title = item.getAttribute("data-title") ? item.getAttribute("data-title").toLowerCase() : "";
+        if (title.indexOf(q) !== -1 || q === "") {
+          item.style.display = "block";
+        } else {
+          item.style.display = "none";
+        }
+      });
+    }
+
+    function downloadCscFormPDF(formName, pdfUrl) {
+      if (window.AndroidApp && typeof window.AndroidApp.savePdfFile === "function") {
+        // Android App Direct Browser/PDF View Open
+        window.open(pdfUrl, '_blank');
+      } else {
+        window.open(pdfUrl, '_blank');
+      }
+    }
+    // === 📑 DYNAMIC CUSTOMIZABLE DOCUMENT HUB MANAGER ===
+    
+    // 1. डिफ़ॉल्ट फॉर्म लिस्ट (यदि पहली बार ऐप खुल रहा हो)
+    var defaultDocHubList = [
+      { id: "doc_1", title: "स्व-घोषणा पत्र (Self Declaration)", desc: "आय, जाति व निवास प्रमाण पत्र हेतु अनिवार्य", url: "https://edistrict.up.gov.in/edistrictup/StaticFormat/Declaration.pdf" },
+      { id: "doc_2", title: "नया राशन कार्ड आवेदन फॉर्म", desc: "ग्रामीण व शहरी क्षेत्रों के लिए आवेदन पत्र", url: "https://fcs.up.gov.in/FoodPortal/RationCardForm.pdf" },
+      { id: "doc_3", title: "पेंशन सत्यापन व आवेदन फॉर्म", desc: "वृद्धावस्था, विधवा एवं दिव्यांग पेंशन", url: "https://sspy-up.gov.in/pdf/OldAgeForm.pdf" },
+      { id: "doc_4", title: "PAN Card Form 49A (Physical)", desc: "नया पैन कार्ड व संशोधन फॉर्म", url: "https://www.tin-nsdl.com/downloads/pan/download/Form49A.pdf" }
+    ];
+
+    var globalDocHubList = [];
+
+    // LocalStorage से सेव्ड फॉर्म्स लोड करें
+    function loadDocHubForms() {
+      var saved = localStorage.getItem("mg_csc_dochub_list");
+      if (saved) {
+        try {
+          globalDocHubList = JSON.parse(saved);
+        } catch(e) {
+          globalDocHubList = defaultDocHubList;
+        }
+      } else {
+        globalDocHubList = defaultDocHubList;
+        localStorage.setItem("mg_csc_dochub_list", JSON.stringify(defaultDocHubList));
+      }
+      renderDocHubFormsUI(globalDocHubList);
+    }
+
+    // फॉर्म लिस्ट की UI स्क्रीन पर दिखाना
+    function renderDocHubFormsUI(list) {
+      var container = document.getElementById("docHubFormsContainer");
+      if (!container) return;
+
+      if (!list || list.length === 0) {
+        container.innerHTML = '<div class="text-center text-muted py-4">कोई फ़ॉर्म नहीं मिला। ऊपर <b>+ नया फ़ॉर्म जोड़ें</b> दबाएँ।</div>';
+        return;
+      }
+
+      var html = "";
+      list.forEach(function(item, idx) {
+        var safeTitle = escapeHtml(item.title).replace(/'/g, "\\'");
+        var safeDesc = escapeHtml(item.desc).replace(/'/g, "\\'");
+
+        html += '<div class="col-12 doc-hub-card-item" data-title="' + (item.title || '').toLowerCase() + '">' +
+          '<div class="p-2.5 border rounded-3 bg-light shadow-sm">' +
+            '<div class="d-flex align-items-center justify-content-between mb-2">' +
+              '<div class="d-flex align-items-center gap-2">' +
+                '<span class="fs-4">📝</span>' +
+                '<div>' +
+                  '<strong class="d-block text-dark" style="font-size:11.5px;">' + escapeHtml(item.title) + '</strong>' +
+                  '<small class="text-muted" style="font-size:9px;">' + escapeHtml(item.desc) + '</small>' +
+                '</div>' +
+              '</div>' +
+              '<div class="d-flex gap-1">' +
+                '<button type="button" class="btn btn-sm btn-outline-primary py-0 px-1.5 fw-bold" style="font-size:9px; border-radius:6px;" onclick="editCustomDocHubItem(' + idx + ')" title="नाम / फ़ाइल बदलें">✏️ एडिट</button>' +
+                '<button type="button" class="btn btn-sm btn-outline-danger py-0 px-1.5 fw-bold" style="font-size:9px; border-radius:6px;" onclick="deleteCustomDocHubItem(' + idx + ')" title="हटाएं">🗑️</button>' +
+              '</div>' +
+            '</div>' +
+            '<div class="d-flex justify-content-end">' +
+              '<button type="button" class="btn btn-sm btn-primary fw-bold py-1 px-3" style="font-size:10px; border-radius:8px;" onclick="openCscDocHubUrl(\'' + item.url + '\')">📄 खोलें / प्रिंट करें</button>' +
+            '</div>' +
+          '</div>' +
+        '</div>';
+      });
+
+      container.innerHTML = html;
+    }
+
+    function toggleAddCustomDocForm() {
+      var card = document.getElementById("addDocHubFormCard");
+      if (card) {
+        card.classList.toggle("d-none");
+        if (card.classList.contains("d-none")) {
+          // Reset Form
+          document.getElementById("editDocHubId").value = "";
+          document.getElementById("newDocHubTitle").value = "";
+          document.getElementById("newDocHubDesc").value = "";
+          document.getElementById("newDocHubFile").value = "";
+          document.getElementById("docHubFormTitle").innerText = "📑 नया सरकारी फॉर्म अपलोड करें";
+        }
+      }
+    }
+
+    // नया फॉर्म जोड़ना या पुराने का नाम/फ़ाइल अपडेट करना
+    function saveCustomDocHubItem() {
+      var editIdxStr = document.getElementById("editDocHubId").value;
+      var title = document.getElementById("newDocHubTitle").value.trim();
+      var desc = document.getElementById("newDocHubDesc").value.trim() || "-";
+      var fileInput = document.getElementById("newDocHubFile");
+
+      if (!title) return alert("⚠️ कृपया फॉर्म का नाम (Title) जरूर लिखें!");
+
+      var finishSave = function(fileUrl) {
+        if (editIdxStr !== "") {
+          // ✏️ Edit Existing Form
+          var idx = parseInt(editIdxStr, 10);
+          globalDocHubList[idx].title = title;
+          globalDocHubList[idx].desc = desc;
+          if (fileUrl) globalDocHubList[idx].url = fileUrl;
+        } else {
+          // ➕ Add New Form
+          if (!fileUrl) return alert("⚠️ कृपया नए फॉर्म की PDF या फोटो चुनकर अपलोड करें!");
+          var newItem = {
+            id: "doc_" + Date.now(),
+            title: title,
+            desc: desc,
+            url: fileUrl
+          };
+          globalDocHubList.unshift(newItem);
+        }
+
+        localStorage.setItem("mg_csc_dochub_list", JSON.stringify(globalDocHubList));
+        renderDocHubFormsUI(globalDocHubList);
+        toggleAddCustomDocForm();
+        alert("✅ फॉर्म सफलतापूर्वक सेव हो गया!");
+      };
+
+      if (fileInput && fileInput.files && fileInput.files[0]) {
+        var file = fileInput.files[0];
+        var reader = new FileReader();
+        reader.onload = function(e) {
+          finishSave(e.target.result); // Base64 PDF / Image Data
+        };
+        reader.readAsDataURL(file);
+      } else {
+        finishSave(""); // बिना फ़ाइल बदले नाम अपडेट
+      }
+    }
+
+    // पुराने फॉर्म को एडिट करना (नाम बदलना / नई फाइल चढ़ाना)
+    function editCustomDocHubItem(idx) {
+      var item = globalDocHubList[idx];
+      if (!item) return;
+
+      document.getElementById("editDocHubId").value = idx;
+      document.getElementById("newDocHubTitle").value = item.title || "";
+      document.getElementById("newDocHubDesc").value = item.desc || "";
+      document.getElementById("docHubFormTitle").innerText = "✏️ फॉर्म एडिट करें / नया फ़ॉर्म बदलें";
+
+      var card = document.getElementById("addDocHubFormCard");
+      if (card) card.classList.remove("d-none");
+    }
+
+    // फॉर्म डिलीट करना
+    function deleteCustomDocHubItem(idx) {
+      if (confirm("क्या आप इस फॉर्म को हटाना चाहते हैं?")) {
+        globalDocHubList.splice(idx, 1);
+        localStorage.setItem("mg_csc_dochub_list", JSON.stringify(globalDocHubList));
+        renderDocHubFormsUI(globalDocHubList);
+      }
+    }
+
+    function openCscDocHubUrl(url) {
+      if (!url) return alert("⚠️ फॉर्म की फाइल उपलब्ध नहीं है!");
+      
+      // यदि Base64 PDF/Image है और Android App है
+      if (url.indexOf("data:") === 0 && window.AndroidApp && typeof window.AndroidApp.savePdfFile === "function") {
+        window.AndroidApp.savePdfFile(url, "Form_Download_" + Date.now());
+      } else {
+        window.open(url, '_blank');
+      }
+    }
+
+    function filterDocHubForms(query) {
+      var q = query.toLowerCase().trim();
+      var items = document.querySelectorAll(".doc-hub-card-item");
+      items.forEach(function(item) {
+        var title = item.getAttribute("data-title") || "";
+        if (title.indexOf(q) !== -1 || q === "") {
+          item.style.display = "block";
+        } else {
+          item.style.display = "none";
+        }
+      });
+    }
+
+    // ऐप लोड होते ही फॉर्म्स लोड करें
+    document.addEventListener("DOMContentLoaded", loadDocHubForms);
+    // === 📌 GOOGLE KEEP STYLE QUICK NOTES SYSTEM ===
+    var globalAppNotesList = [];
+
+    function loadAppQuickNotes() {
+      var saved = localStorage.getItem("mg_csc_quick_notes");
+      if (saved) {
+        try {
+          globalAppNotesList = JSON.parse(saved);
+        } catch(e) {
+          globalAppNotesList = [];
+        }
+      } else {
+        globalAppNotesList = [
+          {
+            title: "दुकान की आवश्यक सामग्री",
+            content: "• फोटो पेपर A4 (100 GSM)\n• लैमिनेशन फिल्म\n• नए स्विच एवं बोर्ड सॉकेट",
+            color: "#fef3c7",
+            date: new Date().toLocaleDateString('en-IN')
+          }
+        ];
+        localStorage.setItem("mg_csc_quick_notes", JSON.stringify(globalAppNotesList));
+      }
+      renderAppNotesUI(globalAppNotesList);
+    }
+
+    function renderAppNotesUI(list) {
+      var container = document.getElementById("notesGridContainer");
+      if (!container) return;
+      if (!list || list.length === 0) {
+        container.innerHTML = '<div class="text-center text-muted py-4">कोई नोट नहीं है। ऊपर <b>+ नया नोट लिखें</b> दबाएँ।</div>';
+        return;
+      }
+      var html = "";
+      list.forEach(function(item, idx) {
+        var cardBg = item.color || "#ffffff";
+        html += '<div class="col-6">' +
+          '<div class="p-3 rounded-4 shadow-sm h-100 d-flex flex-column justify-content-between position-relative" style="background-color: ' + cardBg + ' !important; border: 1px solid rgba(0,0,0,0.06) !important; transition: transform 0.15s ease;">' +
+            '<div>' +
+              '<strong class="d-block text-dark text-truncate mb-1" style="font-size:12px; font-weight:700;">' + (item.title || "नोट") + '</strong>' +
+              '<div class="text-dark opacity-75 fw-medium" style="font-size:10.5px; white-space: pre-wrap; line-height:1.45;">' + (item.content || "") + '</div>' +
+            '</div>' +
+            '<div class="d-flex align-items-center justify-content-between mt-2 pt-1.5 border-top border-dark border-opacity-10" style="font-size:8.5px;">' +
+              '<span class="text-secondary fw-semibold">' + (item.date || '') + '</span>' +
+              '<div class="d-flex gap-1.5">' +
+                '<button type="button" class="btn btn-sm p-0 text-primary fw-bold" onclick="editQuickNoteItem(' + idx + ')" title="संपादित करें">✏️</button>' +
+                '<button type="button" class="btn btn-sm p-0 text-danger fw-bold" onclick="deleteQuickNoteItem(' + idx + ')" title="हटाएं">🗑️</button>' +
+              '</div>' +
+            '</div>' +
+          '</div>' +
+        '</div>';
+      });
+      container.innerHTML = html;
+    }
+
+    function toggleAddNoteForm() {
+      var card = document.getElementById("addNoteFormCard");
+      if (card) {
+        card.classList.toggle("d-none");
+        if (card.classList.contains("d-none")) {
+          document.getElementById("editNoteIdx").value = "";
+          document.getElementById("newNoteTitle").value = "";
+          document.getElementById("newNoteContent").value = "";
+          document.getElementById("noteFormTitle").innerText = "📝 नया नोट तैयार करें";
+        }
+      }
+    }
+
+    function saveQuickNoteItem() {
+      var idxStr = document.getElementById("editNoteIdx").value;
+      var title = document.getElementById("newNoteTitle").value.trim();
+      var content = document.getElementById("newNoteContent").value.trim();
+      var color = document.getElementById("newNoteColor").value || "#fef3c7";
+
+      if (!title && !content) return alert("⚠️ नोट में शीर्षक या विवरण लिखना अनिवार्य है!");
+
+      if (idxStr !== "") {
+        var idx = parseInt(idxStr, 10);
+        globalAppNotesList[idx].title = title;
+        globalAppNotesList[idx].content = content;
+        globalAppNotesList[idx].color = color;
+      } else {
+        var newNote = {
+          title: title || "क्विक नोट",
+          content: content,
+          color: color,
+          date: new Date().toLocaleDateString('en-IN')
+        };
+        globalAppNotesList.unshift(newNote);
+      }
+
+      localStorage.setItem("mg_csc_quick_notes", JSON.stringify(globalAppNotesList));
+      renderAppNotesUI(globalAppNotesList);
+      toggleAddNoteForm();
+    }
+
+    function editQuickNoteItem(idx) {
+      var item = globalAppNotesList[idx];
+      if (!item) return;
+
+      document.getElementById("editNoteIdx").value = idx;
+      document.getElementById("newNoteTitle").value = item.title || "";
+      document.getElementById("newNoteContent").value = item.content || "";
+      document.getElementById("newNoteColor").value = item.color || "#fef3c7";
+      document.getElementById("noteFormTitle").innerText = "✏️ नोट संपादित करें";
+
+      var card = document.getElementById("addNoteFormCard");
+      if (card) card.classList.remove("d-none");
+    }
+
+    function deleteQuickNoteItem(idx) {
+      if (confirm("क्या आप इस नोट को हटाना चाहते हैं?")) {
+        globalAppNotesList.splice(idx, 1);
+        localStorage.setItem("mg_csc_quick_notes", JSON.stringify(globalAppNotesList));
+        renderAppNotesUI(globalAppNotesList);
+      }
+    }
+
+    // ऐप लोड होते ही नोट्स लोड करें
+    document.addEventListener("DOMContentLoaded", loadAppQuickNotes);
   </script>
 </body>
 </html>
