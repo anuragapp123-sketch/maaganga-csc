@@ -1236,7 +1236,7 @@
           </div>
 
           <div class="card p-3 shadow-sm border-0 bg-white" style="border-radius:18px;">
-            <h6 class="fw-bold mb-2 text-primary border-bottom pb-2" style="font-size: 13px;">🎉 सूचना व शुभकामनाएँ कार्ड (Custom Sender)</h6>
+            <h6 class="fw-bold mb-2 text-primary border-bottom pb-2" style="font-size: 13px;">🎉 सूचना व शुभकामनाएँ संदेश (Custom Greeting Card)</h6>
 
             <!-- Customer Details Inputs -->
             <div class="row g-2 mb-2">
@@ -1260,7 +1260,7 @@
 
             <!-- Custom Message Text Box -->
             <div class="mb-3">
-              <label class="form-label-sm fw-bold text-dark">✍️ अपना संदेश लिखें (Custom Message):</label>
+              <label class="form-label-sm fw-bold text-dark">✍️ अपना संदेश लिखें या बदलें (Custom Message):</label>
               <textarea id="greetCustomMsg" class="form-control fw-medium" rows="4" style="font-size:11px; border-radius:10px; background:#f8fafc;" placeholder="यहाँ अपना शुभकामना या सूचना संदेश लिखें..."></textarea>
             </div>
 
@@ -1269,7 +1269,7 @@
               <strong class="d-block text-center text-primary border-bottom pb-1 mb-1" style="font-size:11px;">🚩 माँ गंगा जन सेवा केंद्र व इलेक्ट्रॉनिक्स बरनाहल मैनपुरी रोड, कैरावली 🚩</strong>
               <small class="d-block text-muted text-center mb-2">Pro: अनुराग शाक्य | 📞 9761414105</small>
 
-              <div id="greetPreviewText" class="p-2 bg-white rounded border text-dark fw-bold mb-2" style="white-space: pre-wrap; font-size:10.5px; min-height:50px;">
+              <div id="greetPreviewText" class="p-2.5 bg-white rounded border text-dark fw-semibold mb-2" style="white-space: pre-wrap; font-size:11px; min-height:60px; line-height:1.5;">
                 (आपका संदेश यहाँ दिखेगा...)
               </div>
 
@@ -1277,8 +1277,8 @@
               <div class="p-2 rounded" style="background:#eff6ff; border:1px dashed #bfdbfe; font-size:9px;">
                 <strong class="d-block text-dark mb-1">🌟 हमारी प्रमुख सेवाएँ (Services):</strong>
                 <div class="text-secondary">
-                  • आय, जाति, निवास प्रमाण पत्र, पैन कार्ड, वोटर ID<br>
-                  • पंखा व कूलर मोटर बाइंडिंग एवं सभी इलेक्ट्रॉनिक्स सामान
+                  • प्रमाण पत्र (आय, जाति, निवास), पैन कार्ड, वोटर ID, आयुष्मान कार्ड<br>
+                  • पंखा व कूलर मोटर बाइंडिंग, कीपैड फ़ोन एवं समस्त इलेक्ट्रॉनिक्स सामान
                 </div>
               </div>
             </div>
@@ -1292,7 +1292,7 @@
               </div>
               <div class="col-6">
                 <button type="button" class="btn btn-primary w-100 fw-bold py-2 shadow-sm d-flex align-items-center justify-content-center gap-1" style="border-radius:10px; font-size:11.5px;" onclick="sendCustomGreeting('share')">
-                  ✉️ SMS / ऐप से शेयर करें
+                  ✉️ SMS / शेयर करें
                 </button>
               </div>
             </div>
@@ -1532,6 +1532,16 @@
   </div>
 
   <script>
+    // Safe Native Android Polyfill Wrapper
+    if (typeof window.AndroidApp === 'undefined') {
+      window.AndroidApp = {
+        savePdfFile: function(base64Data, filename) { console.log("Native savePdfFile polyfill called", filename); },
+        saveCsvFile: function(csvData, filename) { console.log("Native saveCsvFile polyfill called", filename); },
+        sharePdfToWhatsApp: function(base64Data, mobile, msg) { console.log("Native sharePdf polyfill called"); },
+        shareImageToWhatsApp: function(base64Data, mobile, msg) { console.log("Native shareImg polyfill called"); }
+      };
+    }
+
     // Deploy kiye gaye Web App ka URL yahan dalein (REST API fallback ke liye)
     var SCRIPT_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbweDBV1k53sII1Pus87cBMlkoWasnnv0FLnGIOwW4A-ZKSjKj2v3_6agumi2fVdLNPG/exec";
     // 🚨 GLOBAL REAL-TIME ERROR LOGGER FUNCTION
@@ -2208,9 +2218,19 @@ function downloadTxnReceiptPDF(index) {
           } catch(e) {}
         }).getDocHistory();
       } else if (SCRIPT_WEB_APP_URL && SCRIPT_WEB_APP_URL.indexOf("http") === 0) {
-        fetch(SCRIPT_WEB_APP_URL + "?action=getTxnHistory").then(function(r){ return r.json(); }).then(function(d){ if(d){ globalTxnHistory=d; localStorage.setItem("cache_txn_history", JSON.stringify(d)); renderTxnHistoryTable(); }});
-        fetch(SCRIPT_WEB_APP_URL + "?action=getInvoiceHistory").then(function(r){ return r.json(); }).then(function(d){ if(d){ globalInvoiceHistory=d; localStorage.setItem("cache_inv_history", JSON.stringify(d)); renderInvoiceHistoryTable(); loadUdharKhataData(); }});
-        fetch(SCRIPT_WEB_APP_URL + "?action=getDocHistory").then(function(r){ return r.json(); }).then(function(d){ if(d){ globalDocHistory=d; localStorage.setItem("cache_doc_history", JSON.stringify(d)); renderDocHistoryTable(); }});
+        var fetchOptions = { method: "GET", mode: "cors", headers: { "Accept": "application/json" } };
+        fetch(SCRIPT_WEB_APP_URL + "?action=getTxnHistory", fetchOptions)
+          .then(function(r){ return r.json(); })
+          .then(function(d){ if(d){ globalTxnHistory=d; localStorage.setItem("cache_txn_history", JSON.stringify(d)); renderTxnHistoryTable(); }})
+          .catch(function(e){ console.warn("APK Txn Sync Error:", e); });
+        fetch(SCRIPT_WEB_APP_URL + "?action=getInvoiceHistory", fetchOptions)
+          .then(function(r){ return r.json(); })
+          .then(function(d){ if(d){ globalInvoiceHistory=d; localStorage.setItem("cache_inv_history", JSON.stringify(d)); renderInvoiceHistoryTable(); loadUdharKhataData(); }})
+          .catch(function(e){ console.warn("APK Invoice Sync Error:", e); });
+        fetch(SCRIPT_WEB_APP_URL + "?action=getDocHistory", fetchOptions)
+          .then(function(r){ return r.json(); })
+          .then(function(d){ if(d){ globalDocHistory=d; localStorage.setItem("cache_doc_history", JSON.stringify(d)); renderDocHistoryTable(); }})
+          .catch(function(e){ console.warn("APK Doc Sync Error:", e); });
       }
     }
 
@@ -3066,13 +3086,12 @@ function sendModalDetailsToWhatsApp() {
     // 1. 10-अंकों का शुद्ध भारतीय नंबर (Country Code +91 के साथ)
     var cleanPhone = "91" + targetMobile;
 
-    // 2. यदि एंड्रॉइड ऐप (APK) में शेयरिंग मेथड है
+    // 2. Direct Call Native Android Image Share Handler
     if (window.AndroidApp && typeof window.AndroidApp.shareImageToWhatsApp === "function") {
-      window.AndroidApp.shareImageToWhatsApp(imgBase64, cleanPhone, message);
-    } 
-    else if (window.AndroidApp && typeof window.AndroidApp.sharePdfToWhatsApp === "function") {
-      window.AndroidApp.sharePdfToWhatsApp(imgBase64, cleanPhone, message);
-    } 
+      window.AndroidApp.shareImageToWhatsApp(imgBase64, targetMobile, message);
+    } else {
+      window.open("https://api.whatsapp.com/send?phone=" + cleanPhone + "&text=" + encodeURIComponent(message), '_blank');
+    }
     // 3. सीधे ग्राहक का व्हाट्सएप चैट ओपन करने वाला डायरेक्ट लिंक फ़ॉलबैक
     else {
       fetch(imgBase64)
@@ -3942,57 +3961,82 @@ function sendModalDetailsToWhatsApp() {
       calcTotal();
     }
 
+    // === 📍 HIGH-ACCURACY GPS & REVERSE GEOCODING FUNCTION ===
     function autoSyncLocation() {
-  if (navigator.geolocation) {
-    var geoOptions = {
-      enableHighAccuracy: true,
-      timeout: 15000,
-      maximumAge: 0
-    };
+      if (navigator.geolocation) {
+        var geoOptions = {
+          enableHighAccuracy: true,
+          timeout: 20000,
+          maximumAge: 0
+        };
 
-    navigator.geolocation.getCurrentPosition(function(pos) {
-      var lat = pos.coords.latitude;
-      var lng = pos.coords.longitude;
-      
-      // डिफ़ॉल्ट रूप से तुरंत GPS स्टैम्प सेट करें
-      currentLocation = "Kerawali, Uttar Pradesh, India | Lat " + lat.toFixed(5) + "° Long " + lng.toFixed(5) + "°";
+        navigator.geolocation.getCurrentPosition(
+          function(pos) {
+            var lat = pos.coords.latitude;
+            var lng = pos.coords.longitude;
 
-      // BigDataCloud Reverse Geocoding API (Fast & Detailed Location)
-      fetch("https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=" + lat + "&longitude=" + lng + "&localityLanguage=en")
-      .then(function(res) { return res.json(); })
-      .then(function(data) {
-        if (data) {
-          var village = data.locality || data.city || "Kerawali";
-          var district = data.principalSubdivisionCode ? data.principalSubdivision : "Uttar Pradesh";
-          var postcode = data.postcode || "205261";
-          var country = data.countryName || "India";
+            // डिफ़ॉल्ट लैटीट्यूड और लोंगिट्यूड तुरंत सेट करें
+            currentLocation = "Kerawali, Mainpuri, Uttar Pradesh 205261 | Lat " + lat.toFixed(5) + "° Long " + lng.toFixed(5) + "°";
 
-          // इमेज जैसे फ़ॉर्मेट में तैयार करें
-          currentLocation = village + ", " + district + " " + postcode + ", " + country + " | Lat " + lat.toFixed(5) + "° Long " + lng.toFixed(5) + "°";
-        }
-      })
-      .catch(function(e) {
-        console.log("Location Geocoding Fallback:", e);
-      });
-    }, function(err) { 
-      console.warn("Location Error: " + err.message);
-      currentLocation = "Kerawali, Mainpuri, Uttar Pradesh 205261, India"; 
-    }, geoOptions);
-  } else {
-    currentLocation = "Kerawali, Mainpuri, Uttar Pradesh 205261, India";
-  }
-}
+            // BigDataCloud API से सटीक विलेज/तहसील विवरण निकालें
+            fetch("https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=" + lat + "&longitude=" + lng + "&localityLanguage=hi")
+              .then(function(res) { return res.json(); })
+              .then(function(data) {
+                if (data) {
+                  var village = data.locality || data.city || "Kerawali";
+                  var subDistrict = "";
 
-    window.addEventListener('popstate', function() { openAppSection('dashboard-home-sec', true); });
+                  // localityInfo का सुरक्षित निष्कर्षण (Safe Optional Chaining)
+                  if (data.localityInfo && data.localityInfo.administrative && data.localityInfo.administrative.length > 2) {
+                    subDistrict = data.localityInfo.administrative[2].name;
+                  }
+
+                  var district = data.principalSubdivision || "Mainpuri";
+                  var postcode = data.postcode || "205261";
+
+                  currentLocation = village + (subDistrict ? ", " + subDistrict : "") + ", " + district + " " + postcode + " | Lat " + lat.toFixed(5) + "° Long " + lng.toFixed(5) + "°";
+                }
+              })
+              .catch(function(e) {
+                console.warn("Geocoding Fetch Fallback Used:", e);
+              });
+          },
+          function(err) {
+            console.warn("Location Service Warning: " + err.message);
+            currentLocation = "Kerawali, Mainpuri, Uttar Pradesh 205261 | GPS Offline";
+          },
+          geoOptions
+        );
+      } else {
+        currentLocation = "Kerawali, Mainpuri, Uttar Pradesh 205261 | Location Unsupported";
+      }
+    }
+
+    // === 📱 HARDWARE BACK BUTTON & FORM CLEAR HELPERS ===
+    window.addEventListener('popstate', function() { 
+      if (typeof openAppSection === 'function') {
+        openAppSection('dashboard-home-sec', true); 
+      }
+    });
 
     function clearForm(sectionId) {
-      var inputs = document.querySelectorAll('#' + sectionId + ' input, #' + sectionId + ' textarea');
-      inputs.forEach(function(i) { if(i.type !== 'button' && i.type !== 'file') i.value = ''; });
-      if(sectionId === 'invoice-sec') {
+      var section = document.getElementById(sectionId);
+      if (!section) return;
+
+      var inputs = section.querySelectorAll('input, textarea');
+      inputs.forEach(function(i) { 
+        if (i.type !== 'button' && i.type !== 'file' && i.type !== 'submit') {
+          i.value = ''; 
+        }
+      });
+
+      if (sectionId === 'invoice-sec') {
         var container = document.getElementById("invoiceItemsContainer");
         if (container) container.innerHTML = "";
         itemRowCounter = 0;
-        addInvoiceItemRow();
+        if (typeof addInvoiceItemRow === 'function') {
+          addInvoiceItemRow();
+        }
       }
     }
 
@@ -4882,19 +4926,32 @@ function generateInvoicePDF(data, callback) {
 
       setTimeout(function() {
         var triggerNativePrint = function() {
-          var printContents = pdfElement.innerHTML;
-          var printWindow = window.open('', '_blank');
-          if (printWindow) {
-            printWindow.document.write('<html><head><title>Invoice_' + (data.invNo || 'Doc') + '</title></head><body>' + printContents + '</body></html>');
-            printWindow.document.close();
-            printWindow.focus();
-            printWindow.print();
-            printWindow.close();
-          } else {
-            window.print();
+          var iframe = document.getElementById('apkPrintIframe');
+          if (!iframe) {
+            iframe = document.createElement('iframe');
+            iframe.id = 'apkPrintIframe';
+            iframe.style.position = 'fixed';
+            iframe.style.right = '0';
+            iframe.style.bottom = '0';
+            iframe.style.width = '0';
+            iframe.style.height = '0';
+            iframe.style.border = '0';
+            document.body.appendChild(iframe);
           }
-          pdfElement.style.display = "none";
-          if(callback) callback();
+          var doc = iframe.contentWindow.document;
+          doc.open();
+          doc.write('<html><head><title>Invoice_' + (data.invNo || 'Doc') + '</title><style>body{font-family:sans-serif;margin:0;padding:10px;}</style></head><body>' + pdfElement.innerHTML + '</body></html>');
+          doc.close();
+          setTimeout(function() {
+            try {
+              iframe.contentWindow.focus();
+              iframe.contentWindow.print();
+            } catch (e) {
+              window.print();
+            }
+            pdfElement.style.display = "none";
+            if (callback) callback();
+          }, 300);
         };
 
         if (window.AndroidApp && typeof window.AndroidApp.savePdfFile === "function") {
@@ -5694,20 +5751,20 @@ function generateInvoicePDFBase64(data, callback) {
       tbody.innerHTML = html;
     }
 
-    // === 🎓 CUSTOM GREETINGS & MESSAGING LOGIC ===
+    // === 🎓 PREMIUM HIGH-CONVERSION CUSTOM GREETINGS LOGIC ===
     function loadGreetingTemplate(type) {
       var name = document.getElementById("greetName") ? document.getElementById("greetName").value.trim() : "";
-      if (!name) name = "ग्राहक";
-      
+      var nameText = name ? " *" + name + " जी*," : "";
+
       var msgBox = document.getElementById("greetCustomMsg");
       if (!msgBox) return;
 
       if (type === 'festival') {
-        msgBox.value = "आपको एवं आपके परिवार को पावन त्योहार की हार्दिक शुभकामनाएं व बधाई! 🌸\nईश्वर आपके जीवन में सुख, समृद्धि व खुशहाली लाए। 🙏";
+        msgBox.value = "आदरणीय" + nameText + " 🙏\n\nआपको एवं आपके समस्त परिवार को इस पावन पर्व की हार्दिक बधाई एवं ढेर सारी शुभकामनाएँ! 🌸\n\nमाँ का आशीर्वाद आप पर सदैव बना रहे और आपका जीवन सुख, समृद्धि, शांति एवं उत्तम स्वास्थ्य से परिपूर्ण हो। 🎉✨";
       } else if (type === 'birthday') {
-        msgBox.value = "आपको जन्मदिन की बहुत-बहुत हार्दिक बधाई एवं शुभकामनाएं! 🎂💐\nईश्वर आपको उत्तम स्वास्थ्य एवं दीर्घायु प्रदान करे।";
+        msgBox.value = "प्रिय" + nameText + " 🎂🎉\n\nआपको जन्मदिवस की अनंत हार्दिक बधाई एवं शुभकामनाएँ! 💐✨\n\nईश्वर से प्रार्थना है कि आने वाला नया वर्ष आपके जीवन में अपार सफलता, उत्तम स्वास्थ्य और ढेर सारी खुशियाँ लेकर आए। 🌟🎁";
       } else if (type === 'promo') {
-        msgBox.value = "नमस्कार " + name + " जी! 🚩\nहमारे यहाँ सभी प्रकार के ऑनलाइन फॉर्म, प्रमाण पत्र (आय/जाति/निवास), पैन कार्ड तथा पंखा व मोटर बाइंडिंग की सुविधा उपलब्ध है।";
+        msgBox.value = "नमस्कार" + nameText + " 🚩\n\n*माँ गंगा जन सेवा केंद्र व इलेक्ट्रॉनिक्स* में आपका हार्दिक स्वागत है!\n\nहमारी प्रमुख त्वरित सेवाएँ:\n✅ ऑनलाइन फॉर्म, आयुष्मान कार्ड व सभी प्रमाण पत्र\n✅ पैन कार्ड, वोटर ID व बैंकिंग (मनी ट्रांसफर / नकद निकासी)\n✅ पंखा व कूलर मोटर बाइंडिंग तथा ओरिजिनल इलेक्ट्रॉनिक्स सामान\n\nउचित दाम और भरोसेमंद सेवा के लिए आज ही संपर्क करें! 📞 9761414105";
       }
       updateGreetingPreview();
     }
