@@ -7,6 +7,9 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0f172a">
+
+<!-- 🚀 PWA Manifest & App Installation Tag -->
+<link rel="manifest" href="data:application/manifest+json;utf8,%7B%22name%22%3A%22Maa%20Ganga%20CSC%20Dashboard%22%2C%22short_name%22%3A%22MaaGangaCSC%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%230f172a%22%2C%22theme_color%22%3A%22%230f172a%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22https%3A%2F%2Flh3.googleusercontent.com%2Fd%2F1AVhGGj41J973HK0KgI1im5JJwJZsKhJR%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fpng%22%7D%5D%7D">
   <title>Maa Ganga CSC Dashboard</title>
   
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -32,6 +35,13 @@
       touch-action: none !important;
       -ms-touch-action: none;
     }
+    @keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+.animate-pulse {
+  animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
 
     /* === Hero Summary Cards Styling === */
     .hero-stat-card {
@@ -94,9 +104,89 @@
       --navy-header: #0f172a;
       --accent-emerald: #10b981;
       --accent-coral: #ef4444;
-      --bg-slate: #f8fafc;
-      --card-border: #e2e8f0;
+      --bg-slate: #f1f5f9;
+      --card-border: #f1f5f9;
       --text-dark: #0f172a;
+      --app-radius: 20px;
+      --card-shadow: 0 4px 18px -2px rgba(15, 23, 42, 0.06);
+    }
+
+    /* Enterprise App Modern Card Overhaul */
+    .card {
+      border-radius: var(--app-radius) !important;
+      border: 1px solid var(--card-border) !important;
+      box-shadow: var(--card-shadow) !important;
+      background: #ffffff !important;
+      padding: 14px 16px !important;
+      margin-bottom: 12px !important;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Soft Inputs like Professional Apps */
+    .form-control, .form-select {
+      border-radius: 12px !important;
+      border: 1.5px solid #e2e8f0 !important;
+      background-color: #f8fafc !important;
+      padding: 8px 12px !important;
+      font-size: 0.82rem !important;
+      font-weight: 500;
+      height: 40px !important;
+      transition: all 0.2s ease;
+    }
+
+    .form-control:focus, .form-select:focus {
+      background-color: #ffffff !important;
+      border-color: var(--primary-blue) !important;
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1) !important;
+    }
+
+    /* Modern Floating Bottom Nav */
+    .app-bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 430px;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      padding: 8px 12px 12px 12px;
+      z-index: 9999;
+      border-top-left-radius: 24px;
+      border-top-right-radius: 24px;
+      box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.08);
+      border-top: 1px solid rgba(226, 232, 240, 0.8);
+    }
+
+    .nav-btn {
+      color: #64748b;
+      text-decoration: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-size: 10px;
+      font-weight: 600;
+      border: none;
+      background: transparent;
+      padding: 6px 16px;
+      border-radius: 16px;
+      transition: all 0.25s ease;
+    }
+
+    .nav-btn.active {
+      color: var(--primary-blue) !important;
+      background: #eff6ff;
+      font-weight: 700;
+    }
+
+    .nav-btn .nav-icon {
+      font-size: 18px;
+      line-height: 1.2;
+      margin-bottom: 2px;
     }
 
     * {
@@ -492,31 +582,51 @@
 
   <div id="printArea" class="d-none"></div>
 
-  <!-- 🔒 LOGIN SCREEN OVERLAY -->
-  <div id="appLoginOverlay" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); z-index: 99999999 !important; display: flex; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box;">
-    <div class="card border-0 shadow-lg p-4 text-center" style="width: 100%; max-width: 380px; border-radius: 24px !important; background: #ffffff !important;">
+  <!-- 🔒 STYLISH ENTERPRISE LOGIN SCREEN OVERLAY -->
+  <div id="appLoginOverlay" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); z-index: 99999999 !important; display: flex; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; backdrop-filter: blur(10px);">
+    <div class="card border-0 shadow-lg p-4 text-center" style="width: 100%; max-width: 380px; border-radius: 28px !important; background: rgba(255, 255, 255, 0.98) !important; box-shadow: 0 20px 40px rgba(0,0,0,0.3) !important;">
       
-      <img src="https://lh3.googleusercontent.com/d/1AVhGGj41J973HK0KgI1im5JJwJZsKhJR" alt="Logo" style="width: 70px; height: 70px; border-radius: 50%; border: 3px solid #2563eb; object-fit: cover; margin: 0 auto 12px auto;">
-      
-      <h5 class="fw-bold text-dark m-0" style="font-size: 1.1rem;">माँ गंगा Jan Seva Kendra</h5>
-      <small class="text-muted d-block mb-4" style="font-size: 11px;">सुरक्षित लॉगिन करें (Sign In)</small>
+      <!-- Top Branding Badge -->
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <span class="badge bg-primary bg-opacity-10 text-primary fw-bold px-2.5 py-1" style="font-size: 9px; border-radius: 8px;">🔐 SECURE PORTAL</span>
+        <span class="badge bg-success bg-opacity-10 text-success fw-bold px-2.5 py-1" style="font-size: 9px; border-radius: 8px;">🟢 ONLINE</span>
+      </div>
+
+      <!-- Avatar Logo -->
+      <div class="position-relative d-inline-block mb-2">
+        <img src="https://lh3.googleusercontent.com/d/1AVhGGj41J973HK0KgI1im5JJwJZsKhJR" alt="Logo" style="width: 72px; height: 72px; border-radius: 50%; border: 3.5px solid #2563eb; object-fit: cover; box-shadow: 0 8px 20px rgba(37,99,235,0.25);">
+      </div>
+
+      <h5 class="fw-bold text-dark m-0" style="font-size: 1.15rem; letter-spacing: -0.2px;">माँ गंगा Jan Seva Kendra</h5>
+      <small class="text-muted d-block mb-3" style="font-size: 11px;">Digital Seva & Business Center</small>
+
+      <!-- Saved User Greeting Indicator (Only visible if already logged in once) -->
+      <div id="savedUserGreetingBox" class="p-2 mb-3 rounded-3 bg-light border d-none">
+        <small class="text-muted d-block fw-semibold" style="font-size: 9.5px;">Welcome Back,</small>
+        <strong class="text-primary d-block" id="savedUserNameText" style="font-size: 13px;">Customer</strong>
+      </div>
+
+      <!-- Input Fields Container -->
+      <div id="loginMobileWrapper" class="text-start mb-2.5">
+        <label class="small fw-bold text-dark mb-1" style="font-size: 10px;">📱 मोबाइल नंबर (Mobile No.)</label>
+        <input type="tel" id="loginMobileInput" class="form-control fw-bold bg-light" placeholder="10 अंकों का मोबाइल नंबर" maxlength="10" style="border-radius: 12px; height: 42px !important; font-size: 13px;" oninput="this.value=this.value.replace(/\D/g,'')">
+      </div>
 
       <div class="text-start mb-3">
-        <label class="small fw-bold text-dark mb-1">📱 मोबाइल नंबर (Mobile No.)</label>
-        <input type="tel" id="loginMobileInput" class="form-control fw-bold" placeholder="10 अंकों का नंबर" maxlength="10">
+        <div class="d-flex justify-content-between align-items-center mb-1">
+          <label class="small fw-bold text-dark m-0" style="font-size: 10px;">🔑 4-अंकों का पास PIN</label>
+          <button type="button" class="btn btn-link p-0 text-decoration-none text-primary d-none" id="changeMobileBtn" style="font-size: 10px; font-weight:700;" onclick="switchLoginAccount()">नंबर बदलें 🔄</button>
+        </div>
+        <input type="password" id="loginPinInput" class="form-control fw-bold text-center letter-spacing-2 bg-light" placeholder="****" maxlength="4" style="font-size: 20px; border-radius: 12px; height: 44px !important; color: #2563eb;" oninput="this.value=this.value.replace(/\D/g,'')">
       </div>
 
-      <div class="text-start mb-4">
-        <label class="small fw-bold text-dark mb-1">🔑 4-अंकों का PIN</label>
-        <input type="password" id="loginPinInput" class="form-control fw-bold text-center letter-spacing-2" placeholder="****" maxlength="4" style="font-size: 18px;">
-      </div>
+      <!-- Submit & Biometric Buttons -->
+      <button type="button" class="btn btn-primary w-100 fw-bold py-2.5 shadow mb-2" id="loginSubmitBtn" style="border-radius: 14px; font-size: 14px; background: linear-gradient(135deg, #2563eb, #1d4ed8); border: none;" onclick="processUserLogin()">🚀 लॉगिन करें (Login)</button>
 
-      <button type="button" class="btn btn-primary w-100 fw-bold py-2.5 shadow mb-2" id="loginSubmitBtn" style="border-radius: 12px; font-size: 14px;" onclick="processUserLogin()">🚀 लॉगिन करें (Login)</button>
+      <!-- 👆 Biometric / Fingerprint / Face ID Button -->
+      <button type="button" class="btn btn-outline-dark w-100 fw-bold py-2.5 shadow-sm d-none" id="biometricLoginBtn" style="border-radius: 14px; font-size: 12.5px; border-color: #cbd5e1;" onclick="loginWithBiometrics()">☝️ फ़िंगरप्रिंट / Face ID से खोलें</button>
 
-      <!-- 👆 Biometric / Fingerprint Button -->
-      <button type="button" class="btn btn-outline-dark w-100 fw-bold py-2 shadow-sm d-none" id="biometricLoginBtn" style="border-radius: 12px; font-size: 13px;" onclick="loginWithBiometrics()">☝️ फ़िंगरप्रिंट से लॉगिन करें</button>
-
-      <small id="loginStatusText" class="d-block mt-3 text-danger fw-bold" style="font-size: 11px; display: none;"></small>
+      <small id="loginStatusText" class="d-block mt-2 text-danger fw-bold" style="font-size: 11px; display: none;"></small>
 
     </div>
   </div>
@@ -644,11 +754,50 @@
             </div>
           </div>
 
+          <!-- ⚡ ENTERPRISE QUICK ACTION GRID -->
+          <div class="row g-2 mb-3">
+            <div class="col-3 text-center">
+              <div class="p-2.5 bg-white rounded-4 shadow-sm border text-decoration-none cursor-pointer" onclick="openAppSection('transaction-sec')">
+                <div class="rounded-circle bg-primary bg-opacity-10 text-primary d-flex align-items-center justify-content-center mx-auto mb-1" style="width: 42px; height: 42px; font-size: 20px;">
+                  💸
+                </div>
+                <span class="d-block text-dark fw-bold" style="font-size: 9.5px;">लेन-देन</span>
+              </div>
+            </div>
+
+            <div class="col-3 text-center">
+              <div class="p-2.5 bg-white rounded-4 shadow-sm border text-decoration-none cursor-pointer" onclick="openAppSection('invoice-sec')">
+                <div class="rounded-circle bg-success bg-opacity-10 text-success d-flex align-items-center justify-content-center mx-auto mb-1" style="width: 42px; height: 42px; font-size: 20px;">
+                  🧾
+                </div>
+                <span class="d-block text-dark fw-bold" style="font-size: 9.5px;">नया बिल</span>
+              </div>
+            </div>
+
+            <div class="col-3 text-center">
+              <div class="p-2.5 bg-white rounded-4 shadow-sm border text-decoration-none cursor-pointer" onclick="openAppSection('udhar-khata-sec'); loadUdharKhataData();">
+                <div class="rounded-circle bg-warning bg-opacity-10 text-warning d-flex align-items-center justify-content-center mx-auto mb-1" style="width: 42px; height: 42px; font-size: 20px;">
+                  📖
+                </div>
+                <span class="d-block text-dark fw-bold" style="font-size: 9.5px;">उधार खाता</span>
+              </div>
+            </div>
+
+            <div class="col-3 text-center">
+              <div class="p-2.5 bg-white rounded-4 shadow-sm border text-decoration-none cursor-pointer" onclick="openAppSection('stock-sec'); fetchStockData();">
+                <div class="rounded-circle bg-info bg-opacity-10 text-info d-flex align-items-center justify-content-center mx-auto mb-1" style="width: 42px; height: 42px; font-size: 20px;">
+                  📦
+                </div>
+                <span class="d-block text-dark fw-bold" style="font-size: 9.5px;">स्टॉक लिस्ट</span>
+              </div>
+            </div>
+          </div>
+
           <!-- Feature 1: Fast CRM Quick Search Bar -->
           <div class="card p-2 border-0 shadow-sm bg-white mb-3" style="border-radius: 14px;">
             <div class="input-group input-group-sm">
               <span class="input-group-text bg-light border-0 fw-bold">🔍</span>
-              <input type="tel" id="globalCrmSearch" class="form-control border-0 bg-light fw-bold" placeholder="कस्टमर का मोबाइल नं. सर्च करें..." maxlength="10" oninput="searchCustomer360(this.value)">
+              <input type="tel" id="globalCrmSearch" class="form-control border-0 bg-light fw-bold" placeholder="कस्टमर का मोबाइल नं. सर्च करें..." maxlength="10" oninput="this.value=this.value.replace(/\D/g,''); searchCustomer360(this.value)">
             </div>
             <!-- CRM Result Preview Card -->
             <div id="crmResultBox" class="d-none mt-2 p-2 rounded bg-light border text-start" style="font-size: 10px;">
@@ -903,13 +1052,13 @@
                     <div class="col-9">
                       <div class="row g-1">
                         <div class="col-6">
-                          <input type="tel" id="txnMobile" class="form-control form-control-sm" placeholder="📱 Mobile No" maxlength="10" oninput="checkCRM(this.value, 'txnName', 'txnAadhaar', null)">
+                          <input type="tel" id="txnMobile" class="form-control form-control-sm" placeholder="📱 Mobile No" maxlength="10" oninput="this.value=this.value.replace(/\D/g,''); checkCRM(this.value, 'txnName', 'txnAadhaar', null)">
                         </div>
                         <div class="col-6">
                           <input type="text" id="txnName" class="form-control form-control-sm" placeholder="👤 Customer Name">
                         </div>
                         <div class="col-12">
-                          <input type="text" id="txnAadhaar" class="form-control form-control-sm" placeholder="🏦 Bank Account Number">
+                          <input type="text" id="txnAadhaar" class="form-control form-control-sm" placeholder="🏦 Bank Account / ID Last 4 Digits" oninput="this.value=this.value.replace(/\D/g,'')">
                         </div>
                       </div>
                     </div>
@@ -1006,7 +1155,7 @@
             <div class="row g-2 compact-grid-form">
               <div class="col-6">
                 <label class="form-label-sm">Client Mobile</label>
-                <input type="tel" id="invMobile" class="form-control form-control-sm inv-dark-input" placeholder="Mobile No." maxlength="10" oninput="checkCRM(this.value, 'invName', null, 'invAddress')">
+                <input type="tel" id="invMobile" class="form-control form-control-sm inv-dark-input" placeholder="Mobile No." maxlength="10" oninput="this.value=this.value.replace(/\D/g,''); checkCRM(this.value, 'invName', null, 'invAddress')">
               </div>
               <div class="col-6">
                 <label class="form-label-sm">Client Name</label>
@@ -1206,7 +1355,26 @@
 
           <!-- Loading & Alert Indicators -->
           <div id="stockAlertBanner" class="alert alert-warning py-2 px-3 small fw-bold mb-2 d-none" style="border-radius: 12px; font-size: 11px;">⚠️ <span id="stockAlertText"></span></div>
-          <div id="stockLoading" class="text-center text-primary fw-bold my-4 d-none" style="font-size: 12px;">⏳ गूगल शीट से स्टॉक लोड हो रहा है...</div>
+          <div id="stockLoading" class="my-3 d-none">
+  <div class="card p-3 border-0 bg-white mb-2 shadow-sm animate-pulse" style="border-radius: 16px;">
+    <div class="d-flex align-items-center gap-3">
+      <div class="bg-secondary bg-opacity-20 rounded-3" style="width: 50px; height: 50px;"></div>
+      <div class="flex-grow-1">
+        <div class="bg-secondary bg-opacity-20 rounded mb-2" style="width: 60%; height: 14px;"></div>
+        <div class="bg-secondary bg-opacity-10 rounded" style="width: 40%; height: 10px;"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card p-3 border-0 bg-white mb-2 shadow-sm animate-pulse" style="border-radius: 16px;">
+    <div class="d-flex align-items-center gap-3">
+      <div class="bg-secondary bg-opacity-20 rounded-3" style="width: 50px; height: 50px;"></div>
+      <div class="flex-grow-1">
+        <div class="bg-secondary bg-opacity-20 rounded mb-2" style="width: 50%; height: 14px;"></div>
+        <div class="bg-secondary bg-opacity-10 rounded" style="width: 30%; height: 10px;"></div>
+      </div>
+    </div>
+  </div>
+</div>
 
           <!-- Dynamic Product Cards Grid Container -->
           <div id="stockCardsContainer" class="d-flex flex-column gap-2 mb-4" style="max-height: calc(100vh - 230px); overflow-y: auto; padding-right: 2px;">
@@ -1281,7 +1449,7 @@
             <button type="button" class="btn btn-sm btn-warning text-dark fw-bold py-1 px-2.5" style="font-size:11px; border-radius:8px;" onclick="toggleAddNoteForm()">➕ नया नोट लिखें</button>
           </div>
 
-          <!-- ✍️ New Note Creation Box (Keep Style Input) -->
+          <!-- ✍️ New Note Creation Box (Google Sheet Synced) -->
           <div id="addNoteFormCard" class="card p-3 mb-3 border-0 shadow-sm bg-white d-none" style="border-radius:18px !important; border-left: 4px solid #f59e0b !important;">
             <div class="d-flex justify-content-between align-items-center mb-2 border-bottom pb-1">
               <h6 class="fw-bold text-dark m-0" style="font-size:12px;" id="noteFormTitle">📝 नया नोट तैयार करें</h6>
@@ -1301,7 +1469,7 @@
               </div>
               <div class="d-flex gap-1">
                 <button type="button" class="btn btn-sm btn-secondary fw-bold px-2 py-1" style="font-size:10px; border-radius:6px;" onclick="toggleAddNoteForm()">रद्द करें</button>
-                <button type="button" class="btn btn-sm btn-warning text-dark fw-bold px-3 py-1" style="font-size:10px; border-radius:6px;" onclick="saveQuickNoteItem()">💾 सेव करें</button>
+                <button type="button" class="btn btn-sm btn-warning text-dark fw-bold px-3 py-1" id="saveNoteBtn" style="font-size:10px; border-radius:6px;" onclick="saveQuickNoteItem()">💾 सेव करें</button>
               </div>
             </div>
           </div>
@@ -1322,14 +1490,14 @@
           </div>
         </div>
 
-        <!-- 6. FESTIVAL & GREETINGS TAB (PROFESSIONAL CUSTOM LAYOUT) -->
+        <!-- 6. FESTIVAL & GREETINGS TAB (HD POSTER BANNER GENERATOR) -->
         <div class="tab-pane" id="greeting-sec">
           <div class="d-flex align-items-center mb-2">
             <button class="btn app-back-btn py-1 px-3 fw-bold" onclick="openAppSection('dashboard-home-sec')" style="font-size: 11px;">⬅️ Dashboard</button>
           </div>
 
           <div class="card p-3 shadow-sm border-0 bg-white" style="border-radius:18px;">
-            <h6 class="fw-bold mb-2 text-primary border-bottom pb-2" style="font-size: 13px;">🎉 सूचना व शुभकामनाएँ संदेश (Custom Greeting Card)</h6>
+            <h6 class="fw-bold mb-2 text-primary border-bottom pb-2" style="font-size: 13px;">🖼️ एचडी पोस्टर व शुभकामना डिज़ाइनर (Poster Creator)</h6>
 
             <!-- Customer Details Inputs -->
             <div class="row g-2 mb-2">
@@ -1345,7 +1513,7 @@
 
             <!-- Quick Template Selector Buttons -->
             <label class="form-label-sm text-muted mb-1">⚡ रेडीमेड मैसेज टेम्पलेट (Quick Select):</label>
-            <div class="d-flex flex-wrap gap-1 mb-3">
+            <div class="d-flex flex-wrap gap-1 mb-2">
               <button type="button" class="btn btn-sm btn-outline-primary fw-bold py-1 px-2" style="font-size:9.5px; border-radius:8px;" onclick="loadGreetingTemplate('festival')">🎉 त्योहार</button>
               <button type="button" class="btn btn-sm btn-outline-success fw-bold py-1 px-2" style="font-size:9.5px; border-radius:8px;" onclick="loadGreetingTemplate('birthday')">🎂 जन्मदिन</button>
               <button type="button" class="btn btn-sm btn-outline-dark fw-bold py-1 px-2" style="font-size:9.5px; border-radius:8px;" onclick="loadGreetingTemplate('promo')">🚩 सेवा प्रचार</button>
@@ -1353,36 +1521,45 @@
               <button type="button" class="btn btn-sm btn-outline-danger fw-bold py-1 px-2" style="font-size:9.5px; border-radius:8px;" onclick="loadGreetingTemplate('due_rem')">💳 उधारी रिमाइंडर</button>
             </div>
 
-            <!-- Custom Message Text Box -->
-            <div class="mb-3">
-              <label class="form-label-sm fw-bold text-dark">✍️ अपना संदेश लिखें या बदलें (Custom Message):</label>
-              <textarea id="greetCustomMsg" class="form-control fw-medium" rows="4" style="font-size:11px; border-radius:10px; background:#f8fafc;" placeholder="यहाँ अपना शुभकामना या सूचना संदेश लिखें..."></textarea>
+            <!-- 🎨 REAL-TIME EDITABLE POSTER PREVIEW CARD -->
+            <div class="d-flex justify-content-between align-items-center mb-1">
+              <label class="form-label-sm fw-bold text-dark mb-0">🖼️ पोस्टर डिज़ाइन व संदेश संपादन:</label>
+              <!-- 🎨 Poster Multi-Theme Selector -->
+              <select id="posterThemeSelect" class="form-select form-select-sm fw-bold border-primary text-primary" style="width: auto; font-size: 10px; border-radius: 8px;" onchange="changePosterThemeLayout(this.value)">
+                <option value="dark">🌌 क्लासिक नेवी (Dark Navy)</option>
+                <option value="festive">🎆 पावन पर्व गोल्ड (Festive Gold)</option>
+                <option value="emerald">🌿 नेचुरल एमेरल्ड (Emerald Green)</option>
+                <option value="purple">👑 रॉयल पर्पल (Royal Purple)</option>
+                <option value="vibrant">⚡ इलेक्ट्रॉनिक्स ऑरेंज (Vibrant Red)</option>
+                <option value="light">⚪ क्लीन कॉर्पोरेट (White & Blue)</option>
+              </select>
             </div>
 
-            <!-- Card Preview Box with Branding & Services Footer -->
-            <div class="p-2.5 border rounded-3 bg-light mb-3" style="font-size:10px; border-color:#cbd5e1 !important;">
-              <strong class="d-block text-center text-primary border-bottom pb-1 mb-1" style="font-size:11px;">🚩 माँ गंगा जन सेवा केंद्र व इलेक्ट्रॉनिक्स बरनाहल मैनपुरी रोड, कैरावली 🚩</strong>
-              <small class="d-block text-muted text-center mb-2">Pro: अनुराग शाक्य | 📞 9761414105</small>
-
-              <div id="greetPreviewText" class="p-2.5 bg-white rounded border text-dark fw-semibold mb-2" style="white-space: pre-wrap; font-size:11px; min-height:60px; line-height:1.5;">
-                (आपका संदेश यहाँ दिखेगा...)
+            <div id="posterCardPreview" class="p-3 mb-3 text-white shadow" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border-radius: 16px; border: 2px solid #38bdf8; transition: all 0.3s ease;">
+              
+              <!-- Header Branding -->
+              <div class="text-center border-bottom border-secondary pb-2 mb-2">
+                <img src="https://lh3.googleusercontent.com/d/1AVhGGj41J973HK0KgI1im5JJwJZsKhJR" style="width:42px; height:42px; border-radius:50%; border:2px solid #38bdf8; object-fit:cover;" class="mb-1">
+                <h6 class="m-0 fw-bold text-white" style="font-size:12px; letter-spacing:0.3px;">माँ गंगा जन सेवा केंद्र व इलेक्ट्रॉनिक्स</h6>
+                <small class="text-info d-block" style="font-size:8.5px;">बरनाहल मैनपुरी रोड, कैरावली | Pro: अनुराग शाक्य (9761414105)</small>
               </div>
 
-              <!-- Services Footer Preview -->
-              <div class="p-2 rounded" style="background:#eff6ff; border:1px dashed #bfdbfe; font-size:9px;">
-                <strong class="d-block text-dark mb-1">🌟 हमारी प्रमुख सेवाएँ (Services):</strong>
-                <div class="text-secondary">
-                  • प्रमाण पत्र (आय, जाति, निवास), पैन कार्ड, वोटर ID, आयुष्मान कार्ड<br>
-                  • पंखा व कूलर मोटर बाइंडिंग, कीपैड फ़ोन एवं समस्त इलेक्ट्रॉनिक्स सामान
-                </div>
+              <!-- Directly Editable Message Textarea Box (Fixed High Visibility) -->
+              <textarea id="greetCustomMsg" class="form-control text-dark rounded-3 fw-bold mb-2 shadow-sm" style="font-size:12px !important; line-height:1.6 !important; border-left: 4px solid #2563eb !important; background:#ffffff !important; color:#0f172a !important; height: 280px !important; min-height: 250px !important; resize: vertical !important;" placeholder="यहाँ अपना संदेश लिखें..."></textarea>
+
+              <!-- Services Footer Strip -->
+              <div class="p-1.5 rounded text-center" style="background: rgba(255,255,255,0.08); border: 1px solid #334155; font-size:8px;">
+                <span class="text-warning fw-bold d-block mb-0.5">🌟 हमारी सेवाएँ 🌟</span>
+                <span class="text-light opacity-90">आय/जाति/निवास • पैन व वोटर ID • मनी ट्रांसफर • पंखा/कूलर बाइंडिंग व इलेक्ट्रॉनिक्स</span>
               </div>
+
             </div>
 
             <!-- SEND BUTTONS SECTION -->
             <div class="row g-2">
               <div class="col-6">
                 <button type="button" class="btn btn-success w-100 fw-bold py-2 shadow-sm d-flex align-items-center justify-content-center gap-1" style="border-radius:10px; background:#25D366; border:none; font-size:11.5px;" onclick="sendCustomGreeting('whatsapp')">
-                  💬 WhatsApp पर भेजें
+                  💬 WhatsApp पोस्टर भेजें
                 </button>
               </div>
               <div class="col-6">
@@ -2619,6 +2796,7 @@ function downloadTxnReceiptPDF(index) {
         try {
           currentLoggedInUser = JSON.parse(savedUser);
           applyLoggedInUserUI(currentLoggedInUser.name);
+          // यदि यूजर पहले से लॉगिन था, तो लॉगिन स्क्रीन छुपाएं
           document.getElementById("appLoginOverlay").style.display = "none";
           initApp();
         } catch(e) {
@@ -2662,9 +2840,53 @@ function downloadTxnReceiptPDF(index) {
       }
     }
 
+    // 🔒 लॉगिन स्क्रीन दिखाने व ऑटो-नंबर भरने का स्मार्ट फ़ंक्शन
     function showLoginScreen() {
-      document.getElementById("appLoginOverlay").style.display = "flex";
+      var overlay = document.getElementById("appLoginOverlay");
+      if (overlay) overlay.style.display = "flex";
+
+      var savedUser = localStorage.getItem("mg_csc_user_session");
+      var mobInput = document.getElementById("loginMobileInput");
+      var mobWrapper = document.getElementById("loginMobileWrapper");
+      var greetingBox = document.getElementById("savedUserGreetingBox");
+      var nameText = document.getElementById("savedUserNameText");
+      var changeBtn = document.getElementById("changeMobileBtn");
+
+      if (savedUser) {
+        try {
+          var u = JSON.parse(savedUser);
+          if (u.mobile) {
+            // मोबाइल नंबर अपने आप भर जाएगा
+            if (mobInput) mobInput.value = u.mobile;
+            if (mobWrapper) mobWrapper.classList.add("d-none"); // नंबर इनपुट बॉक्स छिपाएं
+            if (greetingBox) greetingBox.classList.remove("d-none"); // ग्रिटिंग कार्ड दिखाएं
+            if (nameText) nameText.innerText = u.name || "Maa Ganga CSC User";
+            if (changeBtn) changeBtn.classList.remove("d-none"); // अकाउंट बदलने का बटन दिखाएं
+          }
+        } catch(e){}
+      } else {
+        if (mobWrapper) mobWrapper.classList.remove("d-none");
+        if (greetingBox) greetingBox.classList.add("d-none");
+        if (changeBtn) changeBtn.classList.add("d-none");
+      }
+
       checkBiometricAvailability();
+    }
+
+    // 🔄 दूसरा अकाउंट लॉगिन करने के लिए नंबर बदलने का फ़ंक्शन
+    function switchLoginAccount() {
+      var mobWrapper = document.getElementById("loginMobileWrapper");
+      var greetingBox = document.getElementById("savedUserGreetingBox");
+      var changeBtn = document.getElementById("changeMobileBtn");
+      var mobInput = document.getElementById("loginMobileInput");
+
+      if (mobWrapper) mobWrapper.classList.remove("d-none");
+      if (greetingBox) greetingBox.classList.add("d-none");
+      if (changeBtn) changeBtn.classList.add("d-none");
+      if (mobInput) {
+        mobInput.value = "";
+        mobInput.focus();
+      }
     }
 
     // फ़िंगरप्रिंट सपोर्ट चेक करने वाला फ़ंक्शन
@@ -3531,11 +3753,22 @@ function sendModalDetailsToWhatsApp() {
 
     function saveNewCustomerToKhata() {
       var name = document.getElementById("newCustName").value.trim();
-      var mobile = document.getElementById("newCustMobile").value.trim();
+      var mobile = document.getElementById("newCustMobile").value.trim().replace(/\D/g, '');
       var address = document.getElementById("newCustAddress").value.trim() || "N/A";
 
       if (!name || mobile.length !== 10) {
-        return alert("⚠️ नाम और 10 अंकों का मोबाइल नंबर भरें!");
+        return alert("⚠️ नाम और 10 अंकों का सही मोबाइल नंबर भरें!");
+      }
+
+      // 🛡️ Duplicate Customer Check
+      var isDuplicate = (globalInvoiceHistory || []).some(function(cust) {
+        return cust.mobile && String(cust.mobile).trim() === mobile;
+      });
+
+      if (isDuplicate) {
+        if (!confirm("⚠️ यह कस्टमर (" + mobile + ") पहले से खाताबुक/इनवॉइस लिस्ट में मौजूद है!\nक्या आप फिर भी इसे दोबारा जोड़ना चाहते हैं?")) {
+          return;
+        }
       }
 
       var newCustRecord = {
@@ -3614,10 +3847,11 @@ function sendModalDetailsToWhatsApp() {
       customerList.forEach(function(c) {
         var bal = c.balance;
         var avatar = getAvatarLetters(c.name);
-        // Safely escape special characters to prevent JavaScript runtime crashes
         var safeName = escapeHtml(c.name).replace(/'/g, "\\'");
-
-        // (इसे loadUdharKhataData से पूरी तरह हटा दें)
+        var isDue = bal > 0;
+        var badgeHtml = isDue 
+          ? '<small class="text-primary fw-bold cursor-pointer d-block mt-0.5" style="font-size:9.5px;" onclick="event.stopPropagation(); sendDirectWhatsAppReminder(\'' + c.mobile + '\', \'' + safeName + '\', \'' + bal + '\')">REMIND ></small>' 
+          : '<small class="text-success fw-bold d-block mt-0.5" style="font-size:9.5px;">SETTLED</small>';
 
         html += '<div class="d-flex align-items-center justify-content-between p-3 pe-4 border-bottom cursor-pointer hover-bg-light" onclick="openCustomerPassbookView(\'' + c.mobile + '\', \'' + safeName + '\')">' +
           '<div class="d-flex align-items-center gap-3">' +
@@ -4140,12 +4374,12 @@ function sendModalDetailsToWhatsApp() {
       calcTotal();
     }
 
-    // === 📍 HIGH-ACCURACY GPS & REVERSE GEOCODING FUNCTION ===
+    // === 📍 100% FREE ACCURATE GPS GEOCODING (NO API KEY / NO CARD REQUIRED) ===
     function autoSyncLocation() {
       if (navigator.geolocation) {
         var geoOptions = {
-          enableHighAccuracy: true,
-          timeout: 20000,
+          enableHighAccuracy: true, // उच्च सटीकता के लिए फोन का GPS ऑन रखेगा
+          timeout: 15000,
           maximumAge: 0
         };
 
@@ -4154,34 +4388,42 @@ function sendModalDetailsToWhatsApp() {
             var lat = pos.coords.latitude;
             var lng = pos.coords.longitude;
 
-            // डिफ़ॉल्ट लैटीट्यूड और लोंगिट्यूड तुरंत सेट करें
+            // 1. प्राथमिक फ़ॉलबैक (GPS Coordinates)
             currentLocation = "Kerawali, Mainpuri, Uttar Pradesh 205261 | Lat " + lat.toFixed(5) + "° Long " + lng.toFixed(5) + "°";
 
-            // BigDataCloud API से सटीक विलेज/तहसील विवरण निकालें
-            fetch("https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=" + lat + "&longitude=" + lng + "&localityLanguage=hi")
+            // 2. OpenStreetMap Nominatim API Call (100% फ्री बिना किसी API Key के)
+            var osmUrl = "https://nominatim.openstreetmap.org/reverse?lat=" + lat + "&lon=" + lng + "&format=json&accept-language=hi";
+
+            fetch(osmUrl, {
+              headers: {
+                'User-Agent': 'MaaGangaCSCApp/2.0'
+              }
+            })
               .then(function(res) { return res.json(); })
               .then(function(data) {
-                if (data) {
-                  var village = data.locality || data.city || "Kerawali";
-                  var subDistrict = "";
+                if (data && data.address) {
+                  var addr = data.address;
+                  var village = addr.village || addr.suburb || addr.town || addr.city_district || addr.city || "Kerawali";
+                  var subDistrict = addr.county || addr.state_district || "";
+                  var district = addr.state_district || addr.state || "Mainpuri";
+                  var postcode = addr.postcode || "205261";
 
-                  // localityInfo का सुरक्षित निष्कर्षण (Safe Optional Chaining)
-                  if (data.localityInfo && data.localityInfo.administrative && data.localityInfo.administrative.length > 2) {
-                    subDistrict = data.localityInfo.administrative[2].name;
-                  }
+                  // सटीक पते का संयोजन
+                  var fullAddress = village;
+                  if (subDistrict && subDistrict !== village) fullAddress += ", " + subDistrict;
+                  if (postcode) fullAddress += " " + postcode;
 
-                  var district = data.principalSubdivision || "Mainpuri";
-                  var postcode = data.postcode || "205261";
-
-                  currentLocation = village + (subDistrict ? ", " + subDistrict : "") + ", " + district + " " + postcode + " | Lat " + lat.toFixed(5) + "° Long " + lng.toFixed(5) + "°";
+                  currentLocation = fullAddress + " | Lat " + lat.toFixed(5) + "° Long " + lng.toFixed(5) + "°";
+                } else if (data && data.display_name) {
+                  currentLocation = data.display_name + " | Lat " + lat.toFixed(5) + "° Long " + lng.toFixed(5) + "°";
                 }
               })
               .catch(function(e) {
-                console.warn("Geocoding Fetch Fallback Used:", e);
+                console.warn("OSM Geocoding Error, using GPS Lat/Long fallback:", e);
               });
           },
           function(err) {
-            console.warn("Location Service Warning: " + err.message);
+            console.warn("GPS Permission or Offline Warning: " + err.message);
             currentLocation = "Kerawali, Mainpuri, Uttar Pradesh 205261 | GPS Offline";
           },
           geoOptions
@@ -4420,14 +4662,6 @@ function captureAndUploadStockPhoto(inputEl, itemName) {
         row.querySelector('.inv-prod-rate').value = itemPrice || 0;
         calcTotal();
       }
-    }
-
-    function filterStockTable() {
-      var q = document.getElementById("stockSearchInput").value.toLowerCase();
-      var filtered = globalStockData.filter(function(i) {
-        return (i.name || '').toLowerCase().indexOf(q) !== -1;
-      });
-      renderStockTable(filtered);
     }
 
     function showLowStockOnly() {
@@ -5216,8 +5450,8 @@ function generateInvoicePDF(data, callback) {
           renderInvoiceHistoryTable();
           triggerAutoStockDeduct(data.items);
           fetchTodayLiveSales();
-
-          // Code block cleaned from inside processInvoice
+          updateAllTabsOverview();
+          calculateDayEndCash();
 
           clearForm('invoice-sec');
         };
@@ -5930,15 +6164,20 @@ function generateInvoicePDFBase64(data, callback) {
       tbody.innerHTML = html;
     }
 
-    // === 🎨 ADVANCED & CATEGORIZED CUSTOM GREETINGS LOGIC ===
+    // === 🎨 ADVANCED CUSTOM GREETINGS LOGIC (AUTO NAME + DIRECT EDITABLE) ===
+    var currentGreetingType = 'festival';
+
     function loadGreetingTemplate(type) {
-      var name = document.getElementById("greetName") ? document.getElementById("greetName").value.trim() : "";
-      var nameText = name ? " *" + name + " जी*," : " *आदरणीय ग्राहक जी*,";
+      if (type) currentGreetingType = type;
+      
+      var nameInput = document.getElementById("greetName");
+      var rawName = nameInput ? nameInput.value.trim() : "";
+      var nameText = rawName ? " *" + rawName + " जी*," : " *आदरणीय ग्राहक जी*,";
 
       var msgBox = document.getElementById("greetCustomMsg");
       if (!msgBox) return;
 
-      if (type === 'festival') {
+      if (currentGreetingType === 'festival') {
         msgBox.value = "🌸 *पावन पर्व की हार्दिक शुभकामनाएँ!* 🌸\n\n" +
                        "नमस्कार" + nameText + " 🙏\n\n" +
                        "आपको एवं आपके समस्त परिवार को इस पावन पर्व की अनंत बधाई एवं शुभकामनाएँ! 🎆\n\n" +
@@ -5946,18 +6185,18 @@ function generateInvoicePDFBase64(data, callback) {
                        "🌸 *शुभकाँक्षी:* अनुराग शाक्य\n" +
                        "🚩 *माँ गंगा जन सेवा केंद्र व इलेक्ट्रॉनिक्स, कैरावली*";
 
-      } else if (type === 'birthday') {
+      } else if (currentGreetingType === 'birthday') {
         msgBox.value = "🎂 *जन्मदिन की हार्दिक बधाई एवं शुभकामनाएँ!* 🎉\n\n" +
                        "प्रिय" + nameText + " 💐✨\n\n" +
                        "आपको जन्मदिवस की अनंत शुभकामनाएँ! ईश्वर से प्रार्थना है कि आपका आने वाला वर्ष सफलता, खुशहाली और उत्तम स्वास्थ्य से भरा हो। 🎁🌟\n\n" +
                        "🌸 *शुभकाँक्षी:* अनुराग शाक्य\n" +
                        "🚩 *माँ गंगा जन सेवा केंद्र व इलेक्ट्रॉनिक्स*";
 
-      } else if (type === 'promo') {
+      } else if (currentGreetingType === 'promo') {
         msgBox.value = "🚩 *विशेष सेवा सूचना* 🚩\n\n" +
                        "नमस्कार" + nameText + " 🙏\n\n" +
                        "*माँ गंगा जन सेवा केंद्र व इलेक्ट्रॉनिक्स* में आपकी सेवा के लिए हम सदैव तत्पर हैं।\n\n" +
-                       "🌟 *हमारी प्रमुख त्वरित सेवाएँ:*\n" +
+                       "🌟 *हमारी प्रमुख सेवाएँ:*\n" +
                        "✅ आय, जाति, निवास प्रमाण पत्र व आयुष्मान कार्ड\n" +
                        "✅ नए पैन कार्ड, वोटर ID व आधार कार्ड प्रिंट\n" +
                        "✅ बैंकिंग (नकद निकासी, जमा व मनी ट्रांसफर)\n" +
@@ -5965,7 +6204,7 @@ function generateInvoicePDFBase64(data, callback) {
                        "उचित दाम और भरोसेमंद सेवा के लिए आज ही पधारें! 🤝\n" +
                        "📞 *संपर्क/WhatsApp:* 9761414105";
 
-      } else if (type === 'ready') {
+      } else if (currentGreetingType === 'ready') {
         msgBox.value = "✅ *आपका कार्य / डॉक्यूमेंट तैयार है!* 📦\n\n" +
                        "नमस्कार" + nameText + " 🙏\n\n" +
                        "आपको सूचित किया जाता है कि आपका जमा किया गया कार्य / डॉक्यूमेंट / रिपेयरिंग का सामान *माँ गंगा जन सेवा केंद्र* पर बनकर/सही होकर तैयार है। 📄🛠️\n\n" +
@@ -5973,7 +6212,7 @@ function generateInvoicePDFBase64(data, callback) {
                        "📍 *पता:* बरनाहल मैनपुरी रोड, कैरावली\n" +
                        "📞 *संपर्क:* 9761414105";
 
-      } else if (type === 'due_rem') {
+      } else if (currentGreetingType === 'due_rem') {
         msgBox.value = "💳 *बकाया भुगतान (Payment Reminder)* 📄\n\n" +
                        "नमस्कार" + nameText + " 🙏\n\n" +
                        "माँ गंगा जन सेवा केंद्र व इलेक्ट्रॉनिक्स पर आपका पिछला कुछ बकाया भुगतान शेष है। 💸\n\n" +
@@ -5981,9 +6220,19 @@ function generateInvoicePDFBase64(data, callback) {
                        "💳 *UPI ID:* `anuragkumarshakya@ptaxis`\n" +
                        "📞 *संपर्क:* 9761414105";
       }
-
-      updateGreetingPreview();
     }
+
+    // "ग्राहक का नाम" टाइप करते ही मैसेज में ऑटोमैटिक [नाम + जी] अपडेट करने का इवेंट
+    document.addEventListener("input", function(e) {
+      if (e.target && e.target.id === "greetName") {
+        loadGreetingTemplate();
+      }
+    });
+
+    // पेज लोड होते ही डिफ़ॉल्ट टेम्पलेट लोड करने के लिए
+    document.addEventListener("DOMContentLoaded", function() {
+      setTimeout(function() { loadGreetingTemplate('festival'); }, 500);
+    });
 
     function updateGreetingPreview() {
       var customText = document.getElementById("greetCustomMsg") ? document.getElementById("greetCustomMsg").value : "";
@@ -5999,122 +6248,266 @@ function generateInvoicePDFBase64(data, callback) {
       }
     });
 
-    // === 🎨 PREMIUM IMAGE + TEXT WHATSAPP GREETINGS SENDER ===
-    function sendCustomGreeting(sendMode) {
-      var mobileInput = document.getElementById("greetMobile");
-      var nameInput = document.getElementById("greetName");
-      var msgInput = document.getElementById("greetCustomMsg");
+    // === 🎨 DYNAMIC MULTI-LAYOUT POSTER THEME MANAGER ===
+var currentSelectedPosterTheme = 'dark';
 
-      var mobile = mobileInput ? mobileInput.value.trim() : "";
-      var name = (nameInput && nameInput.value.trim()) ? nameInput.value.trim() : "ग्राहक";
-      var customText = msgInput ? msgInput.value.trim() : "";
+function changePosterThemeLayout(themeKey) {
+  currentSelectedPosterTheme = themeKey;
+  var card = document.getElementById("posterCardPreview");
+  if (!card) return;
 
-      if (!mobile || mobile.length !== 10) {
-        return alert("⚠️ कृपया 10 अंकों का सही मोबाइल नंबर दर्ज करें!");
-      }
-      if (!customText) {
-        return alert("⚠️ कृपया भेजने के लिए कोई संदेश (Message) लिखें!");
-      }
+  if (themeKey === 'festive') {
+    card.style.background = "linear-gradient(135deg, #78350f 0%, #451a03 100%)";
+    card.style.borderColor = "#fbbf24";
+  } else if (themeKey === 'emerald') {
+    card.style.background = "linear-gradient(135deg, #064e3b 0%, #022c22 100%)";
+    card.style.borderColor = "#34d399";
+  } else if (themeKey === 'purple') {
+    card.style.background = "linear-gradient(135deg, #3b0764 0%, #1e1b4b 100%)";
+    card.style.borderColor = "#c084fc";
+  } else if (themeKey === 'light') {
+    card.style.background = "linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%)";
+    card.style.borderColor = "#2563eb";
+  } else if (themeKey === 'vibrant') {
+    card.style.background = "linear-gradient(135deg, #7c2d12 0%, #451a03 100%)";
+    card.style.borderColor = "#fb923c";
+  } else {
+    // Default Navy Dark
+    card.style.background = "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)";
+    card.style.borderColor = "#38bdf8";
+  }
+}
 
-      var cleanPhone = "91" + mobile;
-      var now = new Date();
+// === 🚀 PRODUCTION READY HYBRID POSTER SENDER ===
+function sendCustomGreeting(sendMode) {
+  var mobileInput = document.getElementById("greetMobile");
+  var nameInput = document.getElementById("greetName");
+  var msgInput = document.getElementById("greetCustomMsg");
 
-      // 📝 व्हाट्सएप मैसेज के नीचे जाने वाला कैप्शन टेक्स्ट
-      var captionMsg = "*🚩 माँ गंगा जन सेवा केंद्र व इलेक्ट्रॉनिक्स 🚩*\n" +
-                       "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" +
-                       "नमस्कार *" + name + " जी*,\n\n" +
-                       customText + "\n\n" +
-                       "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" +
-                       "🌟 *हमारी प्रमुख सेवाएँ (Services):*\n" +
-                       "• आय, जाति, निवास प्रमाण पत्र, PAN, वोटर ID\n" +
-                       "• पंखा व कूलर मोटर बाइंडिंग एवं इलेक्ट्रॉनिक्स\n" +
-                       "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" +
-                       "👤 *Pro:* अनुराग शाक्य (Anurag Shakya)\n" +
-                       "📞 *संपर्क/WhatsApp:* 9761414105\n" +
-                       "धन्यवाद! 🙏";
+  var mobile = mobileInput ? mobileInput.value.trim().replace(/\D/g, '') : "";
+  var name = (nameInput && nameInput.value.trim()) ? nameInput.value.trim() : "ग्राहक";
+  var customText = msgInput ? msgInput.value.trim() : "";
 
-      // यदि केवल SMS / ऐप्स से शेयर करना हो
-      if (sendMode === 'share') {
-        if (navigator.share) {
-          navigator.share({ title: 'माँ गंगा जन सेवा केंद्र', text: captionMsg }).catch(function(){});
-        } else {
-          window.open("sms:" + mobile + "?body=" + encodeURIComponent(captionMsg), '_blank');
-        }
-        return;
-      }
+  if (!mobile || mobile.length !== 10) {
+    return alert("⚠️ कृपया 10 अंकों का सही मोबाइल नंबर दर्ज करें!");
+  }
+  if (!customText) {
+    return alert("⚠️ कृपया भेजने के लिए कोई संदेश (Message) लिखें!");
+  }
 
-      // 🎨 HD DIGITAL GREETING BANNER CONTAINER
-      var banner = document.createElement("div");
-      banner.style.cssText = "position:fixed; top:-9999px; left:-9999px; width:520px; background:linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color:#ffffff; padding:22px; font-family:'Poppins', Arial, sans-serif; box-sizing:border-box; border-radius:18px; border:3px solid #38bdf8; z-index:999999;";
+  var cleanPhone = "91" + mobile;
 
-      banner.innerHTML = 
-        '<div style="text-align:center; border-bottom:2px dashed #38bdf8; padding-bottom:12px; margin-bottom:14px;">' +
-          '<img src="https://lh3.googleusercontent.com/d/1AVhGGj41J973HK0KgI1im5JJwJZsKhJR" style="width:55px; height:55px; border-radius:50%; border:2.5px solid #38bdf8; object-fit:cover; margin-bottom:6px;">' +
-          '<h2 style="margin:0; color:#ffffff; font-size:16.5px; font-weight:800; letter-spacing:0.5px; text-transform:uppercase;">माँ गंगा जन सेवा केंद्र व इलेक्ट्रॉनिक्स</h2>' +
-          '<small style="color:#38bdf8; font-size:10.5px; font-weight:700;">बरनाहल मैनपुरी रोड, कैरावली | Pro: अनुराग शाक्य (9761414105)</small>' +
-        '</div>' +
+  var captionMsg = "*🚩 माँ गंगा जन सेवा केंद्र व इलेक्ट्रॉनिक्स 🚩*\n" +
+                   "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" +
+                   "नमस्कार *" + name + " जी*,\n\n" +
+                   customText + "\n\n" +
+                   "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" +
+                   "🌟 *हमारी प्रमुख सेवाएँ (Services):*\n" +
+                   "• आय, जाति, निवास प्रमाण पत्र, PAN, वोटर ID\n" +
+                   "• पंखा व कूलर मोटर बाइंडिंग एवं इलेक्ट्रॉनिक्स\n" +
+                   "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" +
+                   "👤 *Pro:* अनुराग शाक्य (Anurag Shakya)\n" +
+                   "📞 *संपर्क/WhatsApp:* 9761414105\n" +
+                   "धन्यवाद! 🙏";
 
-        '<!-- Message Box -->' +
-        '<div style="background:#ffffff; color:#0f172a; padding:16px; border-radius:14px; margin-bottom:14px; font-size:12.5px; font-weight:600; line-height:1.6; white-space:pre-wrap; border-left:5px solid #2563eb; box-shadow:0 4px 12px rgba(0,0,0,0.15);">' +
-          customText +
-        '</div>' +
-
-        '<!-- Services Footer Grid -->' +
-        '<div style="background:rgba(255,255,255,0.07); border:1px solid #334155; border-radius:12px; padding:10px; font-size:9.5px;">' +
-          '<div style="text-align:center; color:#fbbf24; font-weight:800; font-size:10.5px; margin-bottom:6px; text-transform:uppercase;">🌟 हमारी प्रमुख सेवाएँ (Services) 🌟</div>' +
-          '<div style="display:flex; flex-wrap:wrap; gap:5px; justify-content:center; font-weight:700;">' +
-            '<span style="background:#1e3a8a; color:#bfdbfe; padding:3px 7px; border-radius:6px; border:1px solid #3b82f6;">📄 आय/जाति/निवास</span>' +
-            '<span style="background:#065f46; color:#a7f3d0; padding:3px 7px; border-radius:6px; border:1px solid #10b981;">💳 पैन व आयुष्मान कार्ड</span>' +
-            '<span style="background:#831843; color:#fbcfe8; padding:3px 7px; border-radius:6px; border:1px solid #ec4899;">🗳️ वोटर ID व आधार प्रिंट</span>' +
-            '<span style="background:#78350f; color:#fde68a; padding:3px 7px; border-radius:6px; border:1px solid #f59e0b;">💸 मनी ट्रांसफर / नकद निकासी</span>' +
-            '<span style="background:#312e81; color:#c7d2fe; padding:3px 7px; border-radius:6px; border:1px solid #6366f1;">⚙️ पंखा/कूलर मोटर बाइंडिंग</span>' +
-          '</div>' +
-        '</div>' +
-
-        '<div style="display:flex; justify-content:space-between; align-items:center; margin-top:12px; font-size:9px; color:#94a3b8; border-top:1px solid #334155; padding-top:6px;">' +
-          '<span>📅 Date: ' + now.toLocaleDateString('en-IN') + '</span>' +
-          '<span>🚩 कैरावली (मैनपुरी)</span>' +
-        '</div>';
-
-      document.body.appendChild(banner);
-
-      // 📸 HTML2CANVAS Rendering
-      html2canvas(banner, { scale: 2, useCORS: true, allowTaint: true, backgroundColor: '#0f172a' }).then(function(canvas) {
-        banner.remove();
-        var imgBase64 = canvas.toDataURL('image/jpeg', 0.95);
-
-        // 🚀 1. Android APK Native Environment (Image + Text Caption Both)
-        if (window.AndroidApp && typeof window.AndroidApp.shareImageToWhatsApp === "function") {
-          window.AndroidApp.shareImageToWhatsApp(imgBase64, mobile, captionMsg);
-        } 
-        // 🌐 2. Web Browser Fallback
-        else {
-          fetch(imgBase64)
-            .then(function(res){ return res.blob(); })
-            .then(function(blob){
-              var fileName = "Greeting_" + name.replace(/\s+/g, '_') + ".jpg";
-              var file = new File([blob], fileName, { type: "image/jpeg" });
-
-              if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-                navigator.share({
-                  files: [file],
-                  title: 'माँ गंगा जन सेवा केंद्र',
-                  text: captionMsg
-                }).catch(function(){
-                  window.open("https://api.whatsapp.com/send?phone=" + cleanPhone + "&text=" + encodeURIComponent(captionMsg), '_blank');
-                });
-              } else {
-                window.open("https://api.whatsapp.com/send?phone=" + cleanPhone + "&text=" + encodeURIComponent(captionMsg), '_blank');
-              }
-            }).catch(function(){
-              window.open("https://api.whatsapp.com/send?phone=" + cleanPhone + "&text=" + encodeURIComponent(captionMsg), '_blank');
-            });
-        }
-      }).catch(function(err) {
-        if (document.body.contains(banner)) banner.remove();
-        alert("❌ कार्ड इमेज जनरेट करने में त्रुटि: " + err);
-      });
+  if (sendMode === 'share') {
+    if (navigator.share) {
+      navigator.share({ title: 'माँ गंगा जन सेवा केंद्र', text: captionMsg }).catch(function(){});
+    } else {
+      window.open("sms:" + mobile + "?body=" + encodeURIComponent(captionMsg), '_blank');
     }
+    return;
+  }
+
+  var isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  var targetWaUrl = isMobileDevice 
+    ? "https://api.whatsapp.com/send?phone=" + cleanPhone + "&text=" + encodeURIComponent(captionMsg)
+    : "https://web.whatsapp.com/send?phone=" + cleanPhone + "&text=" + encodeURIComponent(captionMsg);
+
+  if (window.AndroidApp && typeof window.AndroidApp.shareImageToWhatsApp === "function") {
+    generateNativePosterBase64(customText, name, currentSelectedPosterTheme, function(imgBase64) {
+      window.AndroidApp.shareImageToWhatsApp(imgBase64, mobile, captionMsg);
+    });
+  } else {
+    var win = window.open(targetWaUrl, '_blank');
+    if (!win || win.closed || typeof win.closed === 'undefined') {
+      window.location.href = targetWaUrl;
+    }
+  }
+}
+
+// 🎨 Native Canvas HD Multi-Theme Poster Generator
+function generateNativePosterBase64(customText, customerName, themeKey, callback) {
+  try {
+    var canvas = document.createElement('canvas');
+    canvas.width = 600;
+    canvas.height = 700;
+    var ctx = canvas.getContext('2d');
+
+    // Enhanced Multi-Theme Color Configs
+    var bg1 = '#0f172a', bg2 = '#1e293b', borderCol = '#38bdf8', headerTextCol = '#ffffff', accentCol = '#38bdf8';
+    if (themeKey === 'festive') {
+      bg1 = '#78350f'; bg2 = '#451a03'; borderCol = '#fbbf24'; headerTextCol = '#ffffff'; accentCol = '#fbbf24';
+    } else if (themeKey === 'emerald') {
+      bg1 = '#064e3b'; bg2 = '#022c22'; borderCol = '#34d399'; headerTextCol = '#ffffff'; accentCol = '#34d399';
+    } else if (themeKey === 'purple') {
+      bg1 = '#3b0764'; bg2 = '#1e1b4b'; borderCol = '#c084fc'; headerTextCol = '#ffffff'; accentCol = '#c084fc';
+    } else if (themeKey === 'light') {
+      bg1 = '#ffffff'; bg2 = '#f1f5f9'; borderCol = '#2563eb'; headerTextCol = '#0f172a'; accentCol = '#2563eb';
+    } else if (themeKey === 'vibrant') {
+      bg1 = '#7c2d12'; bg2 = '#451a03'; borderCol = '#fb923c'; headerTextCol = '#ffffff'; accentCol = '#fb923c';
+    }
+
+    // Background Gradient
+    var grad = ctx.createLinearGradient(0, 0, 600, 700);
+    grad.addColorStop(0, bg1);
+    grad.addColorStop(1, bg2);
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, 600, 700);
+
+    // Frame
+    ctx.strokeStyle = borderCol;
+    ctx.lineWidth = 6;
+    ctx.strokeRect(15, 15, 570, 670);
+
+    // Header Text
+    ctx.fillStyle = headerTextCol;
+    ctx.font = 'bold 22px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('माँ गंगा जन सेवा केंद्र व इलेक्ट्रॉनिक्स', 300, 55);
+
+    ctx.fillStyle = accentCol;
+    ctx.font = 'bold 13px Arial';
+    ctx.fillText('बरनाहल मैनपुरी रोड, कैरावली | Pro: अनुराग शाक्य (9761414105)', 300, 80);
+
+    // White Card Box
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(35, 105, 530, 430);
+
+    ctx.fillStyle = '#0f172a';
+    ctx.font = 'bold 15px Arial';
+    ctx.textAlign = 'left';
+
+    var lines = customText.split('\n');
+    var startY = 140;
+    for (var i = 0; i < lines.length && startY < 510; i++) {
+      var line = lines[i];
+      if (line.length > 42) {
+        ctx.fillText(line.substring(0, 42), 55, startY);
+        startY += 26;
+        ctx.fillText(line.substring(42), 55, startY);
+      } else {
+        ctx.fillText(line, 55, startY);
+      }
+      startY += 26;
+    }
+
+    // Services Box
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+    ctx.fillRect(35, 555, 530, 85);
+    ctx.fillStyle = '#fbbf24';
+    ctx.font = 'bold 13px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('🌟 हमारी प्रमुख सेवाएँ (Services) 🌟', 300, 580);
+
+    ctx.fillStyle = headerTextCol;
+    ctx.font = 'bold 11px Arial';
+    ctx.fillText('आय/जाति/निवास • पैन व वोटर ID • मनी ट्रांसफर • आधार प्रिंट', 300, 605);
+    ctx.fillText('पंखा/कूलर मोटर बाइंडिंग एवं सभी ओरिजिनल इलेक्ट्रॉनिक्स सामान', 300, 625);
+
+    callback(canvas.toDataURL('image/jpeg', 0.92));
+  } catch(e) {
+    console.warn("Native poster fallback", e);
+  }
+}
+
+// 🎨 HTML5 NATIVE CANVAS POSTER CREATOR (100% Fast & Reliable)
+function generatePosterCanvasBase64(customText, customerName, callback) {
+  var canvas = document.createElement('canvas');
+  canvas.width = 600;
+  canvas.height = 700;
+  var ctx = canvas.getContext('2d');
+
+  // Background Gradient
+  var grad = ctx.createLinearGradient(0, 0, 600, 700);
+  grad.addColorStop(0, '#0f172a');
+  grad.addColorStop(1, '#1e293b');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, 600, 700);
+
+  // Border Outer Frame
+  ctx.strokeStyle = '#38bdf8';
+  ctx.lineWidth = 6;
+  ctx.strokeRect(15, 15, 570, 670);
+
+  // Header Branding
+  ctx.fillStyle = '#ffffff';
+  ctx.font = 'bold 22px Arial';
+  ctx.textAlign = 'center';
+  ctx.fillText('माँ गंगा जन सेवा केंद्र व इलेक्ट्रॉनिक्स', 300, 55);
+
+  ctx.fillStyle = '#38bdf8';
+  ctx.font = 'bold 13px Arial';
+  ctx.fillText('बरनाहल मैनपुरी रोड, कैरावली | Pro: अनुराग शाक्य (9761414105)', 300, 80);
+
+  // Divider Line
+  ctx.strokeStyle = '#38bdf8';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(30, 95);
+  ctx.lineTo(570, 95);
+  ctx.stroke();
+
+  // White Message Card Box
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(35, 115, 530, 420);
+  ctx.strokeStyle = '#2563eb';
+  ctx.lineWidth = 4;
+  ctx.strokeRect(35, 115, 530, 420);
+
+  // Message Text Formatting
+  ctx.fillStyle = '#0f172a';
+  ctx.font = 'bold 15px Arial';
+  ctx.textAlign = 'left';
+
+  var words = customText.split('\n');
+  var startY = 150;
+  for (var i = 0; i < words.length && startY < 510; i++) {
+    var line = words[i];
+    if (line.length > 42) {
+      ctx.fillText(line.substring(0, 42), 55, startY);
+      startY += 26;
+      ctx.fillText(line.substring(42), 55, startY);
+    } else {
+      ctx.fillText(line, 55, startY);
+    }
+    startY += 26;
+  }
+
+  // Services Banner Box Bottom
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.08)';
+  ctx.fillRect(35, 555, 530, 85);
+  ctx.strokeStyle = '#334155';
+  ctx.lineWidth = 1;
+  ctx.strokeRect(35, 555, 530, 85);
+
+  ctx.fillStyle = '#fbbf24';
+  ctx.font = 'bold 13px Arial';
+  ctx.textAlign = 'center';
+  ctx.fillText('🌟 हमारी प्रमुख सेवाएँ (Services) 🌟', 300, 580);
+
+  ctx.fillStyle = '#e2e8f0';
+  ctx.font = 'bold 11px Arial';
+  ctx.fillText('आय/जाति/निवास • पैन व वोटर ID • मनी ट्रांसफर • आधार प्रिंट', 300, 605);
+  ctx.fillText('पंखा/कूलर मोटर बाइंडिंग एवं सभी ओरिजिनल इलेक्ट्रॉनिक्स सामान', 300, 625);
+
+  // Footer Date
+  ctx.fillStyle = '#94a3b8';
+  ctx.font = '11px Arial';
+  ctx.fillText('📅 ' + new Date().toLocaleDateString('en-IN') + ' | 🚩 कैरावली (मैनपुरी)', 300, 665);
+
+  callback(canvas.toDataURL('image/jpeg', 0.92));
+}
 
     // === 1-CLICK ALL-DATA OFFLINE BACKUP FUNCTION ===
     function downloadFullAppBackup() {
@@ -6233,10 +6626,14 @@ function generateInvoicePDFBase64(data, callback) {
     });
 
     var inactivityTimer;
-    var LOCK_TIMEOUT = 45 * 1000;
+    var LOCK_TIMEOUT = 5 * 60 * 1000; // 5 मिनट इनएक्टिविटी टाइमर
+    var isCameraOrPickerActive = false; // कैमरा/फाइल पिकर एक्टिव फ्लैग
 
     function resetInactivityTimer() {
       clearTimeout(inactivityTimer);
+      // यदि कैमरा या फ़ाइल पिकर खुला है तो टाइमर चालू न करें
+      if (isCameraOrPickerActive) return;
+
       inactivityTimer = setTimeout(function() {
         var overlay = document.getElementById("appLoginOverlay");
         if (overlay && overlay.style.display !== "flex") {
@@ -6245,6 +6642,21 @@ function generateInvoicePDFBase64(data, callback) {
         }
       }, LOCK_TIMEOUT);
     }
+
+    // कैमरा/गैलरी इनपुट खोलते समय टाइमर को रोकने व वापस चालू करने के इवेंट्स
+    document.addEventListener("click", function(e) {
+      if (e.target && e.target.tagName === "INPUT" && e.target.type === "file") {
+        isCameraOrPickerActive = true;
+        clearTimeout(inactivityTimer);
+      }
+    });
+
+    window.addEventListener("focus", function() {
+      setTimeout(function() {
+        isCameraOrPickerActive = false;
+        resetInactivityTimer();
+      }, 1000);
+    });
 
     window.onload = resetInactivityTimer;
     document.onmousemove = resetInactivityTimer;
@@ -6313,22 +6725,6 @@ function generateInvoicePDFBase64(data, callback) {
       }
     }
 
-    // === SIDE DRAWER MENU TOGGLE FUNCTIONS (GLOBAL SCOPE FIX) ===
-    window.openSideMenu = function() {
-      var drawer = document.getElementById("sideDrawerMenu");
-      var overlay = document.getElementById("sideDrawerOverlay");
-      if (drawer) drawer.classList.add("open");
-      if (overlay) overlay.classList.add("active");
-      document.body.classList.add("drawer-open");
-    };
-
-    window.closeSideMenu = function() {
-      var drawer = document.getElementById("sideDrawerMenu");
-      var overlay = document.getElementById("sideDrawerOverlay");
-      if (drawer) drawer.classList.remove("open");
-      if (overlay) overlay.classList.remove("active");
-      document.body.classList.remove("drawer-open");
-    };
     // === 🎨 DYNAMIC MULTICOLOR & THEME MANAGER SYSTEM ===
     var DEFAULT_THEME = {
       primary: '#2563eb',
@@ -6688,29 +7084,41 @@ function generateInvoicePDFBase64(data, callback) {
 
     // ऐप लोड होते ही फॉर्म्स लोड करें
     document.addEventListener("DOMContentLoaded", loadDocHubForms);
-    // === 📌 GOOGLE KEEP STYLE QUICK NOTES SYSTEM ===
+    // === 📌 GOOGLE SHEET SYNCED QUICK NOTES SYSTEM ===
     var globalAppNotesList = [];
 
     function loadAppQuickNotes() {
+      // 1. Instant Cache Load
       var saved = localStorage.getItem("mg_csc_quick_notes");
       if (saved) {
-        try {
-          globalAppNotesList = JSON.parse(saved);
-        } catch(e) {
-          globalAppNotesList = [];
-        }
-      } else {
-        globalAppNotesList = [
-          {
-            title: "दुकान की आवश्यक सामग्री",
-            content: "• फोटो पेपर A4 (100 GSM)\n• लैमिनेशन फिल्म\n• नए स्विच एवं बोर्ड सॉकेट",
-            color: "#fef3c7",
-            date: new Date().toLocaleDateString('en-IN')
-          }
-        ];
-        localStorage.setItem("mg_csc_quick_notes", JSON.stringify(globalAppNotesList));
+        try { globalAppNotesList = JSON.parse(saved); renderAppNotesUI(globalAppNotesList); } catch(e){}
       }
-      renderAppNotesUI(globalAppNotesList);
+
+      // 2. Background Google Sheet Sync
+      if (typeof google !== 'undefined' && google.script && google.script.run) {
+        google.script.run.withSuccessHandler(function(res) {
+          if (res) {
+            try {
+              var sheetData = typeof res === 'string' ? JSON.parse(res) : res;
+              if (Array.isArray(sheetData) && sheetData.length > 0) {
+                globalAppNotesList = sheetData;
+                localStorage.setItem("mg_csc_quick_notes", JSON.stringify(globalAppNotesList));
+                renderAppNotesUI(globalAppNotesList);
+              }
+            } catch(e){}
+          }
+        }).getQuickNotes();
+      } else if (typeof SCRIPT_WEB_APP_URL !== 'undefined' && SCRIPT_WEB_APP_URL) {
+        fetch(SCRIPT_WEB_APP_URL + "?action=getQuickNotes")
+          .then(function(r){ return r.json(); })
+          .then(function(sheetData){
+            if (Array.isArray(sheetData) && sheetData.length > 0) {
+              globalAppNotesList = sheetData;
+              localStorage.setItem("mg_csc_quick_notes", JSON.stringify(globalAppNotesList));
+              renderAppNotesUI(globalAppNotesList);
+            }
+          }).catch(function(){});
+      }
     }
 
     function renderAppNotesUI(list) {
@@ -6763,24 +7171,37 @@ function generateInvoicePDFBase64(data, callback) {
 
       if (!title && !content) return alert("⚠️ नोट में शीर्षक या विवरण लिखना अनिवार्य है!");
 
+      var noteObj = {
+        id: (idxStr !== "" && globalAppNotesList[parseInt(idxStr, 10)]) ? globalAppNotesList[parseInt(idxStr, 10)].id : ("note_" + Date.now()),
+        title: title || "क्विक नोट",
+        content: content,
+        color: color,
+        date: new Date().toLocaleDateString('en-IN'),
+        user: (currentLoggedInUser && currentLoggedInUser.name) ? currentLoggedInUser.name : "Maa Ganga User"
+      };
+
       if (idxStr !== "") {
         var idx = parseInt(idxStr, 10);
-        globalAppNotesList[idx].title = title;
-        globalAppNotesList[idx].content = content;
-        globalAppNotesList[idx].color = color;
+        globalAppNotesList[idx] = noteObj;
       } else {
-        var newNote = {
-          title: title || "क्विक नोट",
-          content: content,
-          color: color,
-          date: new Date().toLocaleDateString('en-IN')
-        };
-        globalAppNotesList.unshift(newNote);
+        globalAppNotesList.unshift(noteObj);
       }
 
+      // Local Cache Save
       localStorage.setItem("mg_csc_quick_notes", JSON.stringify(globalAppNotesList));
       renderAppNotesUI(globalAppNotesList);
       toggleAddNoteForm();
+
+      // Google Sheet Backend Save
+      if (typeof google !== 'undefined' && google.script && google.script.run) {
+        google.script.run.saveQuickNote(noteObj);
+      } else if (typeof SCRIPT_WEB_APP_URL !== 'undefined' && SCRIPT_WEB_APP_URL) {
+        fetch(SCRIPT_WEB_APP_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain" },
+          body: JSON.stringify({ action: "saveQuickNote", data: noteObj })
+        }).catch(function(){});
+      }
     }
 
     function editQuickNoteItem(idx) {
@@ -6798,15 +7219,46 @@ function generateInvoicePDFBase64(data, callback) {
     }
 
     function deleteQuickNoteItem(idx) {
+      var item = globalAppNotesList[idx];
+      if (!item) return;
+
       if (confirm("क्या आप इस नोट को हटाना चाहते हैं?")) {
+        var noteId = item.id || "";
         globalAppNotesList.splice(idx, 1);
         localStorage.setItem("mg_csc_quick_notes", JSON.stringify(globalAppNotesList));
         renderAppNotesUI(globalAppNotesList);
+
+        // Google Sheet Backend Delete
+        if (typeof google !== 'undefined' && google.script && google.script.run) {
+          google.script.run.deleteQuickNote(noteId);
+        } else if (typeof SCRIPT_WEB_APP_URL !== 'undefined' && SCRIPT_WEB_APP_URL) {
+          fetch(SCRIPT_WEB_APP_URL, {
+            method: "POST",
+            headers: { "Content-Type": "text/plain" },
+            body: JSON.stringify({ action: "deleteQuickNote", noteId: noteId })
+          }).catch(function(){});
+        }
       }
     }
 
     // ऐप लोड होते ही नोट्स लोड करें
     document.addEventListener("DOMContentLoaded", loadAppQuickNotes);
+
+    // 🚀 Register Dynamic Offline Service Worker (PWA)
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        var swCode = "const CACHE_NAME='mg-csc-v2';" +
+          "self.addEventListener('install',e=>{self.skipWaiting();});" +
+          "self.addEventListener('fetch',e=>{e.respondWith(fetch(e.request).catch(()=>caches.match(e.request)));});";
+        var blob = new Blob([swCode], {type: 'text/javascript'});
+        var blobUrl = URL.createObjectURL(blob);
+        navigator.serviceWorker.register(blobUrl).then(function() {
+          console.log('✅ PWA Service Worker Registered Successfully');
+        }).catch(function(err) {
+          console.log('SW Registration Failed', err);
+        });
+      });
+    }
   </script>
 </body>
 </html>
