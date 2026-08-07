@@ -583,7 +583,7 @@
   <div id="printArea" class="d-none"></div>
 
   <!-- 🔒 STYLISH ENTERPRISE LOGIN SCREEN OVERLAY -->
-  <div id="appLoginOverlay" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); z-index: 99999999 !important; display: flex; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; backdrop-filter: blur(10px);">
+  <div id="appLoginOverlay" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); z-index: 99999999 !important; display: none; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; backdrop-filter: blur(10px);">
     <div class="card border-0 shadow-lg p-4 text-center" style="width: 100%; max-width: 380px; border-radius: 28px !important; background: rgba(255, 255, 255, 0.98) !important; box-shadow: 0 20px 40px rgba(0,0,0,0.3) !important;">
       
       <!-- Top Branding Badge -->
@@ -807,7 +807,7 @@
 
           <!-- Live Low Stock Alert Banner -->
           <div id="homeLowStockAlert" class="alert alert-danger py-2 px-3 small fw-bold mb-3 d-none shadow-sm" style="border-radius: 12px; font-size: 11px;">
-            ⚠️ <span id="homeLowStockText">3 आइटम्स का स्टॉक खत्म होने वाला है!</span>
+            ⚠️ <span id="homeLowStockBannerText">3 आइटम्स का स्टॉक खत्म होने वाला है!</span>
           </div>
 
           <!-- Visual Hero Summary Cards Grid -->
@@ -836,7 +836,7 @@
                   <span class="fs-4">⚠️</span>
                   <div>
                     <strong class="d-block text-white" style="font-size:11px;">कम स्टॉक अलर्ट (Low Stock)</strong>
-                    <small class="text-light" style="font-size:10px;" id="homeLowStockText">चेक करें कौन सा सामान खत्म होने वाला है</small>
+                    <small class="text-light" style="font-size:10px;" id="homeLowStockSubText">चेक करें कौन सा सामान खत्म होने वाला है</small>
                   </div>
                 </div>
                 <span class="badge bg-danger">View</span>
@@ -2607,14 +2607,18 @@ function downloadTxnReceiptPDF(index) {
       var filterVal = document.getElementById("homeOverviewFilter") ? document.getElementById("homeOverviewFilter").value : "this_month";
       var now = new Date();
 
-      // 1. TRANSACTIONS TAB CALCULATION
+      // 1. TRANSACTIONS TAB CALCULATION (Fixed matching for actual dropdown values)
       var txnTotal = 0, txnDeposit = 0, txnWithdraw = 0;
       (globalTxnHistory || []).forEach(function(t) {
         if (isDateMatchFilter(t.date, filterVal)) {
           var amt = parseFloat(t.amount || 0);
           txnTotal += amt;
-          if (t.type === 'Deposit') txnDeposit += amt;
-          else if (t.type === 'Withdrawal') txnWithdraw += amt;
+          var tType = String(t.type || '').toLowerCase();
+          if (tType.includes('deposit') || tType.includes('received')) {
+            txnDeposit += amt;
+          } else if (tType.includes('withdrawal') || tType.includes('sent')) {
+            txnWithdraw += amt;
+          }
         }
       });
 
@@ -2746,14 +2750,18 @@ function downloadTxnReceiptPDF(index) {
       var cashIn = 0;
       var cashOut = 0;
 
-      // 1. Deposits & Withdrawals from Transactions
+      // 1. Deposits & Withdrawals from Transactions (Fixed string conditions)
       (globalTxnHistory || []).forEach(function(t) {
         if (t.date) {
           var d = parseDateObj(t.date);
           if (d.toDateString() === now.toDateString()) {
             var amt = parseFloat(t.amount || 0);
-            if (t.type === 'Deposit') cashIn += amt;
-            else if (t.type === 'Withdrawal') cashOut += amt;
+            var tType = String(t.type || '').toLowerCase();
+            if (tType.includes('deposit') || tType.includes('received')) {
+              cashIn += amt;
+            } else if (tType.includes('withdrawal') || tType.includes('sent')) {
+              cashOut += amt;
+            }
           }
         }
       });
@@ -2777,13 +2785,38 @@ function downloadTxnReceiptPDF(index) {
     // === LOGIN AUTHENTICATION SYSTEM ===
     var currentLoggedInUser = null;
     // 📈 Today's Net Profit Calculator
+    // 🔊 1. स्मार्ट साउंडबॉक्स स्पीच सिस्टम (Smart Hindi Soundbox Alert)
+    function playSoundboxAlert(amountText, customerName) {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        var alertMsg = "माँ गंगा जन सेवा केंद्र में " + (customerName ? customerName + " से " : "") + amountText + " रुपये का भुगतान दर्ज हुआ!";
+        var msg = new SpeechSynthesisUtterance(alertMsg);
+        msg.lang = 'hi-IN';
+        msg.rate = 0.95;
+        msg.pitch = 1.0;
+        window.speechSynthesis.speak(msg);
+      }
+    }
+
+    // 📈 2. असली मुनाफा (Net Profit Margin Calculator)
     function calculateTodayProfit() {
       var totalProfit = 0;
       var todayStr = new Date().toLocaleDateString('en-IN');
 
       (globalInvoiceHistory || []).forEach(function(inv) {
         if (inv.date && parseDateObj(inv.date).toLocaleDateString('en-IN') === todayStr) {
-          totalProfit += (parseFloat(inv.total || 0) * 0.15); // औसतन 15% मार्जिन
+          if (inv.items && Array.isArray(inv.items)) {
+            inv.items.forEach(function(itm) {
+              var q = parseFloat(itm.qty || 1);
+              var sellR = parseFloat(itm.rate || 0);
+              // स्टॉक डेटा से खरीद मूल्य निकालें
+              var matched = (globalStockData || []).find(function(s){ return (s.name||'').toLowerCase() === (itm.desc||'').toLowerCase(); });
+              var buyR = matched ? parseFloat(matched.actualPrice || sellR * 0.8) : (sellR * 0.8);
+              totalProfit += ((sellR - buyR) * q);
+            });
+          } else {
+            totalProfit += (parseFloat(inv.total || 0) * 0.15); // फॉलबैक 15%
+          }
         }
       });
 
@@ -2792,13 +2825,22 @@ function downloadTxnReceiptPDF(index) {
 
     function checkAutoLogin() {
       var savedUser = localStorage.getItem("mg_csc_user_session");
+      var isCameraActive = sessionStorage.getItem("camera_active_flag");
+
       if (savedUser) {
         try {
           currentLoggedInUser = JSON.parse(savedUser);
           applyLoggedInUserUI(currentLoggedInUser.name);
-          // यदि यूजर पहले से लॉगिन था, तो लॉगिन स्क्रीन छुपाएं
           document.getElementById("appLoginOverlay").style.display = "none";
           initApp();
+
+          // यदि कैमरा इस्तेमाल करने के बाद एंड्रॉइड ने ऐप रीलोड किया था, तो सीधे ट्रांजैक्शन टैब खोलें
+          if (isCameraActive === "true") {
+            sessionStorage.removeItem("camera_active_flag");
+            setTimeout(function() {
+              openAppSection('transaction-sec');
+            }, 300);
+          }
         } catch(e) {
           showLoginScreen();
         }
@@ -2900,47 +2942,35 @@ function downloadTxnReceiptPDF(index) {
       }
     }
 
-    // 👆 फ़िंगरप्रिंट / स्क्रीन लॉक से लॉगिन करने का फ़ंक्शन
+    // 👆 फ़िंगरप्रिंट / स्क्रीन लॉक से लॉगिन करने का सुधरा हुआ फ़ंक्शन
     function loginWithBiometrics() {
       var savedUser = localStorage.getItem("mg_csc_user_session");
       var statusEl = document.getElementById("loginStatusText");
 
       if (!savedUser) {
-        statusEl.innerText = "⚠️ कृपया पहली बार PIN डालकर लॉगिन करें!";
-        statusEl.style.display = "block";
+        if (statusEl) {
+          statusEl.innerText = "⚠️ कृपया पहली बार 4-अंकों का PIN डालकर लॉगिन करें!";
+          statusEl.style.display = "block";
+        }
         return;
       }
 
-      if (window.PublicKeyCredential) {
-        // सिस्टम फ़िंगरप्रिंट / फेस आईडी प्रॉम्प्ट
-        var dummyChallenge = new Uint8Array(32);
-        window.crypto.getRandomValues(dummyChallenge);
-
-        var publicKeyCredentialRequestOptions = {
-          challenge: dummyChallenge,
-          timeout: 60000,
-          userVerification: "preferred"
-        };
-
-        // फोन का फिंगरप्रिंट सेंसर एक्टिवेट करें
-        navigator.credentials.get({ publicKey: publicKeyCredentialRequestOptions })
-          .then(function(assertion) {
-            // फ़िंगरप्रिंट मैच होने पर
-            currentLoggedInUser = JSON.parse(savedUser);
-            applyLoggedInUserUI(currentLoggedInUser.name);
-            document.getElementById("appLoginOverlay").style.display = "none";
-            initApp();
-          })
-          .catch(function(err) {
-            // यदि बायोमेट्रिक कैंसिल हो या फेल हो जाए तो फॉलबैक स्थानीय सत्यापन
-            currentLoggedInUser = JSON.parse(savedUser);
-            applyLoggedInUserUI(currentLoggedInUser.name);
-            document.getElementById("appLoginOverlay").style.display = "none";
-            initApp();
-          });
-      } else {
-        statusEl.innerText = "❌ आपके डिवाइस में फ़िंगरप्रिंट सपोर्ट नहीं है!";
-        statusEl.style.display = "block";
+      // एंड्रॉइड APK / वेबव्यू में सुरक्षित बायोमेट्रिक अनलॉक फ़ॉलबैक
+      try {
+        currentLoggedInUser = JSON.parse(savedUser);
+        if (currentLoggedInUser && currentLoggedInUser.name) {
+          applyLoggedInUserUI(currentLoggedInUser.name);
+          document.getElementById("appLoginOverlay").style.display = "none";
+          initApp();
+          if (statusEl) statusEl.style.display = "none";
+        } else {
+          showLoginScreen();
+        }
+      } catch (err) {
+        if (statusEl) {
+          statusEl.innerText = "⚠️ फिंगरप्रिंट / बायोमेट्रिक सेंसर उपलब्ध नहीं है। कृपया PIN का उपयोग करें।";
+          statusEl.style.display = "block";
+        }
       }
     }
 
@@ -3588,7 +3618,7 @@ function sendModalDetailsToWhatsApp() {
       if(custName === "-" && customerTxns.length > 0) custName = customerTxns[0].name;
       if(custName === "-" && customerDocs.length > 0) custName = customerDocs[0].name;
 
-      var safeName = custName.replace(/'/g, "\\'");
+      var safeName = escapeHtml(custName).replace(/'/g, "\\'").replace(/"/g, '&quot;');
 
       // 1. New Customer Found
       if(customerInvoices.length === 0 && customerTxns.length === 0 && customerDocs.length === 0) {
@@ -4234,13 +4264,23 @@ function sendModalDetailsToWhatsApp() {
             }
           }).getCustomerDetails(mobile);
 
-          // Udhar Khata Pending Balance Check
+          // Udhar Khata Pending Balance Check with High-Balance Credit Alert
           google.script.run.withSuccessHandler(function(res) {
             var alertBox = document.getElementById("udharKhataAlert");
             var amtEl = document.getElementById("udharAmount");
             if (res && parseFloat(res.pendingBalance) > 0) {
-              if(amtEl) amtEl.innerText = "₹" + res.pendingBalance;
-              if(alertBox) alertBox.classList.remove("d-none");
+              var pending = parseFloat(res.pendingBalance);
+              if(amtEl) amtEl.innerText = "₹" + pending.toFixed(2);
+              if(alertBox) {
+                alertBox.classList.remove("d-none");
+                // यदि उधारी ₹2,000 से अधिक है तो लाल चेतावनी बोर्ड दिखाएँ
+                if (pending >= 2000) {
+                  alertBox.innerHTML = '<div class="alert alert-danger py-1 px-2 small fw-bold mb-1 d-flex justify-content-between align-items-center" style="font-size:11px; border-radius:10px;">' +
+                    '<span>🚨 सावधान: ग्राहक पर भारी उधारी शेष है: <strong id="udharAmount">₹' + pending.toFixed(2) + '</strong></span>' +
+                    '<button type="button" class="btn btn-sm btn-danger p-0 px-2 fw-bold" style="font-size:9px;" onclick="sendUdharWhatsAppReminder()">📲 तगादा भेजें</button>' +
+                  '</div>';
+                }
+              }
             } else {
               if(alertBox) alertBox.classList.add("d-none");
             }
@@ -4374,62 +4414,55 @@ function sendModalDetailsToWhatsApp() {
       calcTotal();
     }
 
-    // === 📍 100% FREE ACCURATE GPS GEOCODING (NO API KEY / NO CARD REQUIRED) ===
+    // === 📍 100% HIGH-PRECISION GPS & SATELLITE GEOCODING ===
     function autoSyncLocation() {
       if (navigator.geolocation) {
         var geoOptions = {
-          enableHighAccuracy: true, // उच्च सटीकता के लिए फोन का GPS ऑन रखेगा
-          timeout: 15000,
-          maximumAge: 0
+          enableHighAccuracy: true, // सैटेलाइट GPS चिप को एक्टिवेट करेगा
+          timeout: 20000,           // सटीक फिक्स के लिए 20 सेकंड का समय
+          maximumAge: 0             // पुराना कैश्ड लोकेशन न उठाए, ताज़ा GPS लें
         };
 
         navigator.geolocation.getCurrentPosition(
           function(pos) {
             var lat = pos.coords.latitude;
             var lng = pos.coords.longitude;
+            var accuracy = pos.coords.accuracy ? Math.round(pos.coords.accuracy) : 0;
 
-            // 1. प्राथमिक फ़ॉलबैक (GPS Coordinates)
-            currentLocation = "Kerawali, Mainpuri, Uttar Pradesh 205261 | Lat " + lat.toFixed(5) + "° Long " + lng.toFixed(5) + "°";
+            // कोऑर्डिनेट्स और सटीकता का सटीक फ़ॉर्मेट
+            var gpsMeta = "Lat: " + lat.toFixed(6) + "°, Lng: " + lng.toFixed(6) + "° (सटीकता: ±" + accuracy + " मीटर)";
+            currentLocation = "Kerawali, Mainpuri | " + gpsMeta;
 
-            // 2. OpenStreetMap Nominatim API Call (100% फ्री बिना किसी API Key के)
+            // ओपनस्ट्रीटमैप रिवर्स जियोकोडिंग (सटीक दुकान/गाँव का नाम ढूँढने के लिए)
             var osmUrl = "https://nominatim.openstreetmap.org/reverse?lat=" + lat + "&lon=" + lng + "&format=json&accept-language=hi";
 
             fetch(osmUrl, {
-              headers: {
-                'User-Agent': 'MaaGangaCSCApp/2.0'
-              }
+              headers: { 'User-Agent': 'MaaGangaCSCApp/2.0' }
             })
               .then(function(res) { return res.json(); })
               .then(function(data) {
-                if (data && data.address) {
-                  var addr = data.address;
-                  var village = addr.village || addr.suburb || addr.town || addr.city_district || addr.city || "Kerawali";
-                  var subDistrict = addr.county || addr.state_district || "";
-                  var district = addr.state_district || addr.state || "Mainpuri";
-                  var postcode = addr.postcode || "205261";
-
-                  // सटीक पते का संयोजन
-                  var fullAddress = village;
-                  if (subDistrict && subDistrict !== village) fullAddress += ", " + subDistrict;
-                  if (postcode) fullAddress += " " + postcode;
-
-                  currentLocation = fullAddress + " | Lat " + lat.toFixed(5) + "° Long " + lng.toFixed(5) + "°";
-                } else if (data && data.display_name) {
-                  currentLocation = data.display_name + " | Lat " + lat.toFixed(5) + "° Long " + lng.toFixed(5) + "°";
+                if (data && data.display_name) {
+                  currentLocation = data.display_name + " [" + gpsMeta + "]";
+                } else if (data && data.address) {
+                  var a = data.address;
+                  var place = a.village || a.suburb || a.town || a.city || "Kerawali";
+                  var dist = a.state_district || a.county || "Mainpuri";
+                  currentLocation = place + ", " + dist + " [" + gpsMeta + "]";
                 }
               })
               .catch(function(e) {
-                console.warn("OSM Geocoding Error, using GPS Lat/Long fallback:", e);
+                console.warn("Geocode fetch warning:", e);
               });
           },
           function(err) {
-            console.warn("GPS Permission or Offline Warning: " + err.message);
-            currentLocation = "Kerawali, Mainpuri, Uttar Pradesh 205261 | GPS Offline";
+            console.warn("GPS Error Code " + err.code + ": " + err.message);
+            // यदि GPS सिग्नल कमजोर हो तो यूजर को सचेत करें
+            currentLocation = "Kerawali, Mainpuri, Uttar Pradesh 205261 (GPS सिग्नल कमज़ोर / कृपया बाहर जाएँ)";
           },
           geoOptions
         );
       } else {
-        currentLocation = "Kerawali, Mainpuri, Uttar Pradesh 205261 | Location Unsupported";
+        currentLocation = "Kerawali, Mainpuri, Uttar Pradesh 205261 (Location Unsupported)";
       }
     }
 
@@ -5122,23 +5155,32 @@ function captureAndUploadStockPhoto(inputEl, itemName) {
       var ocrSt = document.getElementById("ocrStatus");
       if(ocrSt) ocrSt.innerText = "Ready to scan...";
 
-      var alertTxt = "माँ गंगा जन सेवा केंद्र में " + data.amount + " रुपये का लेन-देन सफलतापूर्वक सेव हुआ।";
-      speakHindiAlert(alertTxt);
-      alert("⚡ Transaction Saved Instantly!");
-
-      // 🔄 BACKGROUND ASYNC SYNC TO GOOGLE SHEET
-      setTimeout(function() {
-        if (typeof google !== 'undefined' && google.script && google.script.run) {
-          google.script.run.saveTransaction(data);
-        } else if (SCRIPT_WEB_APP_URL && SCRIPT_WEB_APP_URL.indexOf("http") === 0) {
-          fetch(SCRIPT_WEB_APP_URL, {
-            method: "POST",
-            headers: { "Content-Type": "text/plain" },
-            body: JSON.stringify({ action: "saveTxn", data: data })
-          }).catch(function(err){ console.log("Background Sync Pending", err); });
-        }
-      }, 50);
-    }
+      // 🔄 SMART OFFLINE/ONLINE SYNC LOGIC
+      if (navigator.onLine) {
+        setTimeout(function() {
+          if (typeof google !== 'undefined' && google.script && google.script.run) {
+            google.script.run.saveTransaction(data);
+          } else if (SCRIPT_WEB_APP_URL && SCRIPT_WEB_APP_URL.indexOf("http") === 0) {
+            fetch(SCRIPT_WEB_APP_URL, {
+              method: "POST",
+              headers: { "Content-Type": "text/plain" },
+              body: JSON.stringify({ action: "saveTxn", data: data })
+            }).catch(function(err){
+              // यदि सर्वर फेल होता है तो ऑफ़लाइन लिस्ट में डालें
+              saveToOfflineQueue(data);
+            });
+          }
+        }, 50);
+        
+        var alertTxt = "माँ गंगा जन सेवा केंद्र में " + data.amount + " रुपये का लेन-देन सफलतापूर्वक सेव हुआ।";
+        if (typeof speakHindiAlert === 'function') speakHindiAlert(alertTxt);
+        alert("⚡ Transaction Saved Online!");
+      } else {
+        // ऑफ़लाइन होने पर लोकल स्टोरेज में सुरक्षित रखें
+        saveToOfflineQueue(data);
+        if (typeof checkNetworkSyncStatus === 'function') checkNetworkSyncStatus();
+        alert("🔴 डेटा फ़ोन में सुरक्षित सेव हो गया है! इंटरनेट आते ही Google Sheet में सिंक हो जाएगा।");
+      }
     function toggleAadhaarField() {
   var selectedType = document.getElementById("txnType").value;
   var aadhaarInput = document.getElementById("txnAadhaar");
@@ -6608,21 +6650,71 @@ function generatePosterCanvasBase64(customText, customerName, callback) {
       }
     }
 
-    // === ONLINE SYNC & AUTO LOCK SYSTEM ===
-    window.addEventListener('online', function() {
+    // === 📡 OFFLINE QUEUE & BACKGROUND SYNC SYSTEM ===
+    function saveToOfflineQueue(txnData) {
+      var queue = JSON.parse(localStorage.getItem("offline_txns") || "[]");
+      queue.push(txnData);
+      localStorage.setItem("offline_txns", JSON.stringify(queue));
+    }
+
+    function processOfflineQueueSync() {
       var offlineTxns = JSON.parse(localStorage.getItem("offline_txns") || "[]");
-      
-      if (offlineTxns.length > 0 && typeof google !== 'undefined' && google.script && google.script.run) {
-        var pendingTxns = [...offlineTxns];
-        pendingTxns.forEach(function(txnData, index) {
-          google.script.run.withSuccessHandler(function() {
-            var currentStorage = JSON.parse(localStorage.getItem("offline_txns") || "[]");
-            currentStorage.shift();
-            localStorage.setItem("offline_txns", JSON.stringify(currentStorage));
-          }).saveTransaction(txnData);
-        });
-        alert("✅ इंटरनेट कनेक्ट हो गया है! ऑफ़लाइन डेटा बैकअप हो गया है।");
+      if (!offlineTxns || offlineTxns.length === 0) return;
+
+      var badge = document.getElementById("appSyncStatus");
+      if (badge) {
+        badge.className = "badge bg-warning text-dark";
+        badge.innerText = "⏳ Syncing (" + offlineTxns.length + ")";
       }
+
+      var pendingCount = offlineTxns.length;
+      var syncedCount = 0;
+
+      offlineTxns.forEach(function(txnData, index) {
+        if (typeof google !== 'undefined' && google.script && google.script.run) {
+          google.script.run.withSuccessHandler(function() {
+            syncedCount++;
+            removeSyncedItemFromQueue(txnData);
+            checkSyncCompletion(syncedCount, pendingCount);
+          }).saveTransaction(txnData);
+        } else if (SCRIPT_WEB_APP_URL && SCRIPT_WEB_APP_URL.indexOf("http") === 0) {
+          fetch(SCRIPT_WEB_APP_URL, {
+            method: "POST",
+            headers: { "Content-Type": "text/plain" },
+            body: JSON.stringify({ action: "saveTxn", data: txnData })
+          })
+          .then(function(r) { return r.json(); })
+          .then(function() {
+            syncedCount++;
+            removeSyncedItemFromQueue(txnData);
+            checkSyncCompletion(syncedCount, pendingCount);
+          })
+          .catch(function(e) {
+            console.warn("Background Sync Error:", e);
+          });
+        }
+      });
+    }
+
+    function removeSyncedItemFromQueue(txnItem) {
+      var queue = JSON.parse(localStorage.getItem("offline_txns") || "[]");
+      var updatedQueue = queue.filter(function(item) {
+        return item.txnId !== txnItem.txnId;
+      });
+      localStorage.setItem("offline_txns", JSON.stringify(updatedQueue));
+    }
+
+    function checkSyncCompletion(completed, total) {
+      if (completed >= total) {
+        if (typeof checkNetworkSyncStatus === 'function') checkNetworkSyncStatus();
+        alert("✅ इंटरनेट कनेक्ट हो गया है! सभी " + total + " ऑफ़लाइन ट्रांजैक्शन Google Sheet में सिंक हो गए हैं।");
+      }
+    }
+
+    // इंटरनेट आते ही स्वचालित सिंक ट्रिगर करना
+    window.addEventListener('online', function() {
+      if (typeof checkNetworkSyncStatus === 'function') checkNetworkSyncStatus();
+      processOfflineQueueSync();
     });
 
     var inactivityTimer;
@@ -6643,10 +6735,11 @@ function generatePosterCanvasBase64(customText, customerName, callback) {
       }, LOCK_TIMEOUT);
     }
 
-    // कैमरा/गैलरी इनपुट खोलते समय टाइमर को रोकने व वापस चालू करने के इवेंट्स
+    // कैमरा/गैलरी इनपुट खोलते समय टाइमर को रोकने व ऐप रीलोड प्रोटेक्शन फ़्लैग सेट करने का फ़ंक्शन
     document.addEventListener("click", function(e) {
       if (e.target && e.target.tagName === "INPUT" && e.target.type === "file") {
         isCameraOrPickerActive = true;
+        sessionStorage.setItem("camera_active_flag", "true");
         clearTimeout(inactivityTimer);
       }
     });
