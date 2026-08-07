@@ -1931,16 +1931,56 @@ function fixDriveImageUrl(url) {
     return url;
 }
 
-    // XSS सुरक्षित करने के लिए टेक्स्ट एस्केप helper
-function escapeHtml(text) {
-  if (!text) return '-';
-  return String(text)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-}
+    // 🛡️ XSS सुरक्षित करने के लिए ग्लोबल टेक्स्ट एस्केप helper
+    function escapeHtml(text) {
+      if (!text) return '-';
+      return String(text)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    // 📑 फॉर्म लिस्ट की UI स्क्रीन पर दिखाना (Fixed escapeHtml integration)
+    function renderDocHubFormsUI(list) {
+      var container = document.getElementById("docHubFormsContainer");
+      if (!container) return;
+
+      if (!list || list.length === 0) {
+        container.innerHTML = '<div class="text-center text-muted py-4">कोई फ़ॉर्म नहीं मिला। ऊपर <b>+ नया फ़ॉर्म जोड़ें</b> दबाएँ।</div>';
+        return;
+      }
+
+      var html = "";
+      list.forEach(function(item, idx) {
+        var safeTitle = escapeHtml(item.title);
+        var safeDesc = escapeHtml(item.desc);
+
+        html += '<div class="col-12 doc-hub-card-item" data-title="' + (item.title || '').toLowerCase() + '">' +
+          '<div class="p-2.5 border rounded-3 bg-light shadow-sm">' +
+            '<div class="d-flex align-items-center justify-content-between mb-2">' +
+              '<div class="d-flex align-items-center gap-2">' +
+                '<span class="fs-4">📝</span>' +
+                '<div>' +
+                  '<strong class="d-block text-dark" style="font-size:11.5px;">' + safeTitle + '</strong>' +
+                  '<small class="text-muted" style="font-size:9px;">' + safeDesc + '</small>' +
+                '</div>' +
+              '</div>' +
+              '<div class="d-flex gap-1">' +
+                '<button type="button" class="btn btn-sm btn-outline-primary py-0 px-1.5 fw-bold" style="font-size:9px; border-radius:6px;" onclick="editCustomDocHubItem(' + idx + ')" title="नाम / फ़ाइल बदलें">✏️ एडिट</button>' +
+                '<button type="button" class="btn btn-sm btn-outline-danger py-0 px-1.5 fw-bold" style="font-size:9px; border-radius:6px;" onclick="deleteCustomDocHubItem(' + idx + ')" title="हटाएं">🗑️</button>' +
+              '</div>' +
+            '</div>' +
+            '<div class="d-flex justify-content-end">' +
+              '<button type="button" class="btn btn-sm btn-primary fw-bold py-1 px-3" style="font-size:10px; border-radius:8px;" onclick="openCscDocHubUrl(\'' + item.url + '\')">📄 खोलें / प्रिंट करें</button>' +
+            '</div>' +
+          '</div>' +
+        '</div>';
+      });
+
+      container.innerHTML = html;
+    }
 
 function renderTxnHistoryTable() {
     var tbody = document.getElementById("txnHistoryTableBody");
@@ -5181,6 +5221,8 @@ function captureAndUploadStockPhoto(inputEl, itemName) {
         if (typeof checkNetworkSyncStatus === 'function') checkNetworkSyncStatus();
         alert("🔴 डेटा फ़ोन में सुरक्षित सेव हो गया है! इंटरनेट आते ही Google Sheet में सिंक हो जाएगा।");
       }
+    } // <-- यहाँ processTransaction का छूटा हुआ क्लोजिंग ब्रैकेट जोड़ा गया है
+
     function toggleAadhaarField() {
   var selectedType = document.getElementById("txnType").value;
   var aadhaarInput = document.getElementById("txnAadhaar");
