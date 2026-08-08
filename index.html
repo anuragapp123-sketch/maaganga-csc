@@ -683,6 +683,11 @@
           <span class="fs-5">🏠</span>
           <span>Home Dashboard</span>
         </button>
+        <!-- 🛒 New Purchase / Kharid Entry Button -->
+<button type="button" class="drawer-menu-item" onclick="openAppSection('purchase-entry-sec'); loadPurchaseHistory(); closeSideMenu();">
+  <span class="fs-5">🛍️</span>
+  <span>खरीद एंट्री / पर्चा (Purchases)</span>
+</button>
         <button type="button" class="drawer-menu-item" onclick="openAppSection('repairing-sec'); closeSideMenu();">
           <span class="fs-5">🛠️</span>
           <span>रिपेयरिंग जॉब कार्ड (Repair)</span>
@@ -1529,6 +1534,89 @@
           </div>
         </div>
 
+        <!-- 7. NEW PURCHASE / KHARID ENTRY TAB -->
+        <div class="tab-pane" id="purchase-entry-sec">
+          <div class="d-flex align-items-center mb-2">
+            <button class="btn app-back-btn py-1 px-3 fw-bold" onclick="openAppSection('dashboard-home-sec')" style="font-size: 11px;">⬅️ Dashboard</button>
+          </div>
+
+          <!-- Entry Form Card -->
+          <div class="card p-3 shadow-sm border-0 bg-white mb-3" style="border-radius:18px;">
+            <h6 class="fw-bold mb-3 text-primary border-bottom pb-2 d-flex align-items-center justify-content-between" style="font-size: 13px;">
+              <span>🛍️ सामान खरीद व बिल पर्चा एंट्री</span>
+              <span class="badge bg-success" style="font-size: 8px;">AUTO DATE/TIME</span>
+            </h6>
+
+            <div class="row g-2 compact-grid-form">
+              <!-- 1. Saman Type Options -->
+              <div class="col-12">
+                <label class="form-label-sm">📦 सामान का प्रकार (Saman Type) *</label>
+                <select id="purSamanType" class="form-select form-select-sm fw-bold text-primary">
+                  <option value="Kirana">🛒 किराना (Kirana)</option>
+                  <option value="Electronics">⚡ इलेक्ट्रॉनिक्स (Electronics)</option>
+                  <option value="Mobile Accessories">📱 मोबाइल एक्सेसरीज (Mobile Accessories)</option>
+                </select>
+              </div>
+
+              <!-- 2. Shop Name -->
+              <div class="col-6">
+                <label class="form-label-sm">🏪 दुकान का नाम (Shop Name) *</label>
+                <input type="text" id="purShopName" class="form-control form-control-sm fw-bold" placeholder="e.g. दिल्ली होलसेल / गुप्ता ट्रेडर्स">
+              </div>
+
+              <!-- 3. Total Amount -->
+              <div class="col-6">
+                <label class="form-label-sm">💵 कुल बिल राशि (Total Amount ₹) *</label>
+                <input type="number" id="purAmount" class="form-control form-control-sm fw-bold text-success" placeholder="0.00">
+              </div>
+
+              <!-- 4. Photo Capture / Upload -->
+              <div class="col-12 mt-2">
+                <label class="form-label-sm text-primary">📷 बिल / पर्चे की फोटो खींचें या अपलोड करें *</label>
+                <input type="file" id="purCamInput" accept="image/*" capture="environment" class="d-none" onchange="previewPurchaseBillPhoto(this)">
+                <input type="file" id="purGalInput" accept="image/*" class="d-none" onchange="previewPurchaseBillPhoto(this)">
+
+                <div class="d-flex align-items-center gap-2 p-2 border rounded-3 bg-light cursor-pointer" onclick="selectPurchasePhotoSource()">
+                  <img id="purBillPreviewImg" src="https://cdn-icons-png.flaticon.com/512/1524/1524855.png" style="width: 46px; height: 46px; border-radius: 8px; object-fit: cover; border: 1.5px solid #cbd5e1;">
+                  <div>
+                    <strong class="d-block text-dark" style="font-size: 11px;">कैमरे या गैलरी से बिल फोटो चुनें</strong>
+                    <small class="text-muted d-block" id="purPhotoStatusText" style="font-size: 9px;">📷 टैप करके पर्चे की फोटो खींचें</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <button type="button" class="btn btn-primary mt-3 w-100 fw-bold py-2 shadow-sm" style="border-radius:12px; font-size:12.5px;" id="savePurBtn" onclick="processSavePurchaseRecord()">
+              💾 खरीद रिकॉर्ड सेव करें (Save Purchase)
+            </button>
+          </div>
+
+          <!-- Purchase History List Card -->
+          <div class="card p-3 shadow-sm border-0 bg-white" style="border-radius:18px;">
+            <div class="d-flex justify-content-between align-items-center mb-2 border-bottom pb-2">
+              <h6 class="fw-bold text-dark m-0" style="font-size: 12px;">📋 पिछली खरीददारी का रिकॉर्ड (Purchase History)</h6>
+              <button type="button" class="btn btn-sm btn-outline-primary py-0 px-2 fw-bold" style="font-size:9px;" onclick="loadPurchaseHistory()">🔄 रिफ्रेश</button>
+            </div>
+
+            <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+              <table class="table table-sm table-bordered align-middle mb-0" style="font-size: 10px;">
+                <thead class="table-dark sticky-top">
+                  <tr>
+                    <th>पर्चा</th>
+                    <th>तारीख व समय</th>
+                    <th>सामान प्रकार</th>
+                    <th>दुकान का नाम</th>
+                    <th>कुल राशि</th>
+                  </tr>
+                </thead>
+                <tbody id="purchaseHistoryTableBody">
+                  <tr><td colspan="5" class="text-center text-muted py-2">कोई खरीद रिकॉर्ड नहीं मिला।</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
         <!-- 6. FESTIVAL & GREETINGS TAB (HD POSTER BANNER GENERATOR) -->
         <div class="tab-pane" id="greeting-sec">
           <div class="d-flex align-items-center mb-2">
@@ -2227,36 +2315,36 @@ function openTxnDetailsModal(index) {
     var item = globalTxnHistory[index];
     if(!item) return;
 
+    // सही फील्ड्स के अनुसार लिंक फिक्स करना
     var profileImgSrc = fixDriveImageUrl(item.receiverPhoto);
     var slipImgSrc = fixDriveImageUrl(item.slipPhoto);
     var sigImgSrc = fixDriveImageUrl(item.signature);
 
     var slipHtml = (item.slipPhoto && item.slipPhoto.length > 20) 
-      ? '<img src="' + slipImgSrc + '" class="modal-doc-img mt-1 cursor-pointer" onclick="viewFullImageZoom(\'' + slipImgSrc + '\', \'Transaction Slip\')" title="टैप करके बड़ा देखें" onerror="this.alt=\'Image Load Error\'">' 
+      ? '<img src="' + slipImgSrc + '" class="modal-doc-img mt-1 cursor-pointer" onclick="viewFullImageZoom(\'' + slipImgSrc + '\', \'Transaction Slip\')" title="टैप करके बड़ा देखें" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/847/847969.png\'">' 
       : '<small class="text-muted d-block mt-1">Not Uploaded</small>';
 
     var sigHtml = (item.signature && item.signature.length > 20) 
-      ? '<img src="' + sigImgSrc + '" class="modal-doc-img mt-1 cursor-pointer" style="background:#fff;" onclick="viewFullImageZoom(\'' + sigImgSrc + '\', \'Customer Signature\')" title="टैप करके बड़ा देखें" onerror="this.alt=\'No Signature\'">' 
+      ? '<img src="' + sigImgSrc + '" class="modal-doc-img mt-1 cursor-pointer" style="background:#fff;" onclick="viewFullImageZoom(\'' + sigImgSrc + '\', \'Customer Signature\')" title="टैप करके बड़ा देखें" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/847/847969.png\'">' 
       : '<small class="text-muted d-block mt-1">No Signature</small>';
 
-    var serviceDetails = item.method || item.remarks || item.summary || item.type || 'General Transaction';
-    
-    // गूगल शीट या लोकल सेशन से यूज़रनेम ऑटो-चेक करने का लॉजिक
-    var entryUser = item.entryDoneBy || item.entrydoneby || item.user || (currentLoggedInUser && currentLoggedInUser.name ? currentLoggedInUser.name : "Anurag Shakya");
+    // नया Remark फ़ील्ड उठाना
+    var remarkText = item.remark || item.remarks || item.method || item.type || 'General Transaction';
+    var entryUser = item.entryDoneBy || item.entrydoneby || (currentLoggedInUser && currentLoggedInUser.name ? currentLoggedInUser.name : "Anurag Shakya");
 
     var html = '<div class="text-center mb-3">' +
-      '<img src="' + profileImgSrc + '" class="modal-profile-img mb-1 cursor-pointer" onclick="viewFullImageZoom(\'' + profileImgSrc + '\', \'' + (item.name || 'Customer') + '\')" title="टैप करके बड़ा देखें" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/847/847969.png\'">' +
-      '<h6 class="fw-bold text-dark m-0">' + (item.name || 'Customer Name') + '</h6>' +
-      '<small class="text-primary fw-bold d-block mb-0.5">📱 Mo: ' + (item.mobile || '-') + '</small>' +
-      '<small class="text-muted">' + (item.date || '-') + '</small>' +
+      '<img src="' + profileImgSrc + '" class="modal-profile-img mb-1 cursor-pointer" onclick="viewFullImageZoom(\'' + profileImgSrc + '\', \'' + (escapeHtml(item.name) || 'Customer') + '\')" title="टैप करके बड़ा देखें" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/847/847969.png\'">' +
+      '<h6 class="fw-bold text-dark m-0">' + (escapeHtml(item.name) || 'Customer Name') + '</h6>' +
+      '<small class="text-primary fw-bold d-block mb-0.5">📱 Mo: ' + (escapeHtml(item.mobile) || '-') + '</small>' +
+      '<small class="text-muted">' + (escapeHtml(item.date) || '-') + '</small>' +
     '</div>' +
     '<div class="card p-2 border-0 bg-white shadow-sm" style="font-size:12px;">' +
-      '<div class="d-flex justify-content-between border-bottom pb-1 mb-2"><span class="text-muted">Transaction Type:</span><span class="badge ' + (item.type==='Deposit' || item.type==='UPI Received'?'bg-success':'bg-danger') + '">' + item.type + '</span></div>' +
+      '<div class="d-flex justify-content-between border-bottom pb-1 mb-2"><span class="text-muted">Transaction Type:</span><span class="badge ' + (item.type==='Deposit' || item.type==='UPI Received'?'bg-success':'bg-danger') + '">' + escapeHtml(item.type) + '</span></div>' +
       '<div class="d-flex justify-content-between border-bottom pb-1 mb-2"><span class="text-muted">Amount:</span><strong class="text-primary fs-6">Rs. ' + (item.amount || 0) + '</strong></div>' +
-      '<div class="d-flex justify-content-between border-bottom pb-1 mb-2"><span class="text-muted">Gateway:</span><strong>' + (item.gateway || '-') + '</strong></div>' +
-      '<div class="d-flex justify-content-between border-bottom pb-1 mb-2"><span class="text-muted">Txn / UTR ID:</span><strong class="text-success">' + (item.txnId || '-') + '</strong></div>' +
-      '<div class="d-flex justify-content-between border-bottom pb-1 mb-2"><span class="text-muted">Respond By:</span><strong class="text-dark">' + entryUser + '</strong></div>' +
-      '<div class="border-bottom pb-2 mb-2"><span class="text-muted d-block mb-1">🛠️ Service / Other Details:</span><div class="p-2 bg-light rounded text-dark fw-bold" style="font-size:11px;">' + serviceDetails + '</div></div>' +
+      '<div class="d-flex justify-content-between border-bottom pb-1 mb-2"><span class="text-muted">Gateway:</span><strong>' + escapeHtml(item.gateway || '-') + '</strong></div>' +
+      '<div class="d-flex justify-content-between border-bottom pb-1 mb-2"><span class="text-muted">Txn / UTR ID:</span><strong class="text-success">' + escapeHtml(item.txnId || '-') + '</strong></div>' +
+      '<div class="d-flex justify-content-between border-bottom pb-1 mb-2"><span class="text-muted">Respond By:</span><strong class="text-dark">' + escapeHtml(entryUser) + '</strong></div>' +
+      '<div class="border-bottom pb-2 mb-2"><span class="text-muted d-block mb-1">💬 Remark / Details:</span><div class="p-2 bg-light rounded text-dark fw-bold" style="font-size:11px;">' + escapeHtml(remarkText) + '</div></div>' +
       '<div class="row text-center mt-2">' +
         '<div class="col-6 border-end"><strong>📄 Transaction Slip</strong><br>' + slipHtml + '<small class="d-block text-muted" style="font-size:8px;">🔍 टैप करके बड़ा देखें</small></div>' +
         '<div class="col-6"><strong>✍️ Customer Signature</strong><br>' + sigHtml + '<small class="d-block text-muted" style="font-size:8px;">🔍 टैप करके बड़ा देखें</small></div>' +
@@ -2431,7 +2519,7 @@ function downloadTxnReceiptPDF(index) {
           docFileRef: docBase64 || "",
           customerPhoto: custPhotoBase64 || "",
           signature: currentDocSigBase64 || "",
-          entryDoneBy: (currentLoggedInUser && currentLoggedInUser.name) ? currentLoggedInUser.name : "Maa Ganga CSC User",
+          entryDoneBy: (typeof currentLoggedInUser !== 'undefined' && currentLoggedInUser && currentLoggedInUser.name) ? currentLoggedInUser.name : (localStorage.getItem("mg_csc_user_session") ? JSON.parse(localStorage.getItem("mg_csc_user_session")).name : "Anurag Shakya"),
           mobileName: (navigator.userAgent.indexOf("Android") !== -1) ? "Android Mobile App" : "Web Browser"
         };
 
@@ -2695,16 +2783,24 @@ function downloadTxnReceiptPDF(index) {
     }
 
     function parseDateObj(dateStr) {
-      if(!dateStr) return new Date(0);
-      var cleanStr = String(dateStr).trim().split(' ')[0]; // केवल तारीख लें, समय हटा दें
-      var parts = cleanStr.split('/');
-      if(parts.length === 3) {
-        var day = parseInt(parts[0], 10);
-        var month = parseInt(parts[1], 10) - 1;
-        var year = parseInt(parts[2], 10);
-        return new Date(year, month, day);
+      if (!dateStr) return new Date(0);
+      var str = String(dateStr).trim().split(' ')[0];
+      
+      // DD/MM/YYYY or DD-MM-YYYY
+      var parts = str.split(/[\/\.-]/);
+      if (parts.length === 3) {
+        var p1 = parseInt(parts[0], 10);
+        var p2 = parseInt(parts[1], 10) - 1;
+        var p3 = parseInt(parts[2], 10);
+        
+        // Handle YYYY-MM-DD
+        if (p1 > 1000) return new Date(p1, p2, p3);
+        // Handle DD/MM/YYYY
+        return new Date(p3, p2, p1);
       }
-      return new Date(dateStr);
+      
+      var d = new Date(dateStr);
+      return isNaN(d.getTime()) ? new Date(0) : d;
     }
 
     function isDateMatchFilter(dateStr, filterType) {
@@ -3011,7 +3107,7 @@ function downloadTxnReceiptPDF(index) {
       }
     }
 
-    // 🔒 लॉगिन स्क्रीन दिखाने व ऑटो-नंबर भरने का स्मार्ट फ़ंक्शन
+    // 🔒 लॉगिन स्क्रीन दिखाने व ऑटो-नंबर भरने का स्मार्ट फ़ंक्शन (ऑटो-फ़िंगरप्रिंट के साथ)
     function showLoginScreen() {
       var overlay = document.getElementById("appLoginOverlay");
       if (overlay) overlay.style.display = "flex";
@@ -3061,6 +3157,13 @@ function downloadTxnReceiptPDF(index) {
 
       if (typeof checkBiometricAvailability === 'function') {
         checkBiometricAvailability();
+      }
+
+      // 🚀 ऑटोमैटिक फ़िंगरप्रिंट स्कैनर चालू करें (यदि यूजर पहले से लॉगिन है)
+      if (savedUser && typeof loginWithBiometrics === 'function') {
+        setTimeout(function() {
+          loginWithBiometrics();
+        }, 300);
       }
     }
 
@@ -4387,7 +4490,7 @@ function sendModalDetailsToWhatsApp() {
           balance: invBalance.toFixed(2),
           proofUrl: proofUrl || "",
           date: new Date().toLocaleDateString(),
-          entryDoneBy: (currentLoggedInUser && currentLoggedInUser.name) ? currentLoggedInUser.name : "Maa Ganga CSC User",
+          entryDoneBy: (typeof currentLoggedInUser !== 'undefined' && currentLoggedInUser && currentLoggedInUser.name) ? currentLoggedInUser.name : (localStorage.getItem("mg_csc_user_session") ? JSON.parse(localStorage.getItem("mg_csc_user_session")).name : "Anurag Shakya"),
           mobileName: (navigator.userAgent.indexOf("Android") !== -1) ? "Android Mobile App" : "Web Browser"
         };
 
@@ -4620,57 +4723,61 @@ function sendModalDetailsToWhatsApp() {
       calcTotal();
     }
 
-    // === 📍 100% HIGH-PRECISION GPS & SATELLITE GEOCODING ===
-    function autoSyncLocation() {
-      if (navigator.geolocation) {
-        var geoOptions = {
-          enableHighAccuracy: true, // सैटेलाइट GPS चिप को एक्टिवेट करेगा
-          timeout: 20000,           // सटीक फिक्स के लिए 20 सेकंड का समय
-          maximumAge: 0             // पुराना कैश्ड लोकेशन न उठाए, ताज़ा GPS लें
-        };
+    // === 📍 100% HIGH-PRECISION SATELLITE GPS & GEOLOCATION ===
+function autoSyncLocation() {
+  if (navigator.geolocation) {
+    var geoOptions = {
+      enableHighAccuracy: true, // 📡 सैटेलाइट GPS चिप को एक्टिवेट करेगा (±3 से 10 मीटर सटीकता)
+      timeout: 15000,           // 15 सेकंड तक सबसे सटीक सिग्नल का इंतज़ार करेगा
+      maximumAge: 0             // 🚫 पुरानी कैश्ड लोकेशन नहीं लेगा, बिल्कुल ताज़ा GPS लेगा
+    };
 
-        navigator.geolocation.getCurrentPosition(
-          function(pos) {
-            var lat = pos.coords.latitude;
-            var lng = pos.coords.longitude;
-            var accuracy = pos.coords.accuracy ? Math.round(pos.coords.accuracy) : 0;
+    // लोकेशन ट्रैकिंग शुरू
+    navigator.geolocation.getCurrentPosition(
+      function(pos) {
+        var lat = pos.coords.latitude;
+        var lng = pos.coords.longitude;
+        var accuracy = pos.coords.accuracy ? Math.round(pos.coords.accuracy) : 0;
 
-            // कोऑर्डिनेट्स और सटीकता का सटीक फ़ॉर्मेट
-            var gpsMeta = "Lat: " + lat.toFixed(6) + "°, Lng: " + lng.toFixed(6) + "° (सटीकता: ±" + accuracy + " मीटर)";
-            currentLocation = "Kerawali, Mainpuri | " + gpsMeta;
+        var gpsMeta = "Lat: " + lat.toFixed(6) + "°, Lng: " + lng.toFixed(6) + "° (सटीकता: ±" + accuracy + "m)";
+        
+        // 1. ओपनस्ट्रीटमैप (Nominatim Free API) से पता निकालें
+        var osmUrl = "https://nominatim.openstreetmap.org/reverse?lat=" + lat + "&lon=" + lng + "&format=json&accept-language=hi";
 
-            // ओपनस्ट्रीटमैप रिवर्स जियोकोडिंग (सटीक दुकान/गाँव का नाम ढूँढने के लिए)
-            var osmUrl = "https://nominatim.openstreetmap.org/reverse?lat=" + lat + "&lon=" + lng + "&format=json&accept-language=hi";
+        fetch(osmUrl, {
+          headers: { 'User-Agent': 'MaaGangaCSCApp/2.0' }
+        })
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+          if (data && data.address) {
+            var a = data.address;
+            // गांव, कस्बा, रोड या लैंडमार्क नाम निकालना
+            var place = a.village || a.suburb || a.town || a.road || a.city || "Kerawali";
+            var district = a.state_district || a.county || "Mainpuri";
+            var state = a.state || "Uttar Pradesh";
+            var postcode = a.postcode ? (" - " + a.postcode) : "";
 
-            fetch(osmUrl, {
-              headers: { 'User-Agent': 'MaaGangaCSCApp/2.0' }
-            })
-              .then(function(res) { return res.json(); })
-              .then(function(data) {
-                if (data && data.display_name) {
-                  currentLocation = data.display_name + " [" + gpsMeta + "]";
-                } else if (data && data.address) {
-                  var a = data.address;
-                  var place = a.village || a.suburb || a.town || a.city || "Kerawali";
-                  var dist = a.state_district || a.county || "Mainpuri";
-                  currentLocation = place + ", " + dist + " [" + gpsMeta + "]";
-                }
-              })
-              .catch(function(e) {
-                console.warn("Geocode fetch warning:", e);
-              });
-          },
-          function(err) {
-            console.warn("GPS Error Code " + err.code + ": " + err.message);
-            // यदि GPS सिग्नल कमजोर हो तो यूजर को सचेत करें
-            currentLocation = "Kerawali, Mainpuri, Uttar Pradesh 205261 (GPS सिग्नल कमज़ोर / कृपया बाहर जाएँ)";
-          },
-          geoOptions
-        );
-      } else {
-        currentLocation = "Kerawali, Mainpuri, Uttar Pradesh 205261 (Location Unsupported)";
-      }
-    }
+            // बिल्कुल साफ़ और सटीक लोकेशन फॉर्मेट
+            currentLocation = place + ", " + district + ", " + state + postcode + " [" + gpsMeta + "]";
+          } else {
+            currentLocation = "Kerawali, Mainpuri [" + gpsMeta + "]";
+          }
+        })
+        .catch(function(e) {
+          // अगर API फ़ेल हो जाए तो सटीक Lat/Lng तो रहेगा ही
+          currentLocation = "Kerawali, Mainpuri [" + gpsMeta + "]";
+        });
+      },
+      function(err) {
+        console.warn("GPS Warning (" + err.code + "): " + err.message);
+        currentLocation = "Kerawali, Mainpuri Road, Uttar Pradesh (GPS सिग्नल कमज़ोर है)";
+      },
+      geoOptions
+    );
+  } else {
+    currentLocation = "Kerawali, Mainpuri (GPS Unsupported)";
+  }
+}
 
     // === 📱 HARDWARE BACK BUTTON & FORM CLEAR HELPERS ===
     window.addEventListener('popstate', function() { 
@@ -4792,10 +4899,14 @@ function sendModalDetailsToWhatsApp() {
         html += '<div class="card p-2.5 border-0 shadow-sm bg-white" style="border-radius: 16px !important; transition: transform 0.15s ease;">' +
           '<div class="d-flex align-items-center gap-2.5">' +
             
-            // Product Photo Box with Direct Camera Input
-            '<div class="position-relative flex-shrink-0 cursor-pointer" onclick="document.getElementById(\'camInput_' + safeId + '\').click()">' +
-              '<img id="stockImg_' + safeId + '" src="' + itemImg + '" style="width: 58px; height: 58px; border-radius: 12px; object-fit: cover; border: 1.5px solid #e2e8f0; background: #f8fafc;" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/1524/1524855.png\'">' +
-              '<span class="position-absolute bottom-0 end-0 bg-dark text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 18px; height: 18px; font-size: 9px; opacity: 0.85;">📷</span>' +
+            // Product Photo Box with Separate Click Handlers
+            '<div class="position-relative flex-shrink-0">' +
+              '<!-- 1. फोटो पर क्लिक करने से बड़ी फोटो खुलेगी -->' +
+              '<img id="stockImg_' + safeId + '" src="' + itemImg + '" class="cursor-pointer" style="width: 58px; height: 58px; border-radius: 12px; object-fit: cover; border: 1.5px solid #e2e8f0; background: #f8fafc;" onclick="viewFullImageZoom(\'' + itemImg + '\', \'' + safeName + '\')" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/1524/1524855.png\'" title="ज़ूम करके देखें">' +
+              
+              '<!-- 2. छोटे कैमरा आइकॉन पर क्लिक करने से कैमरा खुलेगा -->' +
+              '<span class="position-absolute bottom-0 end-0 bg-dark text-white rounded-circle d-flex align-items-center justify-content-center cursor-pointer shadow-sm" style="width: 22px; height: 22px; font-size: 10px; opacity: 0.95; z-index: 2;" onclick="document.getElementById(\'camInput_' + safeId + '\').click()" title="फोटो खींचें">📷</span>' +
+              
               '<input type="file" id="camInput_' + safeId + '" accept="image/*" capture="environment" class="d-none" onchange="captureAndUploadStockPhoto(this, \'' + safeName + '\')">' +
             '</div>' +
 
@@ -5039,33 +5150,48 @@ function captureAndUploadStockPhoto(inputEl, itemName) {
         reader.onload = function(e) {
           var img = new Image();
           img.onload = function() {
-            var canvas = document.createElement('canvas');
-            var ctx = canvas.getContext('2d');
-            canvas.width = img.width;
-            canvas.height = img.height;
+            // Max dimension constraint to reduce memory overhead
+            var maxDim = 1000;
+            var width = img.width;
+            var height = img.height;
 
-            ctx.drawImage(img, 0, 0);
+            if (width > maxDim || height > maxDim) {
+              if (width > height) {
+                height = Math.round((height * maxDim) / width);
+                width = maxDim;
+              } else {
+                width = Math.round((width * maxDim) / height);
+                height = maxDim;
+              }
+            }
+
+            var canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            var ctx = canvas.getContext('2d');
+
+            ctx.drawImage(img, 0, 0, width, height);
 
             var now = new Date();
             var line1 = "📅 " + now.toLocaleDateString('en-IN') + " " + now.toLocaleTimeString('en-IN');
             var locText = (currentLocation && currentLocation !== "N/A" && currentLocation !== "Location Unavailable") ? currentLocation : "Maa Ganga CSC, Mainpuri Road";
             var line2 = "📍 " + locText;
 
-            var fontSize = Math.max(16, Math.floor(canvas.width / 28));
+            var fontSize = Math.max(12, Math.floor(width / 32));
             ctx.font = 'bold ' + fontSize + 'px Arial';
-            var lineHeight = fontSize + 10;
-            var boxHeight = (lineHeight * 2) + 25;
+            var lineHeight = fontSize + 8;
+            var boxHeight = (lineHeight * 2) + 16;
 
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
-            ctx.fillRect(0, canvas.height - boxHeight, canvas.width, boxHeight);
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
+            ctx.fillRect(0, height - boxHeight, width, boxHeight);
 
             ctx.fillStyle = '#FFD700';
-            ctx.fillText(line1, 20, canvas.height - boxHeight + lineHeight + 4);
+            ctx.fillText(line1, 12, height - boxHeight + lineHeight + 2);
 
             ctx.fillStyle = '#FFFFFF';
-            ctx.fillText(line2, 20, canvas.height - 15);
+            ctx.fillText(line2, 12, height - 8);
 
-            receiverImageBase64 = canvas.toDataURL('image/jpeg', 0.85);
+            receiverImageBase64 = canvas.toDataURL('image/jpeg', 0.65); // Compressed ratio
             var previewImg = document.getElementById("nativePreviewImg");
             if (previewImg) previewImg.src = receiverImageBase64;
           };
@@ -5093,57 +5219,55 @@ function captureAndUploadStockPhoto(inputEl, itemName) {
       }
     }
 
-    if(sigCanvas) {
-  // Helper to get touch/mouse coordinates
-  function getPos(e) {
-    var rect = sigCanvas.getBoundingClientRect();
-    var clientX = e.touches && e.touches.length > 0 ? e.touches[0].clientX : e.clientX;
-    var clientY = e.touches && e.touches.length > 0 ? e.touches[0].clientY : e.clientY;
-    
-    // Canvas scaling and scroll resolution adjustment
-    var scaleX = sigCanvas.width / rect.width;
-    var scaleY = sigCanvas.height / rect.height;
+    if (sigCanvas) {
+    function getPos(e) {
+      var rect = sigCanvas.getBoundingClientRect();
+      var touch = (e.touches && e.touches[0]) ? e.touches[0] : (e.changedTouches ? e.changedTouches[0] : e);
+      var scaleX = sigCanvas.width / (rect.width || 1);
+      var scaleY = sigCanvas.height / (rect.height || 1);
 
-    return { 
-      x: (clientX - rect.left) * scaleX, 
-      y: (clientY - rect.top) * scaleY 
-    };
-  }
-
-  function startDrawing(e) {
-    e.preventDefault();
-    drawing = true;
-    if (sigCtx) {
-      var pos = getPos(e);
-      sigCtx.beginPath();
-      sigCtx.moveTo(pos.x, pos.y);
+      return { 
+        x: Math.max(0, Math.min(sigCanvas.width, (touch.clientX - rect.left) * scaleX)), 
+        y: Math.max(0, Math.min(sigCanvas.height, (touch.clientY - rect.top) * scaleY)) 
+      };
     }
-  }
 
-  function draw(e) {
-    e.preventDefault();
-    if (drawing && sigCtx) {
+    function startDrawing(e) {
+      if (e.cancelable) e.preventDefault();
+      drawing = true;
+      if (sigCtx) {
+        var pos = getPos(e);
+        sigCtx.beginPath();
+        sigCtx.lineCap = 'round';
+        sigCtx.lineJoin = 'round';
+        sigCtx.moveTo(pos.x, pos.y);
+      }
+    }
+
+    function draw(e) {
+      if (!drawing || !sigCtx) return;
+      if (e.cancelable) e.preventDefault();
       var pos = getPos(e);
       sigCtx.lineTo(pos.x, pos.y);
       sigCtx.stroke();
     }
+
+    function stopDrawing(e) {
+      if (e.cancelable) e.preventDefault();
+      drawing = false;
+      if (sigCtx) sigCtx.closePath();
+    }
+
+    sigCanvas.onmousedown = startDrawing;
+    sigCanvas.onmousemove = draw;
+    sigCanvas.onmouseup = stopDrawing;
+    sigCanvas.onmouseleave = stopDrawing;
+
+    sigCanvas.addEventListener("touchstart", startDrawing, { passive: false });
+    sigCanvas.addEventListener("touchmove", draw, { passive: false });
+    sigCanvas.addEventListener("touchend", stopDrawing, { passive: false });
+    sigCanvas.addEventListener("touchcancel", stopDrawing, { passive: false });
   }
-
-  function stopDrawing(e) {
-    e.preventDefault();
-    drawing = false;
-  }
-
-  // Mouse Events
-  sigCanvas.onmousedown = startDrawing;
-  sigCanvas.onmousemove = draw;
-  sigCanvas.onmouseup = stopDrawing;
-
-  // Touch Events (For Mobile/Android)
-  sigCanvas.addEventListener("touchstart", startDrawing, { passive: false });
-  sigCanvas.addEventListener("touchmove", draw, { passive: false });
-  sigCanvas.addEventListener("touchend", stopDrawing, { passive: false });
-}
 
     function clearSignature() {
       if(sigCtx && sigCanvas) sigCtx.clearRect(0, 0, sigCanvas.width, sigCanvas.height);
@@ -5297,7 +5421,7 @@ function captureAndUploadStockPhoto(inputEl, itemName) {
         receiverPhoto: receiverImageBase64 || "",
         signature: sigData || "",
         date: formattedDateTime,
-        entryDoneBy: (currentLoggedInUser && currentLoggedInUser.name) ? currentLoggedInUser.name : "Maa Ganga CSC User",
+        entryDoneBy: (typeof currentLoggedInUser !== 'undefined' && currentLoggedInUser && currentLoggedInUser.name) ? currentLoggedInUser.name : (localStorage.getItem("mg_csc_user_session") ? JSON.parse(localStorage.getItem("mg_csc_user_session")).name : "Anurag Shakya"),
         mobileName: (navigator.userAgent.indexOf("Android") !== -1) ? "Android Mobile App" : "Web Browser"
       };
 
@@ -6333,8 +6457,152 @@ function generateInvoicePDFBase64(data, callback) {
 
   </div>
 
-  <!-- 🚨 यहाँ छूटा हुआ <script> टैग जोड़ा गया है -->
   <script>
+    // === 🛍️ PURCHASE / KHARID ENTRY LOGIC (FIXED & GLOBAL) ===
+    var purchaseBillImageBase64 = "";
+    var globalPurchaseHistory = [];
+
+    window.selectPurchasePhotoSource = function() {
+      var html = '<div class="text-center p-2">' +
+        '<small class="fw-bold text-muted d-block mb-3" style="font-size:11px;">पर्चे/बिल की फोटो खींचने का माध्यम चुनें:</small>' +
+        '<div class="d-flex flex-column gap-2">' +
+          '<button type="button" class="btn btn-primary fw-bold py-2.5" style="font-size:12px; border-radius:10px;" onclick="closeModalPopup(); setTimeout(function(){ var el = document.getElementById(\'purCamInput\'); if(el) el.click(); }, 200);">📷 कैमरे से पर्चा खींचें (Camera)</button>' +
+          '<button type="button" class="btn btn-outline-primary fw-bold py-2.5" style="font-size:12px; border-radius:10px;" onclick="closeModalPopup(); setTimeout(function(){ var el = document.getElementById(\'purGalInput\'); if(el) el.click(); }, 200);">🖼️ गैलरी से बिल चुनें (Gallery)</button>' +
+        '</div>' +
+      '</div>';
+
+      showModalPopup("📷 Choose Bill Photo Source", html);
+    };
+
+    window.previewPurchaseBillPhoto = function(input) {
+      if (input.files && input.files[0]) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+          purchaseBillImageBase64 = e.target.result;
+          var img = document.getElementById("purBillPreviewImg");
+          var txt = document.getElementById("purPhotoStatusText");
+          if (img) img.src = purchaseBillImageBase64;
+          if (txt) {
+            txt.innerText = "✅ पर्चे की फोटो सेट हो गई!";
+            txt.className = "text-success fw-bold d-block";
+          }
+        };
+        reader.readAsDataURL(input.files[0]);
+      }
+    };
+
+    window.processSavePurchaseRecord = function() {
+      var samanTypeEl = document.getElementById("purSamanType");
+      var shopNameEl = document.getElementById("purShopName");
+      var amountEl = document.getElementById("purAmount");
+
+      var samanType = samanTypeEl ? samanTypeEl.value : "Kirana";
+      var shopName = shopNameEl ? shopNameEl.value.trim() : "";
+      var amount = amountEl ? amountEl.value.trim() : "";
+
+      if (!shopName) return alert("⚠️ कृपया दुकान का नाम दर्ज करें!");
+      if (!amount || parseFloat(amount) <= 0) return alert("⚠️ कृपया सही बिल राशि दर्ज करें!");
+      if (!purchaseBillImageBase64) return alert("⚠️ कृपया बिल/पर्चे की फोटो अपलोड करें या कैमरे से खींचें!");
+
+      var btn = document.getElementById("savePurBtn");
+      if (btn) { btn.innerText = "⏳ सेव हो रहा है..."; btn.disabled = true; }
+
+      var nowStr = new Date().toLocaleDateString('en-IN') + ' ' + new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
+
+      var record = {
+        id: "PUR-" + Math.floor(100000 + Math.random() * 900000),
+        date: nowStr,
+        samanType: samanType,
+        shopName: shopName,
+        amount: amount,
+        billPhoto: purchaseBillImageBase64,
+        entryDoneBy: (typeof currentLoggedInUser !== 'undefined' && currentLoggedInUser && currentLoggedInUser.name) ? currentLoggedInUser.name : (localStorage.getItem("mg_csc_user_session") ? JSON.parse(localStorage.getItem("mg_csc_user_session")).name : "Anurag Shakya")
+      };
+
+      globalPurchaseHistory.unshift(record);
+      renderPurchaseHistoryTable();
+
+      if (shopNameEl) shopNameEl.value = "";
+      if (amountEl) amountEl.value = "";
+      var previewImg = document.getElementById("purBillPreviewImg");
+      var statusTxt = document.getElementById("purPhotoStatusText");
+      if (previewImg) previewImg.src = "https://cdn-icons-png.flaticon.com/512/1524/1524855.png";
+      if (statusTxt) {
+        statusTxt.innerText = "📷 टैप करके पर्चे की फोटो खींचें";
+        statusTxt.className = "text-muted d-block";
+      }
+      purchaseBillImageBase64 = "";
+
+      if (btn) { btn.innerText = "💾 खरीद रिकॉर्ड सेव करें (Save Purchase)"; btn.disabled = false; }
+
+      if (typeof google !== 'undefined' && google.script && google.script.run) {
+        google.script.run.savePurchaseRecord(record);
+      } else if (typeof SCRIPT_WEB_APP_URL !== 'undefined' && SCRIPT_WEB_APP_URL) {
+        fetch(SCRIPT_WEB_APP_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain" },
+          body: JSON.stringify({ action: "savePurchase", data: record })
+        }).catch(function(e){});
+      }
+
+      alert("✅ खरीददारी का बिल और फोटो सफलतापूर्वक सेव हो गया!");
+    };
+
+    window.loadPurchaseHistory = function() {
+      if (typeof google !== 'undefined' && google.script && google.script.run) {
+        google.script.run.withSuccessHandler(function(res) {
+          try {
+            var data = typeof res === 'string' ? JSON.parse(res) : res;
+            if (Array.isArray(data) && data.length > 0) {
+              globalPurchaseHistory = data;
+              renderPurchaseHistoryTable();
+            }
+          } catch(e){}
+        }).getPurchaseHistory();
+      }
+    };
+
+    window.renderPurchaseHistoryTable = function() {
+      var tbody = document.getElementById("purchaseHistoryTableBody");
+      if (!tbody) return;
+
+      if (!globalPurchaseHistory || globalPurchaseHistory.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-2">कोई खरीद रिकॉर्ड नहीं मिला।</td></tr>';
+        return;
+      }
+
+      var html = "";
+      globalPurchaseHistory.forEach(function(row, idx) {
+        var billImg = fixDriveImageUrl(row.billPhoto) || "";
+        var shopNameStr = escapeHtml(row.shopName || '-');
+
+        var imgHtml = '<span class="text-muted">No Img</span>';
+
+        if (row.billPhoto && row.billPhoto.length > 20) {
+          imgHtml = '<img src="' + billImg + '" style="width:30px; height:30px; border-radius:6px; object-fit:cover; border:1px solid #cbd5e1;" class="cursor-pointer" onclick="openPurchaseImgModal(' + idx + ')" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/1524/1524855.png\'">';
+        }
+
+        html += '<tr class="align-middle">' +
+          '<td class="text-center" style="padding:3px;">' + imgHtml + '</td>' +
+          '<td style="white-space:nowrap;">' + escapeHtml(row.date || '-') + '</td>' +
+          '<td><span class="badge bg-info text-dark" style="font-size:8.5px;">' + escapeHtml(row.samanType || '-') + '</span></td>' +
+          '<td class="fw-bold text-dark">' + shopNameStr + '</td>' +
+          '<td class="fw-bold text-success">₹' + escapeHtml(row.amount || 0) + '</td>' +
+        '</tr>';
+      });
+
+      tbody.innerHTML = html;
+    };
+
+    window.openPurchaseImgModal = function(idx) {
+      var row = globalPurchaseHistory[idx];
+      if (!row) return;
+      var billImg = fixDriveImageUrl(row.billPhoto);
+      var shopName = row.shopName || "Bill Photo";
+      if (typeof viewFullImageZoom === 'function') {
+        viewFullImageZoom(billImg, "Bill Photo - " + shopName);
+      }
+    };
     // === SIDE DRAWER MENU TOGGLE FUNCTIONS ===
     window.openSideMenu = function() {
       var drawer = document.getElementById("sideDrawerMenu");
@@ -6860,10 +7128,31 @@ function generatePosterCanvasBase64(customText, customerName, callback) {
     }
 
     // === 📡 OFFLINE QUEUE & BACKGROUND SYNC SYSTEM ===
+    function safeLocalStorageSet(key, valueString) {
+      try {
+        localStorage.setItem(key, valueString);
+      } catch (e) {
+        if (e.name === 'QuotaExceededError' || e.code === 22) {
+          console.warn('LocalStorage limit reached. Purging old cache...');
+          // Clear non-critical caches
+          localStorage.removeItem("cache_doc_history");
+          localStorage.removeItem("cache_stock_data");
+          try {
+            localStorage.setItem(key, valueString);
+          } catch (retryErr) {
+            console.error('LocalStorage write completely failed:', retryErr);
+          }
+        }
+      }
+    }
+
     function saveToOfflineQueue(txnData) {
-      var queue = JSON.parse(localStorage.getItem("offline_txns") || "[]");
+      var queue = [];
+      try {
+        queue = JSON.parse(localStorage.getItem("offline_txns") || "[]");
+      } catch (e) { queue = []; }
       queue.push(txnData);
-      localStorage.setItem("offline_txns", JSON.stringify(queue));
+      safeLocalStorageSet("offline_txns", JSON.stringify(queue));
     }
 
     function processOfflineQueueSync() {
