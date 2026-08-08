@@ -3159,8 +3159,8 @@ function downloadTxnReceiptPDF(index) {
         checkBiometricAvailability();
       }
 
-      // 🚀 ऑटोमैटिक फ़िंगरप्रिंट स्कैनर चालू करें (यदि यूजर पहले से लॉगिन है)
-      if (savedUser && typeof loginWithBiometrics === 'function') {
+      // 🚀 ऑटोमैटिक फ़िंगरप्रिंट स्कैनर चालू करें (केवल तब जब डिवाइस बायोमेट्रिक सपोर्ट करता हो)
+      if (savedUser && window.PublicKeyCredential && typeof loginWithBiometrics === 'function') {
         setTimeout(function() {
           loginWithBiometrics();
         }, 300);
