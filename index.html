@@ -776,23 +776,29 @@
         <!-- 0. MAIN DASHBOARD HOME -->
         <div class="tab-pane active" id="dashboard-home-sec">
           
-          <!-- Ultra-Stylish Modern User Welcome Profile Banner with Clickable Permanent Avatar -->
-          <div class="stylish-welcome-card p-3 mb-3 border-0 position-relative overflow-hidden d-flex align-items-center justify-content-between shadow-sm" style="border-radius: 20px; background: linear-gradient(135deg, #ffffff 0%, #eff6ff 100%); border-left: 5px solid #2563eb !important;">
-            <div class="d-flex align-items-center gap-3 z-1">
-              <!-- 📷 क्लिक करके अपनी फोटो बदलने के लिए अवतार बॉक्स -->
-              <div class="user-avatar-box rounded-circle position-relative d-flex align-items-center justify-content-center overflow-hidden cursor-pointer" onclick="selectUserAvatarPhoto()" style="width: 52px; height: 52px; border: 2.5px solid #2563eb; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25); background: #ffffff;" title="प्रोफाइल फोटो बदलने के लिए टैप करें">
+          <!-- Perfect Spacing Modern Welcome Banner -->
+          <div class="stylish-welcome-card p-2.5 mb-2.5 border-0 position-relative overflow-hidden shadow-sm" style="border-radius: 18px; background: linear-gradient(135deg, #ffffff 0%, #eff6ff 100%); border-left: 5px solid #2563eb !important;">
+            <!-- gap-3.5 से फ़ोटो और टेक्स्ट के बीच परफेक्ट दूरी बन जाएगी -->
+            <div class="d-flex align-items-center gap-3.5 z-1">
+              <!-- 📷 1. बाईं तरफ गोल प्रोफाइल फोटो (70x70 px) -->
+              <div class="user-avatar-box rounded-circle position-relative d-flex align-items-center justify-content-center overflow-hidden cursor-pointer flex-shrink-0" onclick="selectUserAvatarPhoto()" style="width: 70px; height: 70px; border: 3px solid #2563eb; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.22); background: #ffffff;" title="प्रोफाइल फोटो बदलने के लिए टैप करें">
                 <img id="appLoggedInUserAvatar" src="https://cdn-icons-png.flaticon.com/512/847/847969.png" style="width: 100%; height: 100%; object-fit: cover;" alt="User Avatar">
-                <span class="badge bg-primary position-absolute bottom-0 end-0 p-1" style="font-size: 8px; border-radius: 50%; z-index: 3;">📷</span>
+                <span class="badge bg-primary position-absolute bottom-0 end-0 p-1" style="font-size: 8px; border-radius: 50%; z-index: 3; border: 1.5px solid #fff;">📷</span>
                 <span class="status-online-dot position-absolute top-0 end-0 bg-success border border-white rounded-circle" style="width: 11px; height: 11px; z-index: 3;"></span>
               </div>
 
-              <!-- 📁 फोटो सेलेक्ट करने के लिए हिडन इनपुट -->
+              <!-- 📁 फोटो इनपुट -->
               <input type="file" id="userAvatarCamInput" accept="image/*" capture="user" class="d-none" onchange="handleUserAvatarUpload(this)">
               <input type="file" id="userAvatarGalInput" accept="image/*" class="d-none" onchange="handleUserAvatarUpload(this)">
-              <div>
-                <span class="stylish-greeting-badge badge bg-primary bg-opacity-10 text-primary fw-extrabold mb-1" id="timeBasedGreetingBadge" style="font-size: 9.5px; letter-spacing: 0.5px; border-radius: 6px; padding: 4px 8px;">✨ Welcome</span>
-                <h5 class="fw-extrabold m-0 text-dark user-dynamic-name" id="appLoggedInUserName" style="font-size: 1.15rem; letter-spacing: -0.3px; font-weight: 800;">Welcome User Ji</h5>
-                <small class="text-primary d-block fw-bold mt-1" id="userLiveLocationText" style="font-size: 9.5px; letter-spacing: 0.2px;">📍 Location: Location Fetching...</small>
+
+              <!-- 📝 2. फोटो से थोड़ा हटकर बैलेंस्ड डिटेल्स -->
+              <div class="flex-grow-1 min-w-0 ms-1">
+                <div class="d-flex align-items-center justify-content-between mb-0.5">
+                  <h5 class="fw-extrabold m-0 text-dark user-dynamic-name text-truncate" id="appLoggedInUserName" style="font-size: 1.1rem; letter-spacing: -0.3px; font-weight: 800; line-height: 1.2;">User Ji</h5>
+                  <!-- ग्रीटिंग बैज राइट कॉर्नर में सुंदर दिखेगा -->
+                  <span class="stylish-greeting-badge badge bg-primary bg-opacity-10 text-primary fw-bold flex-shrink-0 ms-1" id="timeBasedGreetingBadge" style="font-size: 8.5px; letter-spacing: 0.2px; border-radius: 6px; padding: 3px 6px;">🌆 Good Evening</span>
+                </div>
+                <small class="text-primary d-block fw-bold" id="userLiveLocationText" style="font-size: 9px; letter-spacing: 0.1px; line-height: 1.3;">📍 Location: Fetching...</small>
               </div>
             </div>
           </div>
@@ -2011,20 +2017,36 @@
         .replace(/'/g, "&#039;");
     }
 
-    // ⚡ INSTANT USER NAME & PHOTO LOAD ON REFRESH (पेज रीफ्रेश होते ही फोटो और नाम तुरंत लोड करने के लिए)
+    // ⚡ INSTANT USER NAME, PHOTO & TIME GREETING LOAD ON REFRESH
 (function() {
   try {
     var savedUser = localStorage.getItem("mg_csc_user_session");
     var savedPhoto = localStorage.getItem("mg_csc_user_photo");
 
     document.addEventListener("DOMContentLoaded", function() {
-      // 1. रिफ्रेश होते ही प्रोफाइल फोटो तुरंत सेट करें
+      // 1. समय के अनुसार ऑटोमैटिक Good Morning / Afternoon / Evening सेट करें
+      var hour = new Date().getHours();
+      var greetingTimeText = "✨ Good Morning";
+      if (hour >= 12 && hour < 17) {
+        greetingTimeText = "☀️ Good Afternoon";
+      } else if (hour >= 17 && hour < 22) {
+        greetingTimeText = "🌆 Good Evening";
+      } else if (hour >= 22 || hour < 5) {
+        greetingTimeText = "🌙 Good Night";
+      }
+
+      var greetingBadgeEl = document.getElementById("timeBasedGreetingBadge");
+      if (greetingBadgeEl) {
+        greetingBadgeEl.innerText = greetingTimeText;
+      }
+
+      // 2. रिफ्रेश होते ही प्रोफाइल फोटो तुरंत सेट करें
       var avatarEl = document.getElementById("appLoggedInUserAvatar");
       if (avatarEl && savedPhoto && savedPhoto.length > 20) {
         avatarEl.src = savedPhoto;
       }
 
-      // 2. रिफ्रेश होते ही यूजर का नाम तुरंत सेट करें
+      // 3. रिफ्रेश होते ही यूजर का नाम तुरंत सेट करें
       if (savedUser) {
         var parsedUser = JSON.parse(savedUser);
         if (parsedUser && parsedUser.name) {
@@ -2033,7 +2055,7 @@
           }).join(' ');
 
           var nameEl = document.getElementById("appLoggedInUserName");
-          if (nameEl) nameEl.innerText = 'Welcome "' + formattedName + ' Ji"';
+          if (nameEl) nameEl.innerText = formattedName + ' Ji';
         }
       }
     });
@@ -2923,67 +2945,105 @@ function downloadTxnReceiptPDF(index) {
       var canvas = document.getElementById("businessAnalyticsChart");
       if (!canvas || typeof Chart === 'undefined') return;
 
-      // पिछले 6 महीनों का डेटा तैयार करना
       var monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-      var monthlyTotals = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
       var now = new Date();
-      var currentYear = now.getFullYear();
 
+      // पिछले 6 महीनों के लिए ऐरे और मैपिंग तैयार करना
+      var chartLabels = [];
+      var monthlySalesMap = {};
+
+      for (var i = 5; i >= 0; i--) {
+        var targetDate = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        var mName = monthNames[targetDate.getMonth()];
+        var yr = targetDate.getFullYear();
+        var key = yr + "_" + targetDate.getMonth();
+        
+        chartLabels.push(mName);
+        monthlySalesMap[key] = { labelIndex: 5 - i, total: 0 };
+      }
+
+      // 🔄 सभी Invoices का डेटा सटीक महीनों में जोड़ना
       (globalInvoiceHistory || []).forEach(function(inv) {
         if (inv.date) {
           var d = parseDateObj(inv.date);
-          if (d.getFullYear() === currentYear) {
-            var mIdx = d.getMonth();
-            monthlyTotals[mIdx] += parseFloat(inv.total || 0);
+          var key = d.getFullYear() + "_" + d.getMonth();
+          if (monthlySalesMap[key] !== undefined) {
+            monthlySalesMap[key].total += parseFloat(inv.total || 0);
           }
         }
       });
 
-      // केवल पिछले 6 महीनों के लेबल्स दिखाना
-      var chartLabels = [];
-      var chartData = [];
-      for (var i = 5; i >= 0; i--) {
-        var dIdx = new Date(now.getFullYear(), now.getMonth() - i, 1).getMonth();
-        chartLabels.push(monthNames[dIdx]);
-        chartData.push(monthlyTotals[dIdx]);
-      }
+      // 🔄 सभी Transactions (Deposit / Received) का डेटा भी बिक्री/कमाई में जोड़ना
+      (globalTxnHistory || []).forEach(function(txn) {
+        if (txn.date) {
+          var d = parseDateObj(txn.date);
+          var key = d.getFullYear() + "_" + d.getMonth();
+          var tType = String(txn.type || '').toLowerCase();
+          
+          if (monthlySalesMap[key] !== undefined && (tType.includes('deposit') || tType.includes('received'))) {
+            monthlySalesMap[key].total += parseFloat(txn.amount || 0);
+          }
+        }
+      });
+
+      var chartData = new Array(6).fill(0);
+      Object.keys(monthlySalesMap).forEach(function(k) {
+        var item = monthlySalesMap[k];
+        chartData[item.labelIndex] = item.total;
+      });
 
       var ctx = canvas.getContext("2d");
 
       if (myAnalyticsChart) {
-        myAnalyticsChart.destroy(); // पुराना ग्राफ साफ़ करें
+        myAnalyticsChart.destroy(); // पुराने चार्ट को साफ़ करें
       }
 
+      // ✨ नया स्मूथ और रेस्पॉन्सिव चार्ट जनरेट करें
       myAnalyticsChart = new Chart(ctx, {
         type: 'line',
         data: {
           labels: chartLabels,
           datasets: [{
-            label: 'बिक्री (₹)',
+            label: 'कुल बिक्री व कमाई (₹)',
             data: chartData,
             borderColor: '#2563eb',
-            backgroundColor: 'rgba(37, 99, 235, 0.1)',
+            backgroundColor: 'rgba(37, 99, 235, 0.12)',
             fill: true,
-            tension: 0.3,
-            borderWidth: 2.5,
-            pointRadius: 4,
-            pointBackgroundColor: '#1d4ed8'
+            tension: 0.35,
+            borderWidth: 3,
+            pointRadius: 5,
+            pointHoverRadius: 7,
+            pointBackgroundColor: '#1d4ed8',
+            pointBorderColor: '#ffffff',
+            pointBorderWidth: 2
           }]
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
           plugins: {
-            legend: { display: false }
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return ' कुल बिक्री: ₹' + context.raw.toLocaleString('en-IN');
+                }
+              }
+            }
           },
           scales: {
             x: {
               grid: { display: false },
-              ticks: { font: { size: 9, weight: 'bold' } }
+              ticks: { font: { size: 10, weight: 'bold' }, color: '#475569' }
             },
             y: {
+              beginAtZero: true,
               grid: { color: '#f1f5f9' },
-              ticks: { font: { size: 9 }, callback: function(v){ return '₹' + v; } }
+              ticks: { 
+                font: { size: 9 }, 
+                color: '#64748b',
+                callback: function(v){ return '₹' + v; } 
+              }
             }
           }
         }
@@ -3372,12 +3432,12 @@ function downloadTxnReceiptPDF(index) {
         reader.onload = function(e) {
           var img = new Image();
           img.onload = function() {
-            // कैनवास रिसाइज (180x180 px) ताकि मेमोरी लोड न हो
+            // बड़ी HD फ़ोटो रिसाइज़िंग (250x250 px)
             var canvas = document.createElement('canvas');
-            canvas.width = 180;
-            canvas.height = 180;
+            canvas.width = 250;
+            canvas.height = 250;
             var ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0, 180, 180);
+            ctx.drawImage(img, 0, 0, 250, 250);
 
             // कंप्रेस्ड Base64 डेटा
             var base64Photo = canvas.toDataURL('image/jpeg', 0.85);
@@ -3405,29 +3465,7 @@ function downloadTxnReceiptPDF(index) {
         return word.charAt(0).toUpperCase() + word.slice(1);
       }).join(' ');
 
-      // 🖼️ लोकल स्टोरेज से सेव की गई परमानेंट फोटो लोड करना
-      var savedPhoto = localStorage.getItem("mg_csc_user_photo");
-      var avatarEl = document.getElementById("appLoggedInUserAvatar");
-      if (avatarEl) {
-        if (savedPhoto && savedPhoto.length > 20) {
-          avatarEl.src = savedPhoto;
-        } else {
-          avatarEl.src = "https://cdn-icons-png.flaticon.com/512/847/847969.png";
-        }
-      }
-
-      // 🖼️ लोकल स्टोरेज से सेव की गई परमानेंट फोटो लोड करना
-      var savedPhoto = localStorage.getItem("mg_csc_user_photo");
-      var avatarEl = document.getElementById("appLoggedInUserAvatar");
-      if (avatarEl) {
-        if (savedPhoto && savedPhoto.length > 20) {
-          avatarEl.src = savedPhoto;
-        } else {
-          avatarEl.src = "https://cdn-icons-png.flaticon.com/512/847/847969.png";
-        }
-      }
-
-      // समय के अनुसार dynamic greeting संदेश तय करें
+      // समय के अनुसार बैज में सटीक ग्रीटिंग तय करें
       var hour = new Date().getHours();
       var greetingTimeText = "✨ Good Morning";
       if (hour >= 12 && hour < 17) {
@@ -3438,19 +3476,26 @@ function downloadTxnReceiptPDF(index) {
         greetingTimeText = "🌙 Good Night";
       }
 
-      // 1. बैज में ग्रीटिंग सेट करें (जैसे: ☀️ Good Afternoon)
+      // 1. बैज में साफ इमोजी सेट करें
       var greetingBadgeEl = document.getElementById("timeBasedGreetingBadge");
       if (greetingBadgeEl) {
-        greetingBadgeEl.innerText = greetingTimeText;
+        greetingBadgeEl.innerHTML = greetingTimeText;
       }
 
-      // 2. वेलकम कार्ड पर नाम को 'Welcome "Name Ji"' के फॉर्मेट में सेट करें
+      // 2. बिना कोट्स के नाम सेट करें
       var nameEl = document.getElementById("appLoggedInUserName");
       if (nameEl) {
-        nameEl.innerText = 'Welcome "' + formattedName + ' Ji"';
+        nameEl.innerText = formattedName + ' Ji';
       }
 
-      // 3. लॉगिन स्क्रीन ग्रीटिंग बॉक्स पर नाम अपडेट करें
+      // 3. फोटो रिस्टोर
+      var savedPhoto = localStorage.getItem("mg_csc_user_photo");
+      var avatarEl = document.getElementById("appLoggedInUserAvatar");
+      if (avatarEl && savedPhoto && savedPhoto.length > 20) {
+        avatarEl.src = savedPhoto;
+      }
+
+      // 4. लॉगिन स्क्रीन ग्रीटिंग बॉक्स
       var savedNameText = document.getElementById("savedUserNameText");
       if (savedNameText) {
         savedNameText.innerText = formattedName;
@@ -5492,7 +5537,7 @@ function verifyGpsMandatory(onSuccess) {
           '<b>कदम 1:</b> अपने फ़ोन का ऊपर का पर्दा खींचकर <b>Location (GPS)</b> ऑन करें।<br>' +
           '<b>कदम 2:</b> नीचे दिए गए <b>"🔄 रिफ़्रेश करें"</b> बटन पर टैप करें।' +
         '</div>' +
-        '<button type="button" class="btn btn-primary w-100 fw-bold py-2" style="border-radius:10px;" onclick="verifyGpsMandatory(onSuccess)">🔄 लोकेशन ऑन करके रिफ़्रेश करें</button>' +
+        '<button type="button" class="btn btn-primary w-100 fw-bold py-2" style="border-radius:10px;" onclick="verifyGpsMandatory()">🔄 लोकेशन ऑन करके रिफ़्रेश करें</button>' +
       '</div>';
 
       showModalPopup("🚨 GPS Location Required", alertHtml);
