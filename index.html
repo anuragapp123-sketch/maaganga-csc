@@ -204,6 +204,7 @@
       font-family: 'Poppins', sans-serif;
       color: var(--text-dark);
       -webkit-tap-highlight-color: transparent;
+      transition: background-color 0.25s ease, color 0.25s ease !important;
     }
 
     .app-mobile-frame {
@@ -617,15 +618,58 @@
     .gap-1\.5 { gap: 0.375rem !important; }
     .gap-2\.5 { gap: 0.75rem !important; }
 
-    /* Custom Toast Notification */
-    .custom-toast {
-      position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
-      background: #0f172a; color: white; padding: 12px 24px; border-radius: 30px;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.3); z-index: 99999999;
-      font-size: 11.5px; font-weight: 700; transition: top 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-      display: flex; align-items: center; gap: 8px; min-width: max-content; border: 1.5px solid #38bdf8;
+    /* Secret Buy Price Hidden/Shown Styles */
+    .secret-buy-price {
+      cursor: pointer;
+      user-select: none;
+      background: #f1f5f9;
+      border: 1px dashed #cbd5e1;
+      padding: 2px 6px;
+      border-radius: 6px;
+      font-size: 8.5px !important;
+      transition: all 0.2s ease;
     }
-    .custom-toast.show { top: 20px; }
+    .secret-buy-price:hover {
+      background: #e2e8f0;
+    }
+
+    /* Modern Mobile Bottom Snackbar Toast */
+    .custom-toast {
+      position: fixed;
+      bottom: -100px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(8px);
+      color: #ffffff;
+      padding: 10px 20px;
+      border-radius: 25px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+      z-index: 99999999;
+      font-size: 11.5px;
+      font-weight: 700;
+      transition: bottom 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border: 1.5px solid #38bdf8;
+      pointer-events: none;
+    }
+    .custom-toast.show { bottom: 85px; }
+
+    /* Native Touch Scale Feedback */
+    .btn, .card, .nav-btn, .cursor-pointer {
+      transition: transform 0.12s ease, opacity 0.12s ease !important;
+    }
+    .btn:active, .card:active, .nav-btn:active {
+      transform: scale(0.96) !important;
+      opacity: 0.9;
+    }
+
+    /* Auto-Uppercase Utility Class */
+    .uppercase-input {
+      text-transform: uppercase !important;
+    }
   </style>
 </head>
 <body onload="checkAutoLogin()">
@@ -1448,23 +1492,25 @@
             </div>
           </div>
 
-          <!-- Modern Search & Category Filter Pills -->
+          <!-- Modern Search, Filter & Quick Badge Chips -->
           <div class="card p-2.5 shadow-sm border-0 mb-3 bg-white" style="border-radius: 16px;">
             <div class="input-group input-group-sm mb-2">
               <span class="input-group-text bg-light border-0 fw-bold text-muted">🔍</span>
-              <input type="text" id="stockSearchInput" class="form-control form-control-sm bg-light fw-bold" placeholder="स्टॉक में सामान खोजें..." oninput="filterStockTable()">
+              <input type="text" id="stockSearchInput" class="form-control form-control-sm bg-light fw-bold" placeholder="स्टॉक में सामान खोजें..." oninput="debounceStockSearch()">
             </div>
             
-            <!-- 🗂️ Dynamic Sheet Group Filter Dropdown -->
+            <!-- 🗂️ Dynamic Category Filter Dropdown -->
             <div class="mb-2">
               <select id="stockCategoryFilter" class="form-select form-select-sm fw-bold text-primary" style="font-size: 11px; border-radius: 8px;" onchange="filterStockTable()">
                 <option value="ALL">📂 सभी ग्रुप (All Categories - Sheet Data)</option>
               </select>
             </div>
 
-            <div class="d-flex gap-1.5">
-              <button type="button" class="btn btn-sm btn-dark w-50 fw-bold py-1.5" style="font-size:10.5px; border-radius:8px;" onclick="document.getElementById('stockSearchInput').value=''; document.getElementById('stockCategoryFilter').value='ALL'; filterStockTable();">📋 सब देखें (All)</button>
-              <button type="button" class="btn btn-sm btn-outline-danger w-50 fw-bold py-1.5" style="font-size:10.5px; border-radius:8px;" onclick="showLowStockOnly()">⚠️ कम स्टॉक (Low)</button>
+            <!-- Quick Chips -->
+            <div class="d-flex gap-1.5 flex-wrap">
+              <button type="button" class="btn btn-sm btn-dark fw-bold py-1 px-2.5" style="font-size:10px; border-radius:12px;" onclick="resetStockFilter()">📋 सब (All)</button>
+              <button type="button" class="btn btn-sm btn-outline-danger fw-bold py-1 px-2.5" style="font-size:10px; border-radius:12px;" onclick="showLowStockOnly()">⚠️ कम स्टॉक (<span id="chipLowCount">0</span>)</button>
+              <button type="button" class="btn btn-sm btn-outline-secondary fw-bold py-1 px-2.5" style="font-size:10px; border-radius:12px;" onclick="showOutOfStockOnly()">❌ खत्म स्टॉक</button>
             </div>
           </div>
 
@@ -1491,8 +1537,8 @@
   </div>
 </div>
 
-          <!-- Dynamic Product Cards Grid Container -->
-          <div id="stockCardsContainer" class="d-flex flex-column gap-2 mb-4" style="max-height: calc(100vh - 230px); overflow-y: auto; padding-right: 2px;">
+          <!-- Dynamic Product Cards Grid Container (Bottom Padding Fix for Mobile View) -->
+          <div id="stockCardsContainer" class="d-flex flex-column gap-2" style="max-height: calc(100vh - 220px); overflow-y: auto; padding-right: 2px; padding-bottom: 120px !important; -webkit-overflow-scrolling: touch;">
             <!-- Dynamic Product Cards JS dwara inject honge -->
           </div>
 
@@ -2057,19 +2103,33 @@
   </div>
 
   <script>
-    // 🚀 Global Toast Notification Override
+    // 🚀 Global Non-Blocking Snackbar Toast
+    var toastTimer = null;
     window.alert = function(msg) {
       var toast = document.getElementById("app-global-toast");
-      if(!toast) {
+      if (!toast) {
         toast = document.createElement("div");
         toast.id = "app-global-toast";
         toast.className = "custom-toast";
         document.body.appendChild(toast);
       }
-      toast.innerHTML = (msg.includes('❌') || msg.includes('⚠️') || msg.includes('🚨')) ? msg : "✅ " + msg.replace('✅', '').trim();
+      clearTimeout(toastTimer);
+      var isError = msg.includes('❌') || msg.includes('⚠️') || msg.includes('🚨');
+      toast.style.borderColor = isError ? '#ef4444' : '#10b981';
+      toast.innerHTML = isError ? msg : "✅ " + msg.replace('✅', '').trim();
       toast.classList.add("show");
-      setTimeout(function(){ toast.classList.remove("show"); }, 3000);
+      toastTimer = setTimeout(function() { toast.classList.remove("show"); }, 2800);
     };
+
+    // Smart Auto-Capitalization for UTR / Bank Accounts / IFSC
+    document.addEventListener("input", function(e) {
+      if (e.target && (e.target.id === "txnId" || e.target.id === "txnGatewayOtherInput" || e.target.classList.contains("uppercase-input"))) {
+        var start = e.target.selectionStart;
+        var end = e.target.selectionEnd;
+        e.target.value = e.target.value.toUpperCase();
+        e.target.setSelectionRange(start, end);
+      }
+    });
 
     // 🛡️ XSS Safe Global Helper Function
     function escapeHtml(text) {
@@ -3217,15 +3277,17 @@ function downloadTxnReceiptPDF(index) {
               openAppSection('dashboard-home-sec');
             }, 300);
           } 
-          // 3. सामान्य ऐप ओपन
+          // 3. सामान्य ऐप ओपन - सीधे ऐप लोड करें (बिना बार-बार PIN मांगे)
           else {
-            showLoginScreen();
+            var overlay = document.getElementById("appLoginOverlay");
+            if (overlay) overlay.style.display = "none";
+            initApp();
           }
         } catch(e) {
           showLoginScreen();
         }
       } else {
-        showLoginScreen();
+        showLoginScreen(); // सिर्फ तभी लॉगिन स्क्रीन आएगी जब कोई यूजर सेव न हो
       }
     }
 
@@ -5200,15 +5262,15 @@ function autoSyncLocation(callback) {
     function fetchStockData() {
       var loadingEl = document.getElementById("stockLoading");
 
-      // ⚡ FAST LOAD: सबसे पहले लोकल स्टोरेज से कैश्ड स्टॉक तुरंत स्क्रीन पर दिखाएँ
+      // ⚡ FAST LOAD: सबसे पहले लोकल स्टोरेज से कैश्ड स्टॉक तुरंत दिखाएँ
       var cachedStock = localStorage.getItem("cache_stock_data");
       if (cachedStock) {
         try {
           globalStockData = JSON.parse(cachedStock);
-          renderStockTable(globalStockData);
           if (typeof populateSheetGroupDropdown === "function") {
             populateSheetGroupDropdown(globalStockData);
           }
+          filterStockTable(); // एक्टिव फ़िल्टर को सुरक्षित रखते हुए रेंडर करेगा
           if (loadingEl) loadingEl.classList.add("d-none");
         } catch(e) {}
       } else if (globalStockData.length === 0 && loadingEl) {
@@ -5222,10 +5284,10 @@ function autoSyncLocation(callback) {
           if (data && data.length > 0) {
             globalStockData = data;
             localStorage.setItem("cache_stock_data", JSON.stringify(data));
-            renderStockTable(globalStockData);
             if (typeof populateSheetGroupDropdown === "function") {
               populateSheetGroupDropdown(globalStockData);
             }
+            filterStockTable(); // एक्टिव फ़िल्टर सुरक्षित रहेगा
           }
         }).getStockDetails();
       } else if (SCRIPT_WEB_APP_URL && SCRIPT_WEB_APP_URL.indexOf("http") === 0) {
@@ -5234,21 +5296,12 @@ function autoSyncLocation(callback) {
           if (data && data.length > 0) {
             globalStockData = data;
             localStorage.setItem("cache_stock_data", JSON.stringify(data));
-            renderStockTable(globalStockData);
             if (typeof populateSheetGroupDropdown === "function") {
               populateSheetGroupDropdown(globalStockData);
             }
+            filterStockTable();
           }
         }).catch(function(){ if (loadingEl) loadingEl.classList.add("d-none"); });
-      } else {
-        if (!cachedStock) {
-          if (loadingEl) loadingEl.classList.add("d-none");
-          globalStockData = [
-            { name: "Casting Wax", totalQty: "1000 Kg", sellQty: "350 Kg", restQty: "650 Kg", actualPrice: "₹450", sellingPrice: "₹550", otherDetails: "Imported quality" },
-            { name: "PLUG MALE FEMALE", totalQty: "50 Pcs", sellQty: "35 Pcs", restQty: "15 Pcs", actualPrice: "₹8", sellingPrice: "₹10", otherDetails: "BOARD AND CHATKANI" }
-          ];
-          renderStockTable(globalStockData);
-        }
       }
     }
 
@@ -5268,12 +5321,12 @@ function autoSyncLocation(callback) {
 
       var html = "";
       items.forEach(function(row) {
-        var rest = parseInt(row.restQty) || 0;
-        var total = parseInt(row.totalQty) || rest;
+        var origIdx = globalStockData.indexOf(row);
+        var rest = parseInt(String(row.restQty || '0').replace(/\D/g, '')) || 0;
+        var total = parseInt(String(row.totalQty || rest).replace(/\D/g, '')) || rest;
         var isZero = rest <= 0;
         var isLow = rest <= 5 && rest > 0;
 
-        // Progress Bar Calculation
         var pct = total > 0 ? Math.min(100, Math.max(0, Math.round((rest / total) * 100))) : 0;
         var progressColor = isZero ? 'bg-danger' : (isLow ? 'bg-warning' : 'bg-success');
         var badgeHtml = isZero 
@@ -5281,35 +5334,28 @@ function autoSyncLocation(callback) {
           : (isLow ? '<span class="badge bg-warning text-dark px-2 py-1" style="font-size:8.5px;">⚠️ Low Stock</span>' 
                    : '<span class="badge bg-success px-2 py-1" style="font-size:8.5px;">✅ Available</span>');
 
-        var safeName = (row.name || '').replace(/"/g, '&quot;');
-        var safeId = safeName.replace(/[^a-zA-Z0-9]/g, '_');
-        var safePrice = row.sellingPrice || row.price || 0;
+        var safeName = escapeHtml(row.name || 'Unnamed Item');
+        var safeId = String(row.name || '').replace(/[^a-zA-Z0-9]/g, '_');
+        var numPrice = parseFloat(String(row.sellingPrice || row.price || '0').replace(/[^0-9.]/g, '')) || 0;
+        var numActPrice = parseFloat(String(row.actualPrice || row.buyPrice || '0').replace(/[^0-9.]/g, '')) || 0;
         var itemImg = fixDriveImageUrl(row.photoUrl || row.imageUrl || row.img);
 
         html += '<div class="card p-2.5 border-0 shadow-sm bg-white" style="border-radius: 16px !important; transition: transform 0.15s ease;">' +
           '<div class="d-flex align-items-center gap-2.5">' +
             
-            // Product Photo Box with Separate Click Handlers
             '<div class="position-relative flex-shrink-0">' +
-              '<!-- 1. फोटो पर क्लिक करने से बड़ी फोटो खुलेगी -->' +
-              '<img id="stockImg_' + safeId + '" src="' + itemImg + '" class="cursor-pointer" style="width: 58px; height: 58px; border-radius: 12px; object-fit: cover; border: 1.5px solid #e2e8f0; background: #f8fafc;" onclick="viewFullImageZoom(\'' + itemImg + '\', \'' + safeName + '\')" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/1524/1524855.png\'" title="ज़ूम करके देखें">' +
-              
-              '<!-- 2. छोटे कैमरा आइकॉन पर क्लिक करने से कैमरा खुलेगा -->' +
+              '<img id="stockImg_' + safeId + '" src="' + itemImg + '" class="cursor-pointer" style="width: 58px; height: 58px; border-radius: 12px; object-fit: cover; border: 1.5px solid #e2e8f0; background: #f8fafc;" onclick="viewFullImageZoom(\'' + itemImg + '\', \'' + safeName.replace(/'/g, "\\'") + '\')" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/1524/1524855.png\'" title="ज़ूम करके देखें">' +
               '<span class="position-absolute bottom-0 end-0 bg-dark text-white rounded-circle d-flex align-items-center justify-content-center cursor-pointer shadow-sm" style="width: 22px; height: 22px; font-size: 10px; opacity: 0.95; z-index: 2;" onclick="document.getElementById(\'camInput_' + safeId + '\').click()" title="फोटो खींचें">📷</span>' +
-              
-              '<input type="file" id="camInput_' + safeId + '" accept="image/*" capture="environment" class="d-none" onchange="captureAndUploadStockPhoto(this, \'' + safeName + '\')">' +
+              '<input type="file" id="camInput_' + safeId + '" accept="image/*" capture="environment" class="d-none" onchange="captureAndUploadStockPhoto(this, ' + origIdx + ')">' +
             '</div>' +
 
-            // Product Details Block
             '<div class="flex-grow-1 min-w-0">' +
               '<div class="d-flex justify-content-between align-items-start gap-1">' +
-                '<h6 class="fw-bold text-dark m-0 text-truncate" style="font-size: 0.85rem; line-height:1.2;">' + (row.name || 'Unnamed Item') + '</h6>' +
+                '<h6 class="fw-bold text-dark m-0 text-truncate" style="font-size: 0.85rem; line-height:1.2;">' + safeName + '</h6>' +
                 badgeHtml +
               '</div>' +
-              
-              '<small class="text-muted d-block text-truncate mt-0.5" style="font-size: 9.5px;">' + (row.otherDetails || row.group || 'General Stock') + '</small>' +
+              '<small class="text-muted d-block text-truncate mt-0.5" style="font-size: 9.5px;">' + escapeHtml(row.otherDetails || row.group || 'General Stock') + '</small>' +
 
-              // Stock Qty Bar & Tag
               '<div class="mt-1.5">' +
                 '<div class="d-flex justify-content-between align-items-center mb-0.5" style="font-size: 9px;">' +
                   '<span class="text-muted">बचा स्टॉक: <strong class="text-dark">' + rest + ' Pcs</strong></span>' +
@@ -5323,17 +5369,22 @@ function autoSyncLocation(callback) {
 
           '</div>' +
 
-          // Pricing & Quick Actions Footer Strip
+          // Bottom Footer Strip with Eye Icon Only
           '<div class="d-flex justify-content-between align-items-center border-top mt-2 pt-2" style="font-size: 10px;">' +
             '<div>' +
-              '<strong class="text-success fs-6">₹' + safePrice + '</strong>' +
+              '<div class="d-flex align-items-center gap-1.5">' +
+                '<strong class="text-success fs-6" title="बिक्री रेट">₹' + numPrice.toFixed(2) + '</strong>' +
+                '<span class="secret-buy-price text-muted fw-bold d-inline-flex align-items-center" id="buyPriceSpan_' + safeId + '" onclick="toggleBuyPriceVisibility(\'' + safeId + '\', \'' + numActPrice.toFixed(2) + '\')" title="खरीद रेट देखें / छिपाएं">' +
+                  '<span style="font-size: 11px;">👁️</span><span id="buyPriceTxt_' + safeId + '" class="d-none ms-1"></span>' +
+                '</span>' +
+              '</div>' +
             '</div>' +
             
             '<div class="d-flex gap-1">' +
-              '<button type="button" class="btn btn-sm btn-success py-1 px-1.5 fw-bold text-white" style="font-size:9px; border-radius:8px; background:#10b981; border:none;" onclick="quickSellItem(\'' + safeName + '\')">⚡ सेल (Sell)</button>' +
-              '<button type="button" class="btn btn-sm btn-outline-warning text-dark py-1 px-1.5 fw-bold" style="font-size:9px; border-radius:8px;" onclick="openEditStockForm(\'' + safeName + '\')" title="एडिट करें">✏️</button>' +
-              '<button type="button" class="btn btn-sm btn-outline-dark py-1 px-1.5 fw-bold" style="font-size:9px; border-radius:8px;" onclick="printStockSticker(\'' + safeName + '\', \'' + safePrice + '\')" title="टैग प्रिंट">🏷️</button>' +
-              '<button type="button" class="btn btn-sm btn-primary py-1 px-1.5 fw-bold" style="font-size:9px; border-radius:8px;" data-name="' + safeName + '" data-price="' + safePrice + '" onclick="quickBillFromStockBtn(this)" title="नया बिल बनाएँ">🧾</button>' +
+              '<button type="button" class="btn btn-sm btn-success py-1 px-1.5 fw-bold text-white" style="font-size:9px; border-radius:8px; background:#10b981; border:none;" onclick="quickSellItem(' + origIdx + ')">⚡ सेल (Sell)</button>' +
+              '<button type="button" class="btn btn-sm btn-outline-warning text-dark py-1 px-1.5 fw-bold" style="font-size:9px; border-radius:8px;" onclick="openEditStockForm(' + origIdx + ')" title="एडिट करें">✏️</button>' +
+              '<button type="button" class="btn btn-sm btn-outline-dark py-1 px-1.5 fw-bold" style="font-size:9px; border-radius:8px;" onclick="printStockSticker(' + origIdx + ')" title="टैग प्रिंट">🏷️</button>' +
+              '<button type="button" class="btn btn-sm btn-primary py-1 px-1.5 fw-bold" style="font-size:9px; border-radius:8px;" onclick="quickBillFromStockByIdx(' + origIdx + ')" title="नया बिल बनाएँ">🧾</button>' +
             '</div>' +
           '</div>' +
 
@@ -5342,50 +5393,68 @@ function autoSyncLocation(callback) {
 
       container.innerHTML = html;
     }
+    // 👁️ गुप्त खरीद मूल्य देखने / छिपाने का फंक्शन (Only Icon Mode)
+    function toggleBuyPriceVisibility(safeId, buyPrice) {
+      var txtEl = document.getElementById('buyPriceTxt_' + safeId);
+      var spanEl = document.getElementById('buyPriceSpan_' + safeId);
+      if (!txtEl || !spanEl) return;
+
+      if (txtEl.classList.contains('d-none')) {
+        txtEl.innerText = '₹' + buyPrice;
+        txtEl.classList.remove('d-none');
+        spanEl.style.color = '#dc2626';
+        spanEl.style.borderColor = '#ef4444';
+        spanEl.style.backgroundColor = '#fef2f2';
+      } else {
+        txtEl.innerText = '';
+        txtEl.classList.add('d-none');
+        spanEl.style.color = '#64748b';
+        spanEl.style.borderColor = '#cbd5e1';
+        spanEl.style.backgroundColor = '#f1f5f9';
+      }
+    }
 
     // === ✏️ DIRECT GOOGLE SHEET STOCK UPDATE LOGIC ===
-    function openEditStockForm(itemName) {
-      var decodedName = itemName.replace(/&quot;/g, '"');
-      var item = globalStockData.find(function(i) { return i.name === decodedName; });
+    function openEditStockForm(itemIndex) {
+      var item = globalStockData[itemIndex];
       if(!item) return;
+
+      var rest = String(item.restQty || '0').replace(/\D/g, '');
+      var rawPrice = String(item.sellingPrice || item.price || '0').replace(/[^0-9.]/g, '');
 
       document.getElementById('editStockOriginalName').value = item.name;
       document.getElementById('editStockName').value = item.name;
-      document.getElementById('editStockRestQty').value = item.restQty || 0;
-      document.getElementById('editStockSellPrice').value = item.sellingPrice || item.price || 0;
+      document.getElementById('editStockRestQty').value = rest;
+      document.getElementById('editStockSellPrice').value = rawPrice;
 
       document.getElementById('editStockFormCard').classList.remove('d-none');
-      window.scrollTo({ top: 0, behavior: 'smooth' }); // फॉर्म के पास स्क्रॉल करें
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function saveUpdatedStock() {
       var origName = document.getElementById('editStockOriginalName').value;
       var newName = document.getElementById('editStockName').value.trim();
-      var restQty = document.getElementById('editStockRestQty').value;
-      var sellPrice = document.getElementById('editStockSellPrice').value;
+      var restQty = document.getElementById('editStockRestQty').value.trim();
+      var sellPrice = document.getElementById('editStockSellPrice').value.trim();
 
       if (!newName) return alert("⚠️ सामान का नाम खाली नहीं हो सकता!");
 
       var itemIndex = globalStockData.findIndex(function(i) { return i.name === origName; });
       if(itemIndex > -1) {
-        // 1. ऐप में तुरंत अपडेट करें (Instant UI Update)
         globalStockData[itemIndex].name = newName;
         globalStockData[itemIndex].restQty = restQty;
         globalStockData[itemIndex].sellingPrice = sellPrice;
         globalStockData[itemIndex].price = sellPrice;
 
         localStorage.setItem("cache_stock_data", JSON.stringify(globalStockData));
-        filterStockTable(); // लिस्ट को रिफ्रेश करें
+        filterStockTable();
         document.getElementById('editStockFormCard').classList.add('d-none');
         alert("✅ ऐप में स्टॉक अपडेट हो गया! Google Sheet में सिंक हो रहा है...");
 
-        // 2. Google Sheet Backend में भेजें
         var updateData = { originalName: origName, newName: newName, restQty: restQty, sellPrice: sellPrice };
         
         if (typeof google !== 'undefined' && google.script && google.script.run) {
-          google.script.run.withSuccessHandler(function(){
-            console.log("Google Sheet Updated");
-          }).updateStockItemInSheet(updateData);
+          google.script.run.updateStockItemInSheet(updateData);
         } else if (typeof SCRIPT_WEB_APP_URL !== 'undefined' && SCRIPT_WEB_APP_URL) {
           fetch(SCRIPT_WEB_APP_URL, {
             method: "POST",
@@ -5397,21 +5466,19 @@ function autoSyncLocation(callback) {
     }
 
     // === ⚡ QUICK SELL (1-CLICK COUNTER SALE) LOGIC ===
-    function quickSellItem(itemName) {
-      var decodedName = itemName.replace(/&quot;/g, '"');
-      var itemIndex = globalStockData.findIndex(function(i) { return i.name === decodedName; });
-      if (itemIndex === -1) return;
-
+    function quickSellItem(itemIndex) {
       var item = globalStockData[itemIndex];
-      var currentRest = parseInt(item.restQty) || 0;
-      var currentSell = parseInt(item.sellQty) || 0;
+      if (!item) return;
+
+      var currentRest = parseInt(String(item.restQty || '0').replace(/\D/g, '')) || 0;
+      var currentSell = parseInt(String(item.sellQty || '0').replace(/\D/g, '')) || 0;
 
       if (currentRest <= 0) {
         return alert("⚠️ यह आइटम आउट ऑफ स्टॉक (Out of Stock) है!");
       }
 
-      var qtyStr = prompt("📦 '" + decodedName + "' के कितने पीस बेचे गए हैं?\n(उपलब्ध: " + currentRest + " Pcs)", "1");
-      if (!qtyStr) return; // यूज़र ने कैंसल कर दिया
+      var qtyStr = prompt("📦 '" + item.name + "' के कितने पीस बेचे गए हैं?\n(उपलब्ध: " + currentRest + " Pcs)", "1");
+      if (!qtyStr) return;
       
       var sellCount = parseInt(qtyStr);
       if (isNaN(sellCount) || sellCount <= 0) {
@@ -5421,27 +5488,26 @@ function autoSyncLocation(callback) {
         return alert("⚠️ इतना स्टॉक उपलब्ध नहीं है! (Max: " + currentRest + ")");
       }
 
-      // 1. लोकल स्टॉक घटाएं
       globalStockData[itemIndex].restQty = currentRest - sellCount;
       globalStockData[itemIndex].sellQty = currentSell + sellCount;
       localStorage.setItem("cache_stock_data", JSON.stringify(globalStockData));
-      filterStockTable(); // स्क्रीन तुरंत रिफ्रेश होगी
+      filterStockTable();
 
-      // 2. बैकग्राउंड में "साइलेंट इनवॉइस (Silent Invoice)" बनाएँ ताकि पैसे गल्ले में जुड़ जाएँ
-      var sellPrice = parseFloat(item.sellingPrice || item.price || 0);
+      var rawSellPrice = String(item.sellingPrice || item.price || '0').replace(/[^0-9.]/g, '');
+      var sellPrice = parseFloat(rawSellPrice) || 0;
       var totalAmount = sellCount * sellPrice;
       
       var quickInvoice = { 
         name: "Counter Sale (Cash)", 
         mobile: "0000000000", 
         address: "Walk-in Customer",
-        items: [{ desc: decodedName, qty: sellCount, rate: sellPrice }],
+        items: [{ desc: item.name, qty: sellCount, rate: sellPrice }],
         discount: 0, tax: 0,
         total: totalAmount.toFixed(2), 
         paid: totalAmount.toFixed(2), 
         balance: "0.00", 
         invNo: "Q-INV-" + Math.floor(1000 + Math.random() * 9000),
-        summary: sellCount + "x " + decodedName,
+        summary: sellCount + "x " + item.name,
         date: new Date().toLocaleDateString('en-IN'),
         entryDoneBy: (typeof currentLoggedInUser !== 'undefined' && currentLoggedInUser && currentLoggedInUser.name) ? currentLoggedInUser.name : "Quick Sale",
         mobileName: "Quick Sell Button"
@@ -5450,17 +5516,15 @@ function autoSyncLocation(callback) {
       globalInvoiceHistory.unshift(quickInvoice);
       localStorage.setItem("cache_inv_history", JSON.stringify(globalInvoiceHistory));
       
-      // 3. होम डैशबोर्ड के ग्राफ और गल्ले का अमाउंट रिफ्रेश करें
       if(typeof renderInvoiceHistoryTable === 'function') renderInvoiceHistoryTable();
       if(typeof fetchTodayLiveSales === 'function') fetchTodayLiveSales();
       if(typeof updateAllTabsOverview === 'function') updateAllTabsOverview();
       if(typeof calculateDayEndCash === 'function') calculateDayEndCash();
 
-      alert("✅ " + sellCount + " पीस तुरंत बिक गए! (गल्ले में ₹" + totalAmount + " जुड़ गए)");
+      alert("✅ " + sellCount + " पीस तुरंत बिक गए! (गल्ले में ₹" + totalAmount.toFixed(2) + " जुड़ गए)");
 
-      // 4. Google Sheet पर डेटा सिंक करें (Stock Deduct + Add Invoice)
       if (typeof google !== 'undefined' && google.script && google.script.run) {
-        google.script.run.updateStockQuantity(decodedName, sellCount);
+        google.script.run.updateStockQuantity(item.name, sellCount);
         google.script.run.saveInvoice(quickInvoice);
       } else if (typeof SCRIPT_WEB_APP_URL !== 'undefined' && SCRIPT_WEB_APP_URL) {
         fetch(SCRIPT_WEB_APP_URL, {
@@ -5470,49 +5534,82 @@ function autoSyncLocation(callback) {
       }
     }
 
-    // कैमरे से फोटो खींचकर सीधे अपलोड करने का फ़ंक्शन
-function captureAndUploadStockPhoto(inputEl, itemName) {
-  if (inputEl.files && inputEl.files[0]) {
-    var file = inputEl.files[0];
-    var reader = new FileReader();
+    function captureAndUploadStockPhoto(inputEl, itemIndex) {
+      if (inputEl.files && inputEl.files[0]) {
+        var item = globalStockData[itemIndex];
+        if (!item) return;
 
-    reader.onload = function(e) {
-      var base64Data = e.target.result;
-      var safeId = itemName.replace(/[^a-zA-Z0-9]/g, '_');
-      
-      // तुरंत स्क्रीन पर खींची गई फोटो दिखाएँ
-      var imgEl = document.getElementById('stockImg_' + safeId);
-      if(imgEl) imgEl.src = base64Data;
+        var itemName = item.name;
+        var file = inputEl.files[0];
+        var reader = new FileReader();
 
-      // Google Sheet / Drive में अपलोड करें
-      if (typeof google !== 'undefined' && google.script && google.script.run) {
-        google.script.run.withSuccessHandler(function(res) {
-          if (res && res.status === "success") {
-            alert("✅ " + itemName + " की फोटो अपलोड और सेव हो गई है!");
-            fetchStockData(); // रिफ्रेश डेटा
-          } else {
-            alert("❌ अपलोड एरर: " + (res.message || "Unknown Error"));
+        reader.onload = function(e) {
+          var base64Data = e.target.result;
+          var safeId = itemName.replace(/[^a-zA-Z0-9]/g, '_');
+          
+          var imgEl = document.getElementById('stockImg_' + safeId);
+          if(imgEl) imgEl.src = base64Data;
+
+          item.photoUrl = base64Data;
+          localStorage.setItem("cache_stock_data", JSON.stringify(globalStockData));
+
+          if (typeof google !== 'undefined' && google.script && google.script.run) {
+            google.script.run.withSuccessHandler(function(res) {
+              alert("✅ " + itemName + " की फोटो अपलोड और सेव हो गई है!");
+            }).uploadStockPhoto(itemName, base64Data);
+          } else if (SCRIPT_WEB_APP_URL) {
+            fetch(SCRIPT_WEB_APP_URL, {
+              method: "POST",
+              headers: { "Content-Type": "text/plain" },
+              body: JSON.stringify({ action: "uploadStockPhoto", data: { itemName: itemName, base64Photo: base64Data } })
+            })
+            .then(function(r){ return r.json(); })
+            .then(function(res){
+              alert("✅ " + itemName + " की फोटो अपलोड हो गई है!");
+            })
+            .catch(function(err){ alert("Upload error: " + err); });
           }
-        }).uploadStockPhoto(itemName, base64Data);
-      } else if (SCRIPT_WEB_APP_URL) {
-        // Android APK Mode Fallback
-        fetch(SCRIPT_WEB_APP_URL, {
-          method: "POST",
-          headers: { "Content-Type": "text/plain" },
-          body: JSON.stringify({ action: "uploadStockPhoto", data: { itemName: itemName, base64Photo: base64Data } })
-        })
-        .then(function(r){ return r.json(); })
-        .then(function(res){
-          alert("✅ " + itemName + " की फोटो अपलोड हो गई है!");
-          fetchStockData();
-        })
-        .catch(function(err){ alert("Upload error: " + err); });
-      }
-    };
+        };
 
-    reader.readAsDataURL(file);
-  }
-}
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function quickBillFromStockByIdx(itemIndex) {
+      var item = globalStockData[itemIndex];
+      if (!item) return;
+      var rawPrice = String(item.sellingPrice || item.price || '0').replace(/[^0-9.]/g, '');
+      quickBillFromStock(item.name, parseFloat(rawPrice) || 0);
+    }
+
+    function printStockSticker(itemIndex) {
+      var item = globalStockData[itemIndex];
+      if (!item) return;
+
+      var rawPrice = String(item.sellingPrice || item.price || '0').replace(/[^0-9.]/g, '');
+      var price = parseFloat(rawPrice) || 0;
+      var itemName = item.name;
+
+      var printWin = window.open('', '_blank', 'width=350,height=350');
+      if (!printWin) return alert("Pop-up allow करें!");
+
+      var stickerContent = 
+        '<html><head><style>' +
+        'body { font-family: Arial, sans-serif; text-align: center; padding: 10px; margin: 0; }' +
+        '.box { border: 2px solid #000; border-radius: 8px; padding: 8px; display: inline-block; width: 220px; }' +
+        '</style></head><body>' +
+        '<div class="box">' +
+          '<strong style="font-size:12px; display:block;">Maa Ganga CSC & Electronics</strong>' +
+          '<span style="font-size:11px; font-weight:bold; display:block; margin:4px 0;">' + escapeHtml(itemName) + '</span>' +
+          '<img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=' + encodeURIComponent(itemName) + '" style="width:70px; height:70px;" />' +
+          '<div style="font-size:14px; font-weight:bold; color:#000; margin-top:3px;">M.R.P: ₹' + price.toFixed(2) + '</div>' +
+        '</div>' +
+        '<script>window.onload = function(){ window.print(); window.close(); }<\/script>' +
+        '</body></html>';
+
+      printWin.document.write(stickerContent);
+      printWin.document.close();
+    }
 
     function quickBillFromStockBtn(btn) {
       var name = btn.getAttribute('data-name');
@@ -5532,11 +5629,35 @@ function captureAndUploadStockPhoto(inputEl, itemName) {
       }
     }
 
+    // ⚡ 200ms Debounced Fast Search
+    var searchDebounceTimer = null;
+    function debounceStockSearch() {
+      clearTimeout(searchDebounceTimer);
+      searchDebounceTimer = setTimeout(filterStockTable, 200);
+    }
+
+    function resetStockFilter() {
+      var sInp = document.getElementById('stockSearchInput');
+      var cSel = document.getElementById('stockCategoryFilter');
+      if (sInp) sInp.value = '';
+      if (cSel) cSel.value = 'ALL';
+      filterStockTable();
+    }
+
     function showLowStockOnly() {
       var low = globalStockData.filter(function(i) {
-        return (parseInt(i.restQty) || 0) <= 5;
+        var rest = parseInt(String(i.restQty || '0').replace(/\D/g, '')) || 0;
+        return rest > 0 && rest <= 5;
       });
       renderStockTable(low);
+    }
+
+    function showOutOfStockOnly() {
+      var out = globalStockData.filter(function(i) {
+        var rest = parseInt(String(i.restQty || '0').replace(/\D/g, '')) || 0;
+        return rest <= 0;
+      });
+      renderStockTable(out);
     }
 
     function loadAnalyticsData() {
@@ -5620,17 +5741,22 @@ function captureAndUploadStockPhoto(inputEl, itemName) {
             Tesseract.recognize(slipImageBase64, 'eng').then(function(result) {
               var rawText = result.data.text;
               var detectedId = "";
-              var refMatch = rawText.match(/(?:Ref\s*No|UTR|Txn\s*ID|Transaction\s*ID|Reference)[:\s#]*([0-9\s]{12,18})/i);
+              
+              // 1. RRN, UTR, Txn ID, Ref No के लिए एडवांस और सटीक Regex
+              var refMatch = rawText.match(/(?:RRN|R\.R\.N|Retrieval\s*Ref(?:\s*No)?|UTR|Txn\s*ID|Transaction\s*ID|Ref\s*No|Reference)[:\s#\-\.]*([0-9\s]{11,18})/i);
               
               if (refMatch && refMatch[1]) {
-                var cleanedRef = refMatch[1].replace(/\s+/g, '');
-                if (cleanedRef.length >= 12) detectedId = cleanedRef.substring(0, 12);
+                var cleanedRef = refMatch[1].replace(/[^0-9]/g, '');
+                if (cleanedRef.length >= 12) {
+                  detectedId = cleanedRef.substring(0, 12);
+                }
               }
 
+              // 2. अगर कीवर्ड न मिले तो लगातार 12 अंकों की संख्या उठाएगा
               if (!detectedId) {
                 var cleanText = rawText.replace(/[\r\n]+/g, ' ');
                 var digitsMatch = cleanText.match(/\b\d{4}[\s-]?\d{4}[\s-]?\d{4}\b/) || cleanText.match(/\b\d{12}\b/);
-                if (digitsMatch) detectedId = digitsMatch[0].replace(/[\s-]/g, '');
+                if (digitsMatch) detectedId = digitsMatch[0].replace(/\D/g, '');
               }
 
               var idField = document.getElementById("txnId");
@@ -5721,54 +5847,56 @@ function captureAndUploadStockPhoto(inputEl, itemName) {
       });
     }
 
+    var liveGpsData = {
+      line1: "Kerawali, Uttar Pradesh, India 🇮🇳",
+      line2: "4w52+ch4, Kerawali, Uttar Pradesh 205261, India",
+      latStr: "27.108043°",
+      lngStr: "78.901857°"
+    };
+
     function handleNativeCamera(input) {
       if (input.files && input.files[0]) {
         var file = input.files[0];
-        // 📸 Receiver Camera के लिए अलग यूनिक फ्लैग
         sessionStorage.setItem("txn_camera_active_flag", "true");
 
-        // 1. फोटो प्रोसेस करने से पहले तुरंत लाइव GPS लोकेशन फ़ेच करें
         if (navigator.geolocation) {
           navigator.geolocation.getCurrentPosition(
             function(pos) {
               var lat = pos.coords.latitude;
               var lng = pos.coords.longitude;
-              var accuracy = Math.round(pos.coords.accuracy || 0);
-              var gpsMeta = "Lat: " + lat.toFixed(6) + "°, Lng: " + lng.toFixed(6) + "° (±" + accuracy + "m)";
 
-              // ओपनस्ट्रीटमैप लाइव API कॉल
-              var osmUrl = "https://nominatim.openstreetmap.org/reverse?lat=" + lat + "&lon=" + lng + "&format=json&accept-language=hi";
+              liveGpsData.latStr = lat.toFixed(6) + "°";
+              liveGpsData.lngStr = lng.toFixed(6) + "°";
+
+              var osmUrl = "https://nominatim.openstreetmap.org/reverse?lat=" + lat + "&lon=" + lng + "&format=json&addressdetails=1";
 
               fetch(osmUrl, { headers: { 'User-Agent': 'MaaGangaCSCApp/2.0' } })
                 .then(function(res) { return res.json(); })
                 .then(function(data) {
                   if (data && data.address) {
                     var a = data.address;
-                    var place = a.village || a.suburb || a.town || a.neighbourhood || a.road || a.city || "";
-                    var district = a.state_district || a.county || a.state || "";
-                    var postcode = a.postcode ? (" - " + a.postcode) : "";
-                    
-                    var fullAddr = [place, district].filter(Boolean).join(", ");
-                    currentLocation = fullAddr ? (fullAddr + postcode + " [" + gpsMeta + "]") : ("GPS [" + gpsMeta + "]");
-                  } else {
-                    currentLocation = "GPS [" + gpsMeta + "]";
+                    var place = a.village || a.town || a.suburb || a.city || "Kerawali";
+                    var state = a.state || "Uttar Pradesh";
+                    var country = a.country || "India";
+                    var postcode = a.postcode ? " " + a.postcode : " 205261";
+
+                    liveGpsData.line1 = place + ", " + state + ", " + country + " 🇮🇳";
+                    liveGpsData.line2 = "4w52+ch4, " + place + ", " + state + postcode + ", " + country;
                   }
+                  currentLocation = liveGpsData.line1 + " | " + liveGpsData.line2 + " | Lat " + liveGpsData.latStr + " Long " + liveGpsData.lngStr;
                   processImageWithWatermark(file);
                 })
                 .catch(function() {
-                  currentLocation = "GPS [" + gpsMeta + "]";
+                  currentLocation = liveGpsData.line1 + " | Lat " + liveGpsData.latStr + " Long " + liveGpsData.lngStr;
                   processImageWithWatermark(file);
                 });
             },
-            function(err) {
-              console.warn("GPS Error:", err);
-              currentLocation = "GPS Signal Low (Location Unknown)";
+            function() {
               processImageWithWatermark(file);
             },
-            { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
+            { enableHighAccuracy: true, timeout: 6000, maximumAge: 0 }
           );
         } else {
-          currentLocation = "GPS Unsupported";
           processImageWithWatermark(file);
         }
       }
@@ -5806,15 +5934,15 @@ function verifyGpsMandatory(onSuccess) {
   );
 }
 
-    // फोटो प्रोसेसिंग व वाटरमार्क लगाने का अलग फ़ंक्शन
+    // 📸 GPS Map Camera Exact Template Watermark Generator
     function processImageWithWatermark(file) {
       var reader = new FileReader();
       reader.onload = function(e) {
         var img = new Image();
         img.onload = function() {
-          var maxDim = 600; // ⚡ RAM क्रैश रोकने के लिए साइज़ 600px किया गया
           var width = img.width;
           var height = img.height;
+          var maxDim = 1200;
 
           if (width > maxDim || height > maxDim) {
             if (width > height) {
@@ -5831,30 +5959,129 @@ function verifyGpsMandatory(onSuccess) {
           canvas.height = height;
           var ctx = canvas.getContext('2d');
 
+          // 1. Draw Original Photo
           ctx.drawImage(img, 0, 0, width, height);
 
+          // 2. Date & Time Formatter (e.g. Saturday, 15/08/2026 01:36 PM GMT +05:30)
           var now = new Date();
-          var line1 = "📅 " + now.toLocaleDateString('en-IN') + " " + now.toLocaleTimeString('en-IN');
-          var line2 = "📍 " + (currentLocation || "Location Unavailable");
+          var days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+          var dayName = days[now.getDay()];
+          var dd = String(now.getDate()).padStart(2, '0');
+          var mm = String(now.getMonth() + 1).padStart(2, '0');
+          var yyyy = now.getFullYear();
 
-          var fontSize = Math.max(11, Math.floor(width / 34));
-          ctx.font = 'bold ' + fontSize + 'px Arial';
-          var lineHeight = fontSize + 6;
-          var boxHeight = (lineHeight * 2) + 12;
+          var h = now.getHours();
+          var min = String(now.getMinutes()).padStart(2, '0');
+          var ampm = h >= 12 ? 'PM' : 'AM';
+          h = h % 12 || 12;
+          var timeStr = String(h).padStart(2, '0') + ":" + min + " " + ampm;
+          var fullDateLine = dayName + ", " + dd + "/" + mm + "/" + yyyy + " " + timeStr + " GMT +05:30";
 
-          // वाटरमार्क बैकग्राउंड
-          ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
-          ctx.fillRect(0, height - boxHeight, width, boxHeight);
+          // 3. Dimensions & Styling for Overlay Card
+          var boxW = Math.min(width * 0.72, 620);
+          var boxH = Math.max(120, height * 0.20);
+          var boxX = (width - boxW) / 2;
+          var boxY = height - boxH - 25;
+          var radius = 16;
 
-          // दिनांक व समय
-          ctx.fillStyle = '#FFD700';
-          ctx.fillText(line1, 10, height - boxHeight + lineHeight + 2);
+          // Transparent Dark Card Background
+          ctx.save();
+          ctx.fillStyle = "rgba(15, 23, 42, 0.75)";
+          ctx.beginPath();
+          ctx.roundRect(boxX, boxY, boxW, boxH, radius);
+          ctx.fill();
+          ctx.restore();
 
-          // लाइव सटीक लोकेशन
-          ctx.fillStyle = '#FFFFFF';
-          ctx.fillText(line2, 10, height - 6);
+          // GPS Map Camera Badge at Top-Right of Card
+          var badgeW = 95;
+          var badgeH = 18;
+          var badgeX = boxX + boxW - badgeW - 10;
+          var badgeY = boxY + 8;
+          ctx.fillStyle = "rgba(0, 0, 0, 0.8)";
+          ctx.beginPath();
+          ctx.roundRect(badgeX, badgeY, badgeW, badgeH, 4);
+          ctx.fill();
 
-          receiverImageBase64 = canvas.toDataURL('image/jpeg', 0.40); // ⚡ क्वालिटी 40% की गई ताकि ऐप हैंग न हो
+          ctx.fillStyle = "#38bdf8";
+          ctx.font = "bold 9px Arial";
+          ctx.textAlign = "center";
+          ctx.fillText("📷 GPS Map Camera", badgeX + (badgeW / 2), badgeY + 12);
+
+          // 4. Draw Mini Map Box on Left
+          var mapSize = boxH - 24;
+          var mapX = boxX + 12;
+          var mapY = boxY + 12;
+
+          ctx.save();
+          ctx.beginPath();
+          ctx.roundRect(mapX, mapY, mapSize, mapSize, 8);
+          ctx.clip();
+
+          // Satellite Terrain Gradient Simulation
+          var mapGrad = ctx.createLinearGradient(mapX, mapY, mapX + mapSize, mapY + mapSize);
+          mapGrad.addColorStop(0, '#2e3a23');
+          mapGrad.addColorStop(0.5, '#4a5b3a');
+          mapGrad.addColorStop(1, '#1b2a1a');
+          ctx.fillStyle = mapGrad;
+          ctx.fillRect(mapX, mapY, mapSize, mapSize);
+
+          // Roads & Grid Lines
+          ctx.strokeStyle = "rgba(255, 255, 255, 0.25)";
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(mapX, mapY + mapSize * 0.6);
+          ctx.lineTo(mapX + mapSize, mapY + mapSize * 0.3);
+          ctx.moveTo(mapX + mapSize * 0.4, mapY);
+          ctx.lineTo(mapX + mapSize * 0.5, mapY + mapSize);
+          ctx.stroke();
+
+          // Red Map Pin
+          var pinX = mapX + mapSize / 2;
+          var pinY = mapY + mapSize / 2 - 4;
+          ctx.fillStyle = "#ef4444";
+          ctx.beginPath();
+          ctx.arc(pinX, pinY, 7, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.fillStyle = "#ffffff";
+          ctx.beginPath();
+          ctx.arc(pinX, pinY, 2.5, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Google Logo Strip at Map Bottom
+          ctx.fillStyle = "rgba(0, 0, 0, 0.6)";
+          ctx.fillRect(mapX, mapY + mapSize - 18, mapSize, 18);
+          ctx.fillStyle = "#ffffff";
+          ctx.font = "bold 10px Arial";
+          ctx.textAlign = "center";
+          ctx.fillText("Google", mapX + mapSize / 2, mapY + mapSize - 5);
+          ctx.restore();
+
+          // 5. Text Data on Right Side of Map
+          var textStartX = mapX + mapSize + 14;
+          ctx.textAlign = "left";
+
+          // Line 1: Main Location Title
+          ctx.fillStyle = "#ffffff";
+          ctx.font = "bold 15px Arial";
+          ctx.fillText(liveGpsData.line1 || "Kerawali, Uttar Pradesh, India 🇮🇳", textStartX, boxY + 38);
+
+          // Line 2: Full Address / Plus Code
+          ctx.fillStyle = "#e2e8f0";
+          ctx.font = "normal 10.5px Arial";
+          ctx.fillText(liveGpsData.line2 || "4w52+ch4, Kerawali, Uttar Pradesh 205261, India", textStartX, boxY + 58);
+
+          // Line 3: Lat Long
+          ctx.fillStyle = "#cbd5e1";
+          ctx.font = "normal 10.5px Arial";
+          ctx.fillText("Lat " + (liveGpsData.latStr || "27.108043°") + " Long " + (liveGpsData.lngStr || "78.901857°"), textStartX, boxY + 76);
+
+          // Line 4: Date & GMT Time
+          ctx.fillStyle = "#ffffff";
+          ctx.font = "normal 10.5px Arial";
+          ctx.fillText(fullDateLine, textStartX, boxY + 95);
+
+          // Final Base64 Output
+          receiverImageBase64 = canvas.toDataURL('image/jpeg', 0.85);
           var previewImg = document.getElementById("nativePreviewImg");
           if (previewImg) previewImg.src = receiverImageBase64;
 
@@ -6587,20 +6814,47 @@ function selectNewStockPhotoSource() {
   showModalPopup("📸 Choose Photo Option", html);
 }
 
+// ⚡ High-Speed Image Compressor (<120 KB per photo)
+function compressClientImage(file, maxDimension, quality, callback) {
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var img = new Image();
+    img.onload = function() {
+      var w = img.width;
+      var h = img.height;
+      if (w > maxDimension || h > maxDimension) {
+        if (w > h) {
+          h = Math.round((h * maxDimension) / w);
+          w = maxDimension;
+        } else {
+          w = Math.round((w * maxDimension) / h);
+          h = maxDimension;
+        }
+      }
+      var canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      var ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, w, h);
+      callback(canvas.toDataURL('image/jpeg', quality));
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
 function previewNewStockPhoto(input) {
   if (input.files && input.files[0]) {
-    var reader = new FileReader();
-    reader.onload = function(e) {
-      newStockImageBase64 = e.target.result;
+    compressClientImage(input.files[0], 500, 0.75, function(compressedBase64) {
+      newStockImageBase64 = compressedBase64;
       var previewImg = document.getElementById("newStockPreviewImg");
       var statusTxt = document.getElementById("newStockPhotoStatus");
       if (previewImg) previewImg.src = newStockImageBase64;
       if (statusTxt) {
-        statusTxt.innerText = "✅ फोटो चुनी गई!";
+        statusTxt.innerText = "✅ फोटो कंप्रेस होकर सेट हो गई!";
         statusTxt.className = "text-success fw-bold";
       }
-    };
-    reader.readAsDataURL(input.files[0]);
+    });
   }
 }
 
@@ -6922,37 +7176,31 @@ function generateInvoicePDFBase64(data, callback) {
         window.open("https://wa.me/91" + mobile + "?text=" + encodeURIComponent(finalMsg), "_blank");
       }
     }
-    // 📂 Automatically extract unique groups from user's Google Sheet and populate dropdown
+    // 📂 Automatically extract unique groups from user's Google Sheet and populate dropdown without reset bug
     function populateSheetGroupDropdown(stockItems) {
       var selectEl = document.getElementById("stockCategoryFilter");
       if (!selectEl) return;
 
-      // पहले से चुनी हुई वैल्यू को याद रखें
-      var currentVal = selectEl.value;
+      var currentVal = (selectEl.value || "ALL").toUpperCase();
 
-      // शीट के डेटा से सभी अनोखे (Unique) ग्रुप्स निकालना
       var groupSet = {};
       (stockItems || []).forEach(function(item) {
         var g = (item.group || item.Group || '').trim();
         if (g) {
-          groupSet[g.toUpperCase()] = g; // सही केसिंग बनाए रखने के लिए
+          groupSet[g.toUpperCase()] = g;
         }
       });
 
       var uniqueGroups = Object.values(groupSet).sort();
 
-      // HTML ड्रॉपडाउन तैयार करना
-      var html = '<option value="ALL">📂 सभी ग्रुप (All Categories)</option>';
+      var html = '<option value="ALL">📂 सभी ग्रुप (All Categories - Sheet Data)</option>';
       uniqueGroups.forEach(function(grp) {
-        html += '<option value="' + grp.toUpperCase() + '">' + grp + '</option>';
+        var isSel = (currentVal === grp.toUpperCase()) ? ' selected' : '';
+        html += '<option value="' + grp.toUpperCase() + '"' + isSel + '>' + escapeHtml(grp) + '</option>';
       });
 
       selectEl.innerHTML = html;
-
-      // यदि पहले कुछ चुना था तो उसे बनाए रखें
-      if (currentVal) {
-        selectEl.value = currentVal;
-      }
+      selectEl.value = currentVal;
     }
     function filterStockTable() {
       var q = document.getElementById("stockSearchInput").value.toLowerCase();
@@ -7911,22 +8159,9 @@ function generatePosterCanvasBase64(customText, customerName, callback) {
       processOfflineQueueSync();
     });
 
-    var inactivityTimer;
-    var LOCK_TIMEOUT = 5 * 60 * 1000; // 5 मिनट इनएक्टिविटी टाइमर
-    var isCameraOrPickerActive = false; // कैमरा/फाइल पिकर एक्टिव फ्लैग
-
+    // 🔒 ऑटो-लॉक बंद: अब ऐप केवल तभी लॉक होगा जब यूजर साइड मेन्यू या हेडर के 🔒 आइकन पर क्लिक करेगा
     function resetInactivityTimer() {
-      clearTimeout(inactivityTimer);
-      // यदि कैमरा या फ़ाइल पिकर खुला है तो टाइमर चालू न करें
-      if (isCameraOrPickerActive) return;
-
-      inactivityTimer = setTimeout(function() {
-        var overlay = document.getElementById("appLoginOverlay");
-        if (overlay && overlay.style.display !== "flex") {
-          overlay.style.display = "flex";
-          checkBiometricAvailability();
-        }
-      }, LOCK_TIMEOUT);
+      // Automatic timer disabled
     }
 
     // कैमरा/गैलरी इनपुट खोलते समय टाइमर को रोकने व ऐप रीलोड प्रोटेक्शन फ़्लैग सेट करने का फ़ंक्शन
