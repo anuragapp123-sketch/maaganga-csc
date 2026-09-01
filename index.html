@@ -1263,6 +1263,10 @@
 
           <!-- 1. Customer Details First (Smart Instant Auto-Fill) -->
           <div class="card p-2.5 border-0 shadow-sm bg-white mb-2" style="border-radius: 18px;">
+            <!-- Hidden Camera & Gallery File Inputs -->
+            <input type="file" id="nativeCameraInput" accept="image/*" capture="user" class="d-none" onchange="handleNativeCamera(this)">
+            <input type="file" id="nativeGalleryInput" accept="image/*" class="d-none" onchange="handleNativeCamera(this)">
+
             <div class="d-flex align-items-center gap-2 mb-2 pb-2 border-bottom">
               <div class="position-relative cursor-pointer flex-shrink-0" onclick="selectPhotoSource()" title="कैमरे से फोटो खींचें">
                 <img id="nativePreviewImg" src="https://cdn-icons-png.flaticon.com/512/847/847969.png" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid #2563eb; background:#f8fafc;">
@@ -6296,17 +6300,28 @@ function autoSyncLocation(callback) {
     }
 
 // Camera vs Gallery Selector Popup
+    function triggerFileInputClick(inputId) {
+      closeModalPopup();
+      setTimeout(function() {
+        var el = document.getElementById(inputId);
+        if (el) {
+          el.value = ""; // Reset value taaki same photo dubara choose ho sake
+          el.click();
+        } else {
+          alert("⚠️ File input element nahi mila!");
+        }
+      }, 250);
+    }
+
     function selectPhotoSource() {
       if (typeof saveTxnFormDraft === 'function') saveTxnFormDraft();
-
-      // Background me GPS update trigger karein bina modal block kiye
       if (typeof autoSyncLocation === 'function') autoSyncLocation();
 
       var html = '<div class="text-center p-2">' +
         '<small class="fw-bold text-muted d-block mb-3" style="font-size:11px;">कृपया फोटो अपलोड करने का माध्यम चुनें:</small>' +
         '<div class="d-flex flex-column gap-2">' +
-          '<button type="button" class="btn btn-primary fw-bold py-2.5" style="font-size:12px; border-radius:10px;" onclick="closeModalPopup(); setTimeout(function(){ var el = document.getElementById(\'nativeCameraInput\'); if(el) el.click(); }, 250);">📷 कैमरे से खींचे (Camera)</button>' +
-          '<button type="button" class="btn btn-outline-primary fw-bold py-2.5" style="font-size:12px; border-radius:10px;" onclick="closeModalPopup(); setTimeout(function(){ var el = document.getElementById(\'nativeGalleryInput\'); if(el) el.click(); }, 250);">🖼️ गैलरी से चुनें (Gallery)</button>' +
+          '<button type="button" class="btn btn-primary fw-bold py-2.5" style="font-size:12px; border-radius:10px;" onclick="triggerFileInputClick(\'nativeCameraInput\')">📷 कैमरे से खींचे (Camera)</button>' +
+          '<button type="button" class="btn btn-outline-primary fw-bold py-2.5" style="font-size:12px; border-radius:10px;" onclick="triggerFileInputClick(\'nativeGalleryInput\')">🖼️ गैलरी से चुनें (Gallery)</button>' +
         '</div>' +
       '</div>';
 
