@@ -4852,24 +4852,6 @@ function sendModalDetailsToWhatsApp() {
         }, 1000);
         alert("✅ एक्सेल फाइल डाउनलोड शुरू हो गई है!");
       }
-        var blob = new Blob([csvData], { type: "text/csv;charset=utf-8;" });
-        var blobUrl = window.URL.createObjectURL(blob);
-        var link = document.createElement("a");
-        link.href = blobUrl;
-        link.setAttribute("download", fullFileName);
-        link.style.display = "none";
-        document.body.appendChild(link);
-        
-        // Mobile browsers ke liye explicit click trigger
-        var clickEvent = new MouseEvent("click", { bubbles: true, cancelable: true, view: window });
-        link.dispatchEvent(clickEvent);
-
-        setTimeout(function() {
-          link.remove();
-          window.URL.revokeObjectURL(blobUrl);
-        }, 1000);
-        alert("✅ Excel file download shuru ho gayi!");
-      }
     }
 
     // === FEATURE 1: Complete CRM Customer 360 & Quick Actions ===
