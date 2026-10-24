@@ -25,8 +25,10 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" crossorigin="anonymous"></script>
   <!-- Chart.js Library for Interactive Earnings Graph -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<!-- Barcode & QR Code Live Scanner Library -->
-<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+  <!-- html2canvas for Image & PDF capture -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <!-- Barcode & QR Code Live Scanner Library -->
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
   
   <style>
     /* === Signature Canvas Touch Fix === */
@@ -44,16 +46,63 @@
 
     /* === Hero Summary Cards Styling === */
     .hero-stat-card {
-      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-      border: 1px solid #334155;
-      border-radius: 18px;
-      padding: 14px;
-      color: #ffffff;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+      background: #ffffff !important;
+      border: 1px solid rgba(0, 0, 0, 0.05) !important;
+      border-radius: 20px !important;
+      padding: 18px 16px !important;
+      color: #1d1d1f !important;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04) !important;
+      transition: transform 0.16s ease !important;
     }
+
+    .hero-stat-card small {
+      color: #86868b !important;
+      font-size: 11px !important;
+      font-weight: 600 !important;
+      letter-spacing: 0.2px;
+    }
+
+    .hero-stat-card h5 {
+      color: #1d1d1f !important;
+      font-size: 1.35rem !important;
+      font-weight: 700 !important;
+      margin-top: 4px !important;
+    }
+
     .hero-stat-card.alert-card {
-      background: linear-gradient(135deg, #7f1d1d 0%, #450a0a 100%);
+      background: #fff2f2 !important;
+      border-color: rgba(255, 59, 48, 0.15) !important;
+    }
+    
+    .hero-stat-card.alert-card strong, 
+    .hero-stat-card.alert-card small {
+      color: #d70015 !important;
+    }
+    .hero-stat-card::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -50%;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle, rgba(255,255,255,0.06) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-stat-card:active { transform: scale(0.97); }
+
+    .hero-stat-card.alert-card {
+      background: linear-gradient(145deg, #7f1d1d 0%, #450a0a 100%);
       border-color: #ef4444;
+    }
+
+    .hero-stat-card small {
+      color: rgba(255,255,255,0.7) !important;
+      font-size: 10.5px;
+      font-weight: 500;
+    }
+    .hero-stat-card h5 {
+      font-size: 1.15rem;
+      letter-spacing: -0.3px;
     }
 
     /* === 2-Column Compact Grid Forms === */
@@ -96,8 +145,13 @@
       display: flex;
       flex-direction: column;
       border: none;
-      box-shadow: 0 -10px 30px rgba(0,0,0,0.35);
+      box-shadow: 0 -16px 48px rgba(0,0,0,0.35);
       background: #ffffff !important;
+      animation: slideUpSheet 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes slideUpSheet {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
     }
     .bottom-sheet-modal .modal-body {
       overflow-y: auto !important;
@@ -117,65 +171,98 @@
     }
 
     :root {
-      --primary-blue: #2563eb;
-      --navy-header: #0f172a;
-      --accent-emerald: #10b981;
-      --accent-coral: #ef4444;
-      --bg-slate: #f1f5f9;
-      --card-border: #f1f5f9;
-      --text-dark: #0f172a;
+      --primary-blue: #0071e3;
+      --primary-light: #f5f5f7;
+      --primary-dark: #0058b0;
+      --navy-header: #fbfbfd;
+      --accent-emerald: #34c759;
+      --accent-coral: #ff3b30;
+      --accent-amber: #ff9500;
+      --bg-slate: #f5f5f7;
+      --bg-soft: #ffffff;
+      --card-border: rgba(0, 0, 0, 0.04);
+      --text-dark: #1d1d1f;
+      --text-muted: #86868b;
       --app-radius: 20px;
-      --card-shadow: 0 4px 18px -2px rgba(15, 23, 42, 0.06);
+      --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
     }
 
-    /* Enterprise App Modern Card Overhaul */
+    html, body {
+      background-color: #f5f5f7 !important;
+      color: var(--text-dark) !important;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif !important;
+    }
+
+    .app-mobile-frame {
+      background-color: #f5f5f7 !important;
+    }
+
+    /* Minimal Card-less Floating Aesthetic */
     .card {
       border-radius: var(--app-radius) !important;
       border: 1px solid var(--card-border) !important;
       box-shadow: var(--card-shadow) !important;
       background: #ffffff !important;
-      padding: 14px 16px !important;
-      margin-bottom: 12px !important;
-      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      padding: 16px !important;
+      margin-bottom: 14px !important;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
     }
 
-    /* Soft Inputs like Professional Apps */
+    /* Apple-style Soft Inset Inputs */
     .form-control, .form-select {
       border-radius: 12px !important;
-      border: 1.5px solid #e2e8f0 !important;
-      background-color: #f8fafc !important;
-      padding: 8px 12px !important;
-      font-size: 0.82rem !important;
-      font-weight: 500;
-      height: 40px !important;
-      transition: all 0.2s ease;
+      border: 1px solid transparent !important;
+      background-color: #f2f2f7 !important;
+      padding: 10px 14px !important;
+      font-size: 0.85rem !important;
+      font-weight: 500 !important;
+      height: 44px !important;
+      color: var(--text-dark) !important;
+    }
+
+    .form-control:focus, .form-select:focus {
+      background-color: #ffffff !important;
+      border-color: #0071e3 !important;
+      box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.15) !important;
+    }
+
+    /* Clean Dividers instead of Heavy Borders */
+    hr, .border-bottom {
+      border-color: rgba(0, 0, 0, 0.06) !important;
+    }
+
+    .form-control::placeholder {
+      color: #94a3b8 !important;
+      font-weight: 400;
     }
 
     .form-control:focus, .form-select:focus {
       background-color: #ffffff !important;
       border-color: var(--primary-blue) !important;
-      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1) !important;
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12) !important;
+      outline: none;
     }
 
     /* Ultra-Modern Glassmorphic Floating Bottom Nav */
     .app-bottom-nav {
       position: fixed;
-      bottom: 12px;
+      bottom: 14px;
       left: 50%;
       transform: translateX(-50%);
       width: calc(100% - 24px);
       max-width: 406px;
-      background: rgba(255, 255, 255, 0.82) !important;
-      backdrop-filter: blur(16px) saturate(180%);
-      -webkit-backdrop-filter: blur(16px) saturate(180%);
+      background: rgba(255, 255, 255, 0.92) !important;
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
       display: flex;
       justify-content: space-around;
       align-items: center;
-      padding: 6px 8px;
+      padding: 8px 6px;
       z-index: 9999;
-      border-radius: 24px !important;
-      box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(255, 255, 255, 0.6) inset;
-      border: 1px solid rgba(226, 232, 240, 0.6) !important;
+      border-radius: 20px !important;
+      box-shadow: 0 8px 28px -6px rgba(0, 0, 0, 0.15),
+                  0 0 0 1px rgba(255, 255, 255, 0.7) inset;
+      border: 1px solid rgba(226, 232, 240, 0.7) !important;
     }
 
     /* Modern Card Overhaul */
@@ -197,7 +284,7 @@
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
     .nav-btn {
-      color: #64748b;
+      color: #94a3b8;
       text-decoration: none;
       display: flex;
       flex-direction: column;
@@ -206,15 +293,21 @@
       font-weight: 600;
       border: none;
       background: transparent;
-      padding: 6px 16px;
-      border-radius: 16px;
-      transition: all 0.25s ease;
+      padding: 6px 14px;
+      border-radius: 14px;
+      transition: color 0.2s ease, background 0.2s ease, transform 0.15s ease;
+      position: relative;
     }
 
     .nav-btn.active {
       color: var(--primary-blue) !important;
-      background: #eff6ff;
+      background: var(--primary-light);
       font-weight: 700;
+    }
+
+    .nav-btn.active .nav-icon {
+      transform: scale(1.12);
+      transition: transform 0.2s ease;
     }
 
     .nav-btn .nav-icon {
@@ -276,7 +369,7 @@
     }
 
     .nav-btn {
-      color: #64748b;
+      color: #8e8e93;
       text-decoration: none;
       display: flex;
       flex-direction: column;
@@ -285,7 +378,8 @@
       font-weight: 600;
       border: none;
       background: transparent;
-      width: 25%;
+      width: 20%;
+      padding: 4px 0;
       transition: all 0.2s ease;
     }
 
@@ -316,16 +410,33 @@
 
     /* Ultra-Compact Header with Safe-Area Fix for Mobile & Android APK */
     .app-header {
-      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-      color: #ffffff;
-      /* एंड्रॉइड APK के लिए टॉप पैडिंग बढ़ाकर 38px की गई ताकि स्टेटस बार न चढ़े */
+      background: rgba(255, 255, 255, 0.82) !important;
+      backdrop-filter: blur(20px) saturate(180%) !important;
+      -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+      color: #1d1d1f !important;
       padding-top: max(38px, calc(16px + env(safe-area-inset-top, 16px))) !important;
-      padding-bottom: 10px !important;
-      padding-left: 12px !important;
-      padding-right: 12px !important;
-      border-bottom-left-radius: 14px !important;
-      border-bottom-right-radius: 14px !important;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+      padding-bottom: 12px !important;
+      padding-left: 16px !important;
+      padding-right: 16px !important;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .app-header button, .app-header h1, .app-header span {
+      color: #1d1d1f !important;
+    }
+
+    .app-header .header-subtitle {
+      color: #86868b !important;
+    }
+    .app-header::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: radial-gradient(circle at 80% 20%, rgba(56,189,248,0.15) 0%, transparent 50%);
+      pointer-events: none;
     }
 
     .header-logo {
@@ -399,10 +510,23 @@
 
     /* Modern Stylish User Welcome Banner */
     .stylish-welcome-card {
-      background: linear-gradient(135deg, #ffffff 0%, #eff6ff 50%, #dbeafe 100%) !important;
-      border-radius: 20px !important;
-      border: 1px solid rgba(59, 130, 246, 0.2) !important;
-      box-shadow: 0 8px 20px -2px rgba(37, 99, 235, 0.12) !important;
+      background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 50%, #e0f2fe 100%) !important;
+      border-radius: 18px !important;
+      border: 1px solid rgba(59, 130, 246, 0.18) !important;
+      box-shadow: 0 4px 20px -2px rgba(37, 99, 235, 0.10) !important;
+      position: relative;
+      overflow: hidden;
+    }
+    .stylish-welcome-card::before {
+      content: '';
+      position: absolute;
+      top: -30px;
+      right: -30px;
+      width: 100px;
+      height: 100px;
+      background: radial-gradient(circle, rgba(37,99,235,0.10) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
     }
 
     .user-avatar-box {
@@ -534,8 +658,93 @@
       font-size: 0.82rem !important;
     }
 
-    .tab-pane { display: none !important; }
-    .tab-pane.active { display: block !important; animation: fadeIn 0.25s ease forwards; }
+    /* Clean Tab Isolation */
+    .tab-pane {
+      display: none !important;
+      height: auto !important;
+    }
+
+    /* Modern Apple Segmented Control for Transaction Types */
+    .segmented-pill-bar {
+      background: #e5e5ea;
+      padding: 3px;
+      border-radius: 14px;
+      display: flex;
+      gap: 3px;
+    }
+    .segmented-pill-bar button {
+      border: none !important;
+      border-radius: 11px !important;
+      font-size: 11px !important;
+      font-weight: 600 !important;
+      padding: 7px 0 !important;
+      color: #3c3c43 !important;
+      background: transparent !important;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+      box-shadow: none !important;
+    }
+    .segmented-pill-bar button.btn-primary {
+      background: #ffffff !important;
+      color: #0071e3 !important;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12) !important;
+    }
+
+    /* Soft Inset Group for Inputs */
+    .inset-input-box {
+      background: #f2f2f7;
+      border-radius: 14px;
+      padding: 4px 12px;
+      border: 1px solid rgba(0, 0, 0, 0.04);
+      display: flex;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .inset-input-box input, 
+    .inset-input-box select {
+      background: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+      font-size: 12.5px !important;
+      font-weight: 600 !important;
+      padding: 8px 6px !important;
+      height: auto !important;
+    }
+    .inset-input-box input:focus, 
+    .inset-input-box select:focus {
+      outline: none !important;
+    }
+
+    /* Quick Preset Amount Chips */
+    .amount-chip {
+      background: #f2f2f7 !important;
+      border: 1px solid rgba(0, 0, 0, 0.05) !important;
+      border-radius: 12px !important;
+      font-weight: 700 !important;
+      color: #1d1d1f !important;
+      font-size: 11.5px !important;
+      padding: 8px 0 !important;
+      transition: transform 0.1s ease, background-color 0.2s ease !important;
+    }
+    .amount-chip:active {
+      transform: scale(0.95);
+      background: #e5e5ea !important;
+    }
+    .tab-pane.active {
+      display: block !important;
+      height: auto !important;
+      animation: fadeIn 0.2s ease forwards;
+    }
+    @keyframes fadeIn { 
+      from { opacity: 0; transform: translateY(2px); } 
+      to { opacity: 1; transform: translateY(0); } 
+    }
+
+    /* Stock Card Fit Fix */
+    .stock-card-item {
+      min-height: 110px !important;
+      height: auto !important;
+      overflow: visible !important;
+    }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
 
     /* Clean Input Fields */
@@ -622,21 +831,24 @@
       .app-mobile-frame, .app-bottom-nav, .fab-btn, .app-header, #addNewStockFormCard, .modal { display: none !important; }
     }
 
-    /* === 📱 SIDE DRAWER MENU STYLES === */
+    /* === 📱 APPLE / MATERIAL YOU MINIMAL SIDE DRAWER === */
     .app-side-drawer {
       position: fixed;
       top: 0;
-      left: -280px;
-      width: 280px;
+      left: -290px;
+      width: 290px;
       height: 100vh;
-      background: #0f172a;
-      color: #ffffff;
+      background: rgba(255, 255, 255, 0.96) !important;
+      backdrop-filter: blur(25px) saturate(180%) !important;
+      -webkit-backdrop-filter: blur(25px) saturate(180%) !important;
+      color: #1d1d1f !important;
       z-index: 999999;
-      transition: left 0.3s ease;
-      box-shadow: 4px 0 20px rgba(0, 0, 0, 0.4);
-      padding: 20px 15px;
+      transition: left 0.28s cubic-bezier(0.16, 1, 0.3, 1) !important;
+      box-shadow: 10px 0 35px rgba(0, 0, 0, 0.08) !important;
+      padding: 24px 16px;
       display: flex;
       flex-direction: column;
+      border-right: 1px solid rgba(0, 0, 0, 0.06);
     }
     .app-side-drawer.open {
       left: 0;
@@ -647,16 +859,15 @@
       left: 0;
       width: 100vw;
       height: 100vh;
-      background: rgba(0, 0, 0, 0.5);
+      background: rgba(0, 0, 0, 0.25) !important;
+      backdrop-filter: blur(4px) !important;
+      -webkit-backdrop-filter: blur(4px) !important;
       z-index: 999998;
       display: none;
     }
     .drawer-overlay.active {
       display: block !important;
-      background: rgba(0, 0, 0, 0.7) !important;
-      backdrop-filter: blur(2px);
     }
-    /* साइड मेन्यू खुलते ही बॉटम बार को छिपाने के लिए */
     body.drawer-open .app-bottom-nav {
       display: none !important;
     }
@@ -664,23 +875,23 @@
       display: flex;
       align-items: center;
       gap: 12px;
-      padding: 11px 14px;
-      color: #e2e8f0;
+      padding: 12px 14px;
+      color: #1d1d1f !important;
       text-decoration: none;
-      font-size: 13px;
+      font-size: 13.5px;
       font-weight: 600;
-      border-radius: 12px;
-      margin-bottom: 4px;
+      border-radius: 14px;
+      margin-bottom: 5px;
       background: transparent;
       border: none;
       width: 100%;
       text-align: left;
-      transition: all 0.15s ease-in-out;
+      transition: all 0.15s ease;
     }
     .drawer-menu-item:hover, .drawer-menu-item:active {
-      background: #1e293b;
-      color: #38bdf8;
-      transform: translateX(3px);
+      background: #f2f2f7 !important;
+      color: #0071e3 !important;
+      transform: translateX(4px);
     }
     .btn {
       border-radius: 12px !important;
@@ -890,15 +1101,15 @@
 
     <!-- 📱 Slide-out Side Drawer Menu -->
     <div id="sideDrawerMenu" class="app-side-drawer">
-      <div class="d-flex align-items-center justify-content-between border-bottom border-secondary pb-3 mb-3">
+      <div class="d-flex align-items-center justify-content-between border-bottom pb-3 mb-3">
         <div class="d-flex align-items-center gap-2">
-          <img src="https://lh3.googleusercontent.com/d/1AVhGGj41J973HK0KgI1im5JJwJZsKhJR" style="width:36px; height:34px; border-radius:50%; border:1.5px solid #38bdf8;">
+          <img src="https://lh3.googleusercontent.com/d/1AVhGGj41J973HK0KgI1im5JJwJZsKhJR" style="width:38px; height:38px; border-radius:50%; border:1.5px solid #0071e3; object-fit:cover;">
           <div>
-            <strong class="d-block text-white" style="font-size:12px;">माँ गंगा CSC</strong>
-            <small class="text-info" style="font-size:9px;">Side Menu Options</small>
+            <strong class="d-block text-dark" style="font-size:13px; font-weight:700;">माँ गंगा जन सेवा केंद्र</strong>
+            <small class="text-muted" style="font-size:10px;">सुविधा व सेटिंग्स मेन्यू</small>
           </div>
         </div>
-        <button type="button" class="btn btn-sm btn-outline-light py-0 px-2 fw-bold" onclick="closeSideMenu()">❌</button>
+        <button type="button" class="btn btn-sm btn-light py-1 px-2 fw-bold text-muted rounded-circle" onclick="closeSideMenu()">✕</button>
       </div>
 
       <div class="flex-grow-1 overflow-y-auto">
@@ -963,8 +1174,8 @@
         </button>
       </div>
 
-      <div class="border-top border-secondary pt-2 text-center text-muted" style="font-size:10px;">
-        Developer: Anurag Shakya | v2.0.12
+      <div class="border-top pt-2.5 text-center text-muted" style="font-size:10.5px; font-weight:500;">
+        विक्रेता: अनुराग शाक्य | v2.0.13
       </div>
     </div>
 
@@ -976,8 +1187,8 @@
           <button class="btn btn-sm text-white p-0 me-1" style="font-size: 22px; line-height: 1;" onclick="openSideMenu()">☰</button>
           <img src="https://lh3.googleusercontent.com/d/1AVhGGj41J973HK0KgI1im5JJwJZsKhJR" alt="Logo" class="header-logo">
           <div>
-            <h1 class="header-title">माँ गंगा Jan Seva Kendra</h1>
-            <p class="header-subtitle">Digital Seva & Electronics Center</p>
+            <h1 class="header-title">माँ गंगा जन सेवा केंद्र</h1>
+<p class="header-subtitle">डिजिटल सेवा व इलेक्ट्रॉनिक्स केंद्र</p>
           </div>
         </div>
         <div class="d-flex align-items-center gap-1.5">
@@ -1006,7 +1217,6 @@
           
           <!-- Perfect Spacing Modern Welcome Banner -->
           <div class="stylish-welcome-card p-2.5 mb-2.5 border-0 position-relative overflow-hidden shadow-sm" style="border-radius: 18px; background: linear-gradient(135deg, #ffffff 0%, #eff6ff 100%); border-left: 5px solid #2563eb !important;">
-            <!-- gap-3.5 से फ़ोटो और टेक्स्ट के बीच परफेक्ट दूरी बन जाएगी -->
             <div class="d-flex align-items-center gap-3.5 z-1">
               <!-- 📷 1. बाईं तरफ गोल प्रोफाइल फोटो (70x70 px) -->
               <div class="user-avatar-box rounded-circle position-relative d-flex align-items-center justify-content-center overflow-hidden cursor-pointer flex-shrink-0" onclick="selectUserAvatarPhoto()" style="width: 70px; height: 70px; border: 3px solid #2563eb; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.22); background: #ffffff;" title="प्रोफाइल फोटो बदलने के लिए टैप करें">
@@ -1023,7 +1233,6 @@
               <div class="flex-grow-1 min-w-0 ms-1">
                 <div class="d-flex align-items-center justify-content-between mb-0.5">
                   <h5 class="fw-extrabold m-0 text-dark user-dynamic-name text-truncate" id="appLoggedInUserName" style="font-size: 1.1rem; letter-spacing: -0.3px; font-weight: 800; line-height: 1.2;">User Ji</h5>
-                  <!-- ग्रीटिंग बैज राइट कॉर्नर में सुंदर दिखेगा -->
                   <span class="stylish-greeting-badge badge bg-primary bg-opacity-10 text-primary fw-bold flex-shrink-0 ms-1" id="timeBasedGreetingBadge" style="font-size: 8.5px; letter-spacing: 0.2px; border-radius: 6px; padding: 3px 6px;">🌆 Good Evening</span>
                 </div>
                 <small class="text-primary d-block fw-bold" id="userLiveLocationText" style="font-size: 9px; letter-spacing: 0.1px; line-height: 1.3;">📍 Location: Fetching...</small>
@@ -1031,18 +1240,13 @@
             </div>
           </div>
 
-          <!-- (Upar ke action buttons ko hatakar bottom bar me shift kiya gaya hai) -->
-
           <!-- Feature 1: Fast CRM Quick Search Bar -->
           <div class="card p-2 border-0 shadow-sm bg-white mb-3" style="border-radius: 14px;">
             <div class="input-group input-group-sm">
               <span class="input-group-text bg-light border-0 fw-bold">🔍</span>
               <input type="tel" id="globalCrmSearch" class="form-control border-0 bg-light fw-bold" placeholder="कस्टमर का मोबाइल नं. सर्च करें..." maxlength="10" oninput="this.value=this.value.replace(/\D/g,''); searchCustomer360(this.value)">
             </div>
-            <!-- CRM Result Preview Card -->
-            <div id="crmResultBox" class="d-none mt-2 p-2 rounded bg-light border text-start" style="font-size: 10px;">
-              <!-- Dynamic CRM Details loaded via JS -->
-            </div>
+            <div id="crmResultBox" class="d-none mt-2 p-2 rounded bg-light border text-start" style="font-size: 10px;"></div>
           </div>
 
           <!-- Live Low Stock Alert Banner -->
@@ -1050,314 +1254,284 @@
             ⚠️ <span id="homeLowStockBannerText">3 आइटम्स का स्टॉक खत्म होने वाला है!</span>
           </div>
 
-          <!-- Visual Hero Summary Cards Grid -->
+          <!-- ⚡ 1. QUICK ACTION 4-GRID TILES (100% Screen Fitted) -->
           <div class="row g-2 mb-3">
+            <div class="col-3">
+              <button type="button" class="btn w-100 p-2 card border-0 shadow-sm text-center d-flex flex-column align-items-center justify-content-center m-0" onclick="openAppSection('transaction-sec')" style="border-radius:16px; background:#ffffff; min-height:64px;">
+                <span style="font-size: 20px; line-height:1; margin-bottom: 4px;">💸</span>
+                <span style="font-size: 10px; font-weight: 700; color: #1d1d1f; white-space:nowrap;">AePS नकद</span>
+              </button>
+            </div>
+            <div class="col-3">
+              <button type="button" class="btn w-100 p-2 card border-0 shadow-sm text-center d-flex flex-column align-items-center justify-content-center m-0" onclick="openAppSection('invoice-sec')" style="border-radius:16px; background:#ffffff; min-height:64px;">
+                <span style="font-size: 20px; line-height:1; margin-bottom: 4px;">🧾</span>
+                <span style="font-size: 10px; font-weight: 700; color: #1d1d1f; white-space:nowrap;">नया बिल</span>
+              </button>
+            </div>
+            <div class="col-3">
+              <button type="button" class="btn w-100 p-2 card border-0 shadow-sm text-center d-flex flex-column align-items-center justify-content-center m-0" onclick="openAppSection('stock-sec'); toggleAddStockForm();" style="border-radius:16px; background:#ffffff; min-height:64px;">
+                <span style="font-size: 20px; line-height:1; margin-bottom: 4px;">📦</span>
+                <span style="font-size: 10px; font-weight: 700; color: #1d1d1f; white-space:nowrap;">स्टॉक जोड़ें</span>
+              </button>
+            </div>
+            <div class="col-3">
+              <button type="button" class="btn w-100 p-2 card border-0 shadow-sm text-center d-flex flex-column align-items-center justify-content-center m-0" onclick="openCounterPaymentQrModal()" style="border-radius:16px; background:#ffffff; min-height:64px;">
+                <span style="font-size: 20px; line-height:1; margin-bottom: 4px;">📲</span>
+                <span style="font-size: 10px; font-weight: 700; color: #1d1d1f; white-space:nowrap;">काउंटर QR</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- 🌟 2. PRIMARY SUMMARY HERO CARDS -->
+          <div class="row g-2 mb-3">
+            <!-- Aaj Ki Bikri & Munafa -->
             <div class="col-6">
-              <div class="hero-stat-card">
+              <div class="card p-3 m-0 border-0 shadow-sm" style="background:#ffffff; border-radius:20px;">
                 <div class="d-flex justify-content-between align-items-center mb-1">
-                  <small class="text-light" style="font-size: 10px;">आज की कुल बिक्री</small>
-                  <span>💵</span>
+                  <small class="text-muted fw-bold" style="font-size:10.5px;">आज की बिक्री</small>
+                  <span class="fs-6">💵</span>
                 </div>
-                <h5 class="fw-bold m-0 text-success" id="statTodayTotal">₹0.00</h5>
+                <h4 class="fw-bold m-0 text-success" id="statTodayTotal" style="font-size:1.35rem; letter-spacing:-0.5px;">₹0.00</h4>
+                <div class="d-flex align-items-center gap-1 mt-1">
+                  <span class="badge bg-success bg-opacity-10 text-success fw-bold px-1.5 py-0.5 rounded-pill" style="font-size:8.5px;" id="statHomeProfitChip">मुनाफा: ₹0.00</span>
+                </div>
               </div>
             </div>
+
+            <!-- Pending Udhar -->
             <div class="col-6">
-              <div class="hero-stat-card" onclick="openAppSection('udhar-khata-sec'); loadUdharKhataData();" style="cursor:pointer;">
+              <div class="card p-3 m-0 border-0 shadow-sm cursor-pointer" onclick="openAppSection('udhar-khata-sec'); loadUdharKhataData();" style="background:#ffffff; border-radius:20px;">
                 <div class="d-flex justify-content-between align-items-center mb-1">
-                  <small class="text-light" style="font-size: 10px;">पेंडिंग उधार (Udhar)</small>
-                  <span>📖</span>
+                  <small class="text-muted fw-bold" style="font-size:10.5px;">बाकी उधार</small>
+                  <span class="fs-6">📖</span>
                 </div>
-                <h5 class="fw-bold m-0 text-warning" id="statPendingCount">₹0.00</h5>
+                <h4 class="fw-bold m-0 text-danger" id="statPendingCount" style="font-size:1.35rem; letter-spacing:-0.5px;">₹0.00</h4>
+                <small class="text-primary fw-bold mt-1 d-block" style="font-size:9px;">खाता विवरण ➔</small>
               </div>
             </div>
+
+            <!-- Pending Documents & Repairs Strip -->
+            <div class="col-12">
+              <div class="card p-2.5 m-0 border-0 shadow-sm bg-white" style="border-radius:18px;">
+                <div class="row g-2 text-center">
+                  <div class="col-6 border-end cursor-pointer" onclick="openAppSection('doc-receive-sec')">
+                    <small class="text-muted d-block fw-bold" style="font-size:9px;">📁 पेंडिंग फॉर्म / प्रमाण पत्र</small>
+                    <strong class="text-primary d-block mt-0.5" id="homePendingDocsCount" style="font-size:12px;">0 कार्य बाकी</strong>
+                  </div>
+                  <div class="col-6 cursor-pointer" onclick="openAppSection('repairing-sec')">
+                    <small class="text-muted d-block fw-bold" style="font-size:9px;">🛠️ रिपेयरिंग (पंखा/मोटर)</small>
+                    <strong class="text-warning d-block mt-0.5" id="homePendingRepairCount" style="font-size:12px;">0 रिपेयरिंग बाकी</strong>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Low Stock Banner -->
             <div class="col-12" id="heroLowStockWrapper">
-              <div class="hero-stat-card alert-card d-flex align-items-center justify-content-between" onclick="openAppSection('stock-sec'); showLowStockOnly();" style="cursor:pointer;">
-                <div class="d-flex align-items-center gap-2">
-                  <span class="fs-4">⚠️</span>
-                  <div>
-                    <strong class="d-block text-white" style="font-size:11px;">कम स्टॉक अलर्ट (Low Stock)</strong>
-                    <small class="text-light" style="font-size:10px;" id="homeLowStockSubText">चेक करें कौन सा सामान खत्म होने वाला है</small>
-                  </div>
-                </div>
-                <span class="badge bg-danger">View</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- 📊 COLLAPSIBLE ANALYTICS (Clean Screen Mode) -->
-          <div class="card p-2.5 border-0 shadow-sm bg-white mb-2" style="border-radius: 16px;">
-            <div class="d-flex justify-content-between align-items-center cursor-pointer" onclick="document.getElementById('analyticsChartCollapse').classList.toggle('d-none'); setTimeout(renderAnalyticsChart, 200);">
-              <div class="d-flex align-items-center gap-2">
-                <span class="fs-5">📊</span>
-                <div>
-                  <strong class="d-block text-dark" style="font-size:11.5px;">बिजनेस रिपोर्ट व मुनाफा ग्राफ</strong>
-                  <small class="text-muted" style="font-size:9px;">ग्राफ देखने के लिए यहाँ टैप करें</small>
-                </div>
-              </div>
-              <span class="badge bg-light text-primary border" style="font-size:9px;">चार्ट खोलें ▾</span>
-            </div>
-            <div id="analyticsChartCollapse" class="d-none mt-2 pt-2 border-top">
-              <div class="d-flex justify-content-end gap-1 mb-2">
-                <button type="button" class="btn btn-sm btn-outline-danger py-0.5 px-2 fw-bold" style="font-size: 9px; border-radius: 6px;" onclick="addMonthlyExpense()">➕ नया खर्च</button>
-                <button type="button" class="btn btn-sm btn-outline-primary py-0.5 px-2 fw-bold" style="font-size: 9px; border-radius: 6px;" onclick="renderAnalyticsChart()">🔄</button>
-              </div>
-              <div style="position: relative; width: 100%; height: 190px;">
-                <canvas id="businessAnalyticsChart"></canvas>
-              </div>
-            </div>
-          </div>
-            <div class="d-flex justify-content-between align-items-center mb-2 border-bottom pb-2">
-              <h6 class="fw-bold text-dark m-0" style="font-size: 0.85rem;">📊 सम्पूर्ण बिज़नेस ओवरव्यू (All Tabs)</h6>
-              <!-- Filter Select -->
-              <select id="homeOverviewFilter" class="form-select form-select-sm fw-bold border-primary text-primary" style="width: auto; font-size: 10px; border-radius: 8px;" onchange="updateAllTabsOverview()">
-                <option value="today">📅 आज (Today)</option>
-                <option value="this_month" selected>🗓️ इस महीने (This Month)</option>
-                <option value="all_time">🌐 अब तक (All Time)</option>
-              </select>
-            </div>
-            <!-- 1-Click All Data Backup Card -->
-          <div class="card p-2.5 border-0 shadow-sm bg-white mb-3" style="border-radius: 16px;">
-            <div class="d-flex justify-content-between align-items-center">
-              <div>
-                <strong class="d-block text-dark" style="font-size:12px;">📁 डेटा सुरक्षा (Data Backup)</strong>
-                <small class="text-muted" style="font-size:9.5px;">1-क्लिक में बैकअप फाइल डाउनलोड करें</small>
-              </div>
-              <button type="button" class="btn btn-sm btn-outline-success fw-bold py-1 px-2.5" style="font-size: 10px; border-radius: 8px;" onclick="downloadFullAppBackup()">💾 Backup All</button>
-            </div>
-          </div>
-          <div class="card p-3 border-0 shadow-sm bg-white mb-3" style="border-radius: 18px;">
-            <div class="d-flex justify-content-between align-items-center mb-2">
-              <h6 class="fw-bold text-dark m-0" style="font-size: 0.85rem;">🧮 आज की कैश क्लोजिंग (Daily Cash Summary)</h6>
-              <button type="button" class="btn btn-sm btn-outline-primary py-0 px-2 fw-bold" style="font-size: 9px;" onclick="calculateDayEndCash()">🔄 रिफ्रेश</button>
-            </div>
-            <div class="row g-2 text-center mt-1">
-              <div class="col-4">
-                <div class="p-2 border rounded bg-light">
-                  <small class="d-block text-muted fw-bold" style="font-size:8px;">कुल नकद आया (Cash In)</small>
-                  <strong class="text-success d-block fs-6" id="dayCashIn">₹0.00</strong>
-                </div>
-              </div>
-              <div class="col-4">
-                <div class="p-2 border rounded bg-light">
-                  <small class="d-block text-muted fw-bold" style="font-size:8px;">कुल नकद दिया (Cash Out)</small>
-                  <strong class="text-danger d-block fs-6" id="dayCashOut">₹0.00</strong>
-                </div>
-              </div>
-              <div class="col-4">
-                <div class="p-2 border rounded bg-primary text-white">
-                  <small class="d-block fw-bold" style="font-size:8px;">गल्ले में होना चाहिए</small>
-                  <strong class="d-block fs-6" id="dayNetCash">₹0.00</strong>
-                </div>
-              </div>
-            </div>
-          </div>
-
-            <!-- SECTION 1: BANKING TRANSACTIONS OVERVIEW -->
-            <div class="mb-2 p-2 rounded-3 border bg-light text-start">
-              <div class="d-flex justify-content-between align-items-center mb-1.5 border-bottom pb-1" onclick="openAppSection('transaction-sec')" style="cursor:pointer;">
-                <span class="fw-bold text-primary" style="font-size: 10.5px;">💸 Transactions (बैंक/UPI लेन-देन)</span>
-                <span class="badge bg-primary" style="font-size: 8px;">देखें ➔</span>
-              </div>
-              <div class="row g-1 text-center">
-                <div class="col-4">
-                  <div class="p-1.5 bg-white border rounded">
-                    <small class="d-block text-muted fw-bold" style="font-size:8px;">कुल लेन-देन</small>
-                    <strong class="text-dark d-block" style="font-size:10px;" id="ovTxnTotal">₹0.00</strong>
-                  </div>
-                </div>
-                <div class="col-4">
-                  <div class="p-1.5 bg-white border rounded">
-                    <small class="d-block text-success fw-bold" style="font-size:8px;">Deposit (नकद इन)</small>
-                    <strong class="text-success d-block" style="font-size:10px;" id="ovTxnDeposit">₹0.00</strong>
-                  </div>
-                </div>
-                <div class="col-4">
-                  <div class="p-1.5 bg-white border rounded">
-                    <small class="d-block text-danger fw-bold" style="font-size:8px;">Withdraw (पेआउट)</small>
-                    <strong class="text-danger d-block" style="font-size:10px;" id="ovTxnWithdraw">₹0.00</strong>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- SECTION 2: INVOICES & KHATA OVERVIEW -->
-            <div class="mb-2 p-2 rounded-3 border bg-light text-start">
-              <div class="d-flex justify-content-between align-items-center mb-1.5 border-bottom pb-1" onclick="openAppSection('invoice-sec')" style="cursor:pointer;">
-                <span class="fw-bold text-dark" style="font-size: 10.5px;">🧾 Invoices & Khata (बिक्री व उधार)</span>
-                <span class="badge bg-dark" style="font-size: 8px;">देखें ➔</span>
-              </div>
-              <div class="row g-1 text-center">
-                <div class="col-4">
-                  <div class="p-1.5 bg-white border rounded">
-                    <small class="d-block text-muted fw-bold" style="font-size:8px;">कुल बिक्री</small>
-                    <strong class="text-dark d-block" style="font-size:10px;" id="ovInvTotal">₹0.00</strong>
-                  </div>
-                </div>
-                <div class="col-4">
-                  <div class="p-1.5 bg-white border rounded">
-                    <small class="d-block text-success fw-bold" style="font-size:8px;">प्राप्त (Paid)</small>
-                    <strong class="text-success d-block" style="font-size:10px;" id="ovInvPaid">₹0.00</strong>
-                  </div>
-                </div>
-                <div class="col-4" onclick="openAppSection('udhar-khata-sec'); loadUdharKhataData();" style="cursor:pointer;">
-                  <div class="p-1.5 bg-white border border-danger rounded" style="background:#fff5f5 !important;">
-                    <small class="d-block text-danger fw-bold" style="font-size:8px;">पेंडिंग उधार</small>
-                    <strong class="text-danger d-block" style="font-size:10px;" id="ovInvBalance">₹0.00</strong>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- SECTION 3: DOCUMENTS & STOCK OVERVIEW -->
-            <div class="p-2 rounded-3 border bg-light text-start">
-              <div class="row g-2">
-                <!-- Documents Summary -->
-                <div class="col-6">
-                  <div class="p-2 bg-white border rounded" onclick="openAppSection('doc-receive-sec')" style="cursor:pointer;">
-                    <div class="d-flex justify-content-between align-items-center border-bottom pb-1 mb-1">
-                      <span class="fw-bold text-dark" style="font-size: 10px;">📁 Documents</span>
-                      <small class="badge bg-warning text-dark" style="font-size: 8px;" id="ovDocPendingCount">0 Pending</small>
-                    </div>
-                    <div class="d-flex justify-content-between align-items-center" style="font-size: 9px;">
-                      <span class="text-muted">कुल जमा:</span>
-                      <strong class="text-dark" id="ovDocTotalCount">0 Files</strong>
+              <div class="card p-2.5 m-0 border-0 shadow-sm cursor-pointer" onclick="openAppSection('stock-sec'); showLowStockOnly();" style="background:#fff8f0; border:1px solid #fed7aa !important; border-radius:18px;">
+                <div class="d-flex align-items-center justify-content-between">
+                  <div class="d-flex align-items-center gap-2">
+                    <span class="fs-5">⚠️</span>
+                    <div>
+                      <strong class="d-block text-dark" style="font-size:11.5px;">कम स्टॉक अलर्ट (Low Stock)</strong>
+                      <small class="text-secondary" style="font-size:9.5px;" id="homeLowStockSubText">सामान खत्म होने वाला है</small>
                     </div>
                   </div>
+                  <span class="badge bg-warning text-dark px-2 py-1 rounded-pill" style="font-size:9.5px;">चेक करें ➔</span>
                 </div>
+              </div>
+            </div>
 
-                <!-- Stock Summary -->
-                <div class="col-6">
-                  <div class="p-2 bg-white border rounded" onclick="openAppSection('stock-sec'); fetchStockData();" style="cursor:pointer;">
-                    <div class="d-flex justify-content-between align-items-center border-bottom pb-1 mb-1">
-                      <span class="fw-bold text-dark" style="font-size: 10px;">📦 Shop Stock</span>
-                      <small class="badge bg-danger" style="font-size: 8px;" id="ovStockLowCount">0 Low</small>
+            <!-- Compact Cash Closing Summary -->
+            <div class="col-12">
+              <div class="card p-3 m-0 border-0 shadow-sm bg-white" style="border-radius:20px;">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <span class="fw-bold text-dark" style="font-size:11px;">🧮 गल्ले की नकद स्थिति (Cash Closing)</span>
+                  <button type="button" class="btn btn-sm btn-light border py-0 px-2 fw-bold text-primary" style="font-size:9.5px; border-radius:8px;" onclick="calculateDayEndCash()">🔄 रिफ्रेश</button>
+                </div>
+                <div class="row g-2 text-center">
+                  <div class="col-4">
+                    <div class="p-2 rounded-3 bg-light">
+                      <small class="text-muted d-block" style="font-size:8.5px;">नकद आया</small>
+                      <strong class="text-success d-block" id="dayCashIn" style="font-size:11.5px;">₹0.00</strong>
                     </div>
-                    <div class="d-flex justify-content-between align-items-center" style="font-size: 9px;">
-                      <span class="text-muted">कुल सामान:</span>
-                      <strong class="text-dark" id="ovStockTotalCount">0 Items</strong>
+                  </div>
+                  <div class="col-4">
+                    <div class="p-2 rounded-3 bg-light">
+                      <small class="text-muted d-block" style="font-size:8.5px;">नकद दिया</small>
+                      <strong class="text-danger d-block" id="dayCashOut" style="font-size:11.5px;">₹0.00</strong>
+                    </div>
+                  </div>
+                  <div class="col-4">
+                    <div class="p-2 rounded-3" style="background:#f0f9ff; border:1px solid #bae6fd;">
+                      <small class="text-primary fw-bold d-block" style="font-size:8.5px;">गल्ले में नकद</small>
+                      <strong class="text-primary d-block" id="dayNetCash" style="font-size:11.5px;">₹0.00</strong>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-
           </div>
 
-        </div>
+          <!-- Hidden Values Placeholder for Backend Compatibility -->
+          <div class="d-none">
+            <span id="ovTxnTotal">₹0.00</span>
+            <span id="ovTxnDeposit">₹0.00</span>
+            <span id="ovTxnWithdraw">₹0.00</span>
+            <span id="ovInvTotal">₹0.00</span>
+            <span id="ovInvPaid">₹0.00</span>
+            <span id="ovInvBalance">₹0.00</span>
+            <span id="ovDocTotalCount">0 Files</span>
+            <span id="ovDocPendingCount">0 Pending</span>
+            <span id="ovStockTotalCount">0 Items</span>
+            <span id="ovStockLowCount">0 Low</span>
+          </div>
+
+        </div> <!-- dashboard-home-sec end -->
 
         <!-- 1. MODERN FINTECH TRANSACTION TAB -->
         <div class="tab-pane" id="transaction-sec">
-          <div class="d-flex align-items-center justify-content-between mb-2">
-            <button class="btn app-back-btn py-1 px-2.5 fw-bold" onclick="openAppSection('dashboard-home-sec')" style="font-size: 10px;">⬅️ Dashboard</button>
-            <span class="badge bg-primary bg-opacity-10 text-primary fw-bold px-2 py-1" style="font-size: 9.5px; border-radius: 8px;">⚡ FAST COUNTER</span>
+          <!-- Top Navigation Header -->
+          <div class="d-flex align-items-center justify-content-between mb-3 px-1">
+            <button class="btn btn-sm btn-light border py-1.5 px-3 fw-bold rounded-4 shadow-sm" onclick="openAppSection('dashboard-home-sec')" style="font-size: 11px;">⬅️ Dashboard</button>
+            <span class="badge bg-primary bg-opacity-10 text-primary fw-bold px-2.5 py-1.5 rounded-pill" style="font-size: 10px;">⚡ Fast Counter</span>
           </div>
 
-          <!-- Single Line 4-Column Compact Buttons -->
-          <div class="d-flex gap-1 mb-2" id="txnPillContainer">
-            <button type="button" class="btn btn-sm btn-primary fw-bold py-1 px-1 rounded-3 flex-fill text-nowrap" style="font-size: 9.5px;" onclick="selectTxnTypePill('AePS Withdrawal', this)">💵 AePS</button>
-            <button type="button" class="btn btn-sm btn-light border fw-bold py-1 px-1 rounded-3 flex-fill text-nowrap" style="font-size: 9.5px;" onclick="selectTxnTypePill('Bank Cash Deposit', this)">🏦 जमा</button>
-            <button type="button" class="btn btn-sm btn-light border fw-bold py-1 px-1 rounded-3 flex-fill text-nowrap" style="font-size: 9.5px;" onclick="selectTxnTypePill('UPI Received', this)">📲 UPI इन</button>
-            <button type="button" class="btn btn-sm btn-light border fw-bold py-1 px-1 rounded-3 flex-fill text-nowrap" style="font-size: 9.5px;" onclick="selectTxnTypePill('UPI Sent', this)">↗️ UPI आउट</button>
+          <!-- Apple Style Segmented Pill Selector -->
+          <div class="segmented-pill-bar mb-3" id="txnPillContainer">
+            <button type="button" class="btn btn-sm btn-primary flex-fill" onclick="selectTxnTypePill('AePS Withdrawal', this)">💵 AePS</button>
+            <button type="button" class="btn btn-sm flex-fill" onclick="selectTxnTypePill('Bank Cash Deposit', this)">🏦 जमा</button>
+            <button type="button" class="btn btn-sm flex-fill" onclick="selectTxnTypePill('UPI Received', this)">📲 UPI इन</button>
+            <button type="button" class="btn btn-sm flex-fill" onclick="selectTxnTypePill('UPI Sent', this)">↗️ UPI आउट</button>
           </div>
           <input type="hidden" id="txnType" value="AePS Withdrawal">
 
-          <!-- 1. Customer Details First (Smart Instant Auto-Fill) -->
-          <div class="card p-2.5 border-0 shadow-sm bg-white mb-2" style="border-radius: 18px;">
-            <!-- Hidden Camera & Gallery File Inputs -->
+          <!-- 👤 Step 1: Customer & Gateway Card -->
+          <div class="card p-3 border-0 shadow-sm bg-white mb-2.5" style="border-radius: 20px;">
             <input type="file" id="nativeCameraInput" accept="image/*" capture="user" class="d-none" onchange="handleNativeCamera(this)">
             <input type="file" id="nativeGalleryInput" accept="image/*" class="d-none" onchange="handleNativeCamera(this)">
 
-            <div class="d-flex align-items-center gap-2 mb-2 pb-2 border-bottom">
+            <!-- Top Row: Photo Avatar + Phone Number -->
+            <div class="d-flex align-items-center gap-3 mb-2.5">
               <div class="position-relative cursor-pointer flex-shrink-0" onclick="selectPhotoSource()" title="कैमरे से फोटो खींचें">
-                <img id="nativePreviewImg" src="https://cdn-icons-png.flaticon.com/512/847/847969.png" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid #2563eb; background:#f8fafc;">
-                <span class="badge bg-primary position-absolute bottom-0 end-0 p-1" style="font-size: 7px; border-radius: 50%; border: 1.5px solid #fff;">📷</span>
+                <img id="nativePreviewImg" src="https://cdn-icons-png.flaticon.com/512/847/847969.png" style="width: 54px; height: 54px; border-radius: 18px; object-fit: cover; border: 2px solid #0071e3; background:#f2f2f7;">
+                <span class="badge bg-primary position-absolute bottom-0 end-0 p-1 rounded-circle" style="font-size: 8px; border: 2px solid #fff;">📷</span>
               </div>
               <div class="flex-grow-1 min-w-0">
-                <div class="row g-1">
-                  <div class="col-12 mb-1">
-                    <input type="tel" id="txnMobile" class="form-control form-control-sm fw-bold border-primary text-primary" placeholder="📱 मोबाइल नं. दर्ज करें (Instant CRM Auto-fill)" maxlength="10" style="font-size:12px !important; height:38px !important;" oninput="this.value=this.value.replace(/\D/g,''); checkCRM(this.value, 'txnName', 'txnAadhaar', null)">
-                  </div>
-                  <div class="col-6">
-                    <input type="text" id="txnName" class="form-control form-control-sm fw-bold" placeholder="👤 ग्राहक का नाम">
-                  </div>
-                  <div class="col-6">
-                    <input type="text" id="txnAadhaar" class="form-control form-control-sm fw-bold" placeholder="🏦 अंतिम 4 अंक (e.g. 0467)" maxlength="4" oninput="this.value=this.value.replace(/\D/g,'').slice(0,4)">
-                  </div>
+                <div class="inset-input-box m-0">
+                  <span class="text-primary me-1 fs-6">📱</span>
+                  <input type="tel" id="txnMobile" class="w-100 fw-bold" placeholder="मोबाइल नंबर (Instant Auto-Fill)" maxlength="10" oninput="this.value=this.value.replace(/\D/g,''); checkCRM(this.value, 'txnName', 'txnAadhaar', null)">
                 </div>
               </div>
             </div>
 
-            <div class="row g-1.5">
-              <div class="col-12">
-                <select id="txnGateway" class="form-select form-select-sm fw-bold text-primary" onchange="toggleOtherGatewayInput()">
-                  <option value="ReliPay">ReliPay</option>
-                  <option value="CSC DigiPay">CSC DigiPay</option>
-                  <option value="Paytm">Paytm</option>
-                  <option value="PhonePe">PhonePe</option>
-                  <option value="Google Pay (GPay)">Google Pay</option>
-                  <option value="Other">Other</option>
-                </select>
-              </div>
-              <div class="col-12 d-none mt-1" id="otherGatewayBox">
-                <input type="text" id="txnGatewayOtherInput" class="form-control form-control-sm fw-bold border-danger" placeholder="ऐप / पोर्टल का नाम दर्ज करें">
-              </div>
-            </div>
-          </div>
-
-          <!-- 2. Transaction Amount with Quick Preset Chips -->
-          <div class="card p-2.5 border-0 shadow-sm bg-white mb-2" style="border-radius: 18px;">
-            <label class="small fw-bold text-muted mb-1" style="font-size: 10px;">निकासी / जमा राशि (AMOUNT ₹)</label>
-            <div class="input-group mb-2">
-              <span class="input-group-text bg-light border-0 fw-bold fs-4 text-primary">₹</span>
-              <input type="number" id="txnAmount" class="form-control border-0 bg-light fw-bold fs-4 text-primary" placeholder="0.00" style="height: 48px !important; border-radius: 12px !important;">
-            </div>
-            <!-- Fast Cash Chips -->
-            <div class="d-flex gap-1.5">
-              <button type="button" class="btn btn-sm btn-light border text-dark fw-bold py-1 px-2.5 rounded-3 flex-grow-1" style="font-size:10.5px;" onclick="document.getElementById('txnAmount').value=500">₹500</button>
-              <button type="button" class="btn btn-sm btn-light border text-dark fw-bold py-1 px-2.5 rounded-3 flex-grow-1" style="font-size:10.5px;" onclick="document.getElementById('txnAmount').value=1000">₹1,000</button>
-              <button type="button" class="btn btn-sm btn-light border text-dark fw-bold py-1 px-2.5 rounded-3 flex-grow-1" style="font-size:10.5px;" onclick="document.getElementById('txnAmount').value=2000">₹2,000</button>
-              <button type="button" class="btn btn-sm btn-light border text-dark fw-bold py-1 px-2.5 rounded-3 flex-grow-1" style="font-size:10.5px;" onclick="document.getElementById('txnAmount').value=5000">₹5,000</button>
-            </div>
-          </div>
-
-          <!-- 3. Slip OCR & Verification Card -->
-          <div class="card p-2.5 border-0 shadow-sm bg-white mb-2" style="border-radius: 18px;">
-            <div class="d-flex justify-content-between align-items-center mb-1">
-              <label class="small fw-bold text-primary m-0" style="font-size:10px;">📄 RRN / UTR NUMBER</label>
-              <input type="file" id="txnPhoto" accept="image/*" class="d-none" onchange="scanImage(this)">
-              <button type="button" class="btn btn-sm btn-outline-primary py-0.5 px-2 fw-bold" style="font-size: 9.5px; border-radius: 8px;" onclick="document.getElementById('txnPhoto').click()">📷 स्लिप स्कैन (OCR)</button>
-            </div>
-            <input type="text" id="txnId" class="form-control form-control-sm border-primary fw-bold text-uppercase" placeholder="RRN / UTR नंबर">
-            <span id="ocrStatus" class="small text-muted d-block mt-1" style="font-size: 9px;">स्लिप अपलोड करके RRN/UTR ऑटो-स्कैन करें</span>
-          </div>
-
-          <!-- 4. Signature & Note Card -->
-          <div class="card p-2.5 border-0 shadow-sm bg-white mb-2" style="border-radius: 18px;">
-            <div class="row g-2 align-items-center">
+            <!-- Bottom Row: Customer Name + Account Last 4 Digits -->
+            <div class="row g-2">
               <div class="col-7">
-                <input type="text" id="txnRemark" class="form-control form-control-sm border-secondary fw-medium" placeholder="💬 रिमार्क / नोट...">
+                <div class="inset-input-box m-0">
+                  <span class="text-muted me-1">👤</span>
+                  <input type="text" id="txnName" class="w-100 fw-bold text-truncate" placeholder="ग्राहक का नाम">
+                </div>
               </div>
               <div class="col-5">
-                <div class="p-1.5 border rounded-3 bg-light text-center cursor-pointer" onclick="openFullScreenSignatureModal()" style="border: 1.5px dashed #2563eb !important;">
-                  <img id="sigPreviewImg" src="" class="d-none" style="height: 24px; max-width: 100%; object-fit: contain;">
-                  <span id="sigPlaceholder" class="text-primary fw-bold d-block" style="font-size: 9.5px;">✍️ हस्ताक्षर करें</span>
+                <div class="inset-input-box m-0">
+                  <span class="text-muted me-1">🏦</span>
+                  <input type="text" id="txnAadhaar" class="w-100 fw-bold text-center" placeholder="अंतिम 4 अंक" maxlength="4" oninput="this.value=this.value.replace(/\D/g,'').slice(0,4)">
                 </div>
               </div>
             </div>
-            <div class="form-check mt-2 pt-1 border-top" style="font-size: 9.5px;">
-              <input class="form-check-input ms-0 me-1.5" type="checkbox" id="txnLegalConsent" checked>
-              <label class="form-check-label fw-semibold text-dark" for="txnLegalConsent">
-                पुष्टि: नकद राशि/ऑनलाइन ट्रांसफर प्राप्त/जमा कर लिया है।
-              </label>
+
+            <!-- Gateway Selector -->
+            <div class="inset-input-box m-0 mt-2">
+              <span class="text-primary me-1">🌐</span>
+              <select id="txnGateway" class="w-100 fw-bold text-primary" onchange="toggleOtherGatewayInput()">
+                <option value="ReliPay">ReliPay</option>
+              </select>
             </div>
-            <!-- Hidden Canvas for Data Storage -->
-            <canvas id="sigCanvas" height="80" class="d-none"></canvas>
+            <div class="d-none mt-2" id="otherGatewayBox">
+              <div class="inset-input-box m-0 border-danger">
+                <input type="text" id="txnGatewayOtherInput" class="w-100 fw-bold text-danger" placeholder="पोर्टल / ऐप का नाम लिखें">
+              </div>
+            </div>
           </div>
 
-          <!-- Submit Button -->
-          <button class="btn btn-primary w-100 fw-bold py-2.5 shadow mb-3" id="saveTxnBtn" style="border-radius: 16px; font-size: 13.5px; background: linear-gradient(135deg, #2563eb, #1d4ed8); border:none;" onclick="processTransaction()">
-            💾 लेन-देन सुरक्षित सेव करें (Save Txn)
-          </button>
+          <!-- 🔒 Step 2: Amount & Verification Wrapper (Unlocked After Photo) -->
+          <div id="txnFormRestWrapper" class="pe-none opacity-50" style="transition: all 0.3s ease;">
+            
+            <div id="photoCapturedAlert" class="alert alert-success py-2 px-3 small fw-bold mb-2.5 d-none shadow-sm rounded-4" style="font-size: 11px;">
+              ✅ फोटो सुरक्षित रूप से कैप्चर हो गई!
+            </div>
+
+            <!-- Big Modern Amount Display Card -->
+            <div class="card p-3 border-0 shadow-sm bg-white mb-2.5" style="border-radius: 20px;">
+              <span class="text-muted fw-bold d-block mb-1" style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;">लेन-देन राशि (Amount)</span>
+              
+              <div class="d-flex align-items-center justify-content-center py-1 mb-2">
+                <span class="fs-1 fw-bold text-primary me-2">₹</span>
+                <input type="number" id="txnAmount" class="border-0 bg-transparent fw-bold text-dark text-center" placeholder="0.00" style="font-size: 2.2rem; width: 80%; outline: none;">
+              </div>
+
+              <!-- Quick Presets -->
+              <div class="row g-2">
+                <div class="col-3">
+                  <button type="button" class="btn w-100 amount-chip" onclick="document.getElementById('txnAmount').value=500">₹500</button>
+                </div>
+                <div class="col-3">
+                  <button type="button" class="btn w-100 amount-chip" onclick="document.getElementById('txnAmount').value=1000">₹1,000</button>
+                </div>
+                <div class="col-3">
+                  <button type="button" class="btn w-100 amount-chip" onclick="document.getElementById('txnAmount').value=2000">₹2,000</button>
+                </div>
+                <div class="col-3">
+                  <button type="button" class="btn w-100 amount-chip" onclick="document.getElementById('txnAmount').value=5000">₹5,000</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- RRN / OCR Slip Box -->
+            <div class="card p-3 border-0 shadow-sm bg-white mb-2.5" style="border-radius: 20px;">
+              <div class="d-flex justify-content-between align-items-center mb-1.5">
+                <span class="text-muted fw-bold" style="font-size: 10px; text-transform: uppercase;">📄 RRN / UTR नंबर</span>
+                <input type="file" id="txnPhoto" accept="image/*" class="d-none" onchange="scanImage(this)">
+                <button type="button" class="btn btn-sm btn-outline-primary py-0.5 px-2.5 fw-bold rounded-pill" style="font-size: 10px;" onclick="document.getElementById('txnPhoto').click()">📷 स्लिप स्कैन (OCR)</button>
+              </div>
+              <div class="inset-input-box m-0">
+                <input type="text" id="txnId" class="w-100 fw-bold text-uppercase" placeholder="12-अंकों का RRN या UTR दर्ज करें">
+              </div>
+              <span id="ocrStatus" class="small text-muted d-block mt-1 text-center" style="font-size: 9.5px;">स्लिप अपलोड करके ऑटो-स्कैन करें</span>
+            </div>
+
+            <!-- Note & Signature Row -->
+            <div class="card p-3 border-0 shadow-sm bg-white mb-3" style="border-radius: 20px;">
+              <div class="row g-2 align-items-center">
+                <div class="col-7">
+                  <div class="inset-input-box m-0">
+                    <input type="text" id="txnRemark" class="w-100 fw-medium" placeholder="💬 रिमार्क / विवरण...">
+                  </div>
+                </div>
+                <div class="col-5">
+                  <div class="p-2 border rounded-4 bg-light text-center cursor-pointer" onclick="openFullScreenSignatureModal()" style="border: 1.5px dashed #0071e3 !important;">
+                    <img id="sigPreviewImg" src="" class="d-none" style="height: 24px; max-width: 100%; object-fit: contain;">
+                    <span id="sigPlaceholder" class="text-primary fw-bold d-block" style="font-size: 10px;">✍️ साइन करें</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="form-check mt-2.5 pt-2 border-top" style="font-size: 10px;">
+                <input class="form-check-input ms-0 me-2" type="checkbox" id="txnLegalConsent" checked>
+                <label class="form-check-label fw-semibold text-dark" for="txnLegalConsent">
+                  पुष्टि: नकद राशि/ऑनलाइन ट्रांसफर प्राप्त/जमा कर लिया है।
+                </label>
+              </div>
+              <canvas id="sigCanvas" height="80" class="d-none"></canvas>
+            </div>
+
+            <!-- Final Big Apple-style Primary Save Button -->
+            <button class="btn btn-primary w-100 fw-bold py-3 shadow mb-3" id="saveTxnBtn" style="border-radius: 18px; font-size: 14px; background: #0071e3; border: none; letter-spacing: 0.2px;" onclick="processTransaction()">
+              💾 लेन-देन सुरक्षित सेव करें
+            </button>
+
+          </div> <!-- txnFormRestWrapper end -->
 
           <!-- Transaction Recent Entries History List with Search -->
           <div class="card p-3 shadow-sm border-0 mt-3">
@@ -1368,7 +1542,6 @@
                 <button type="button" class="btn btn-sm btn-outline-success p-0 px-1.5 fw-bold" style="font-size:9px; border-radius:4px;" onclick="exportTableToExcel('txnHistoryTableBody', 'Transaction_History')" title="Excel">📊 Excel</button>
               </div>
             </div>
-            <!-- Search Box -->
             <div class="mb-2">
               <input type="text" id="txnSearchInput" class="form-control form-control-sm" placeholder="🔍 Search Name, Txn ID, Mobile..." oninput="filterTxnHistoryTable()">
             </div>
@@ -1389,12 +1562,13 @@
                   </tr>
                 </thead>
                 <tbody id="txnHistoryTableBody">
-                  <tr><td colspan="6" class="text-center text-muted">Koi transaction entry nahi mili.</td></tr>
+                  <tr><td colspan="10" class="text-center text-muted">Koi transaction entry nahi mili.</td></tr>
                 </tbody>
               </table>
             </div>
           </div>
-        </div>
+
+        </div> <!-- transaction-sec end -->
 
         <!-- 2. INVOICE TAB (Matching Image Layout) -->
         <div class="tab-pane" id="invoice-sec">
@@ -1470,7 +1644,6 @@
               <div class="col-12 text-end mt-3">
                 <h5 class="inv-grand-total m-0">Grand Total: ₹<span id="displayTotal">0.00</span></h5>
               </div>
-              <!-- 📱 Live Payment QR Box Placeholder -->
               <div class="col-12" id="formUpiQrBox"></div>
             </div>
 
@@ -1490,7 +1663,6 @@
                 <button type="button" class="btn btn-sm btn-outline-success p-0 px-1.5 fw-bold" style="font-size:9px; border-radius:4px;" onclick="exportTableToExcel('invoiceHistoryTableBody', 'Invoice_History')" title="Excel">📊 Excel</button>
               </div>
             </div>
-            <!-- Search Box -->
             <div class="mb-2">
               <input type="text" id="invSearchInput" class="form-control form-control-sm" placeholder="🔍 Search Invoice No, Name, Mobile..." oninput="filterInvoiceHistoryTable()">
             </div>
@@ -1509,12 +1681,12 @@
                   </tr>
                 </thead>
                 <tbody id="invoiceHistoryTableBody">
-                  <tr><td colspan="6" class="text-center text-muted py-2">Koi invoice history nahi hai.</td></tr>
+                  <tr><td colspan="8" class="text-center text-muted py-2">Koi invoice history nahi hai.</td></tr>
                 </tbody>
               </table>
             </div>
           </div>
-        </div>
+        </div> <!-- invoice-sec end -->
 
         <!-- 3. STOCK DETAILS TAB (REDESIGNED MODERN UI) -->
         <div class="tab-pane" id="stock-sec">
@@ -1659,8 +1831,8 @@
             </div>
           </div>
 
-          <!-- Dynamic Product Cards Grid Container (Bottom Padding Fix for Mobile View) -->
-          <div id="stockCardsContainer" class="d-flex flex-column gap-2" style="max-height: calc(100vh - 220px); overflow-y: auto; padding-right: 2px; padding-bottom: 120px !important; -webkit-overflow-scrolling: touch;">
+          <!-- Dynamic Product Cards Grid Container -->
+          <div id="stockCardsContainer" class="d-flex flex-column gap-2.5" style="overflow-y: auto; padding-bottom: 110px !important; -webkit-overflow-scrolling: touch;">
             <!-- Dynamic Product Cards JS dwara inject honge -->
           </div>
 
@@ -2177,19 +2349,26 @@
               <button class="btn btn-success w-50 fw-bold py-2 shadow-sm" style="border-radius: 8px; font-size:12px; background:#1b5e20;" onclick="openKhataEntryDrawer('GET')">YOU GOT ₹</button>
             </div>
           </div>
-
         </div>
 
+      </div> <!-- tab-content end -->
+
+      <!-- Developer Info Footer -->
+      <div class="text-center py-2 mt-2 border-top">
+        <small class="text-muted d-block fw-bold" style="font-size: 10px;">Developed By :- Er. Anurag Shakya</small>
+        <small class="text-secondary d-block fw-bold" style="font-size: 9px;">Version:-2.0.14</small>
+        <a href="tel:9761414105" class="text-decoration-none fw-bold text-primary" style="font-size: 10px;">📞 9761414105</a>
       </div>
 
-     <!-- Developer Info Footer -->
-    <div class="text-center py-2 mt-2 border-top">
-      <small class="text-muted d-block fw-bold" style="font-size: 10px;">Developed By :- Er. Anurag Shakya</small>
-      <small class="text-secondary d-block fw-bold" style="font-size: 9px;">Version:-2.0.13</small>
-      <a href="tel:9761414105" class="text-decoration-none fw-bold text-primary" style="font-size: 10px;">📞 9761414105</a>
-    </div>
+    </div> <!-- p-2.5 end -->
+  </div> <!-- app-mobile-frame end -->
 
-    <!-- Fixed App Bottom Navigation Bar (4 Core Tabs) -->
+  <!-- ➕ Minimal Material You Floating Action Button (FAB) -->
+    <button type="button" class="fab-btn" onclick="openAppSection('invoice-sec')" style="position: fixed; bottom: 85px; right: 20px; width: 56px; height: 56px; border-radius: 18px; background: #0071e3; color: #fff; border: none; box-shadow: 0 8px 24px rgba(0, 113, 227, 0.35); font-size: 24px; display: flex; align-items: center; justify-content: center; z-index: 999;" title="नया बिल बनाएं">
+      ＋
+    </button>
+
+    <!-- Fixed App Bottom Navigation Bar (5 Core Tabs with Stock) -->
     <nav class="app-bottom-nav">
       <button class="nav-btn active" onclick="openAppSection('dashboard-home-sec')">
         <span class="nav-icon">🏠</span>
@@ -2202,6 +2381,10 @@
       <button class="nav-btn" onclick="openAppSection('invoice-sec')">
         <span class="nav-icon">🧾</span>
         <span>नया बिल</span>
+      </button>
+      <button class="nav-btn" onclick="openAppSection('stock-sec'); fetchStockData();">
+        <span class="nav-icon">📦</span>
+        <span>स्टॉक</span>
       </button>
       <button class="nav-btn" onclick="openAppSection('udhar-khata-sec'); loadUdharKhataData();">
         <span class="nav-icon">📖</span>
@@ -2507,7 +2690,7 @@
     }
 
     // Deploy kiye gaye Web App ka URL yahan dalein (REST API fallback ke liye)
-    var SCRIPT_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyktX8JhAvRoctaiP5EiyBvPEmh4t1GW8MHDsUssEW_5QD-L0QEJObjCfmi_zTPQWA-/exec";
+    var SCRIPT_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbz4xm7NpxHt8dgSOK3v5KkAoCaivNo2HsA-lXYwjfC3of1LN7Sth89MSx8Ad6gIcF6T/exec";
     // 🚨 GLOBAL REAL-TIME ERROR LOGGER FUNCTION
     function sendErrorToSheet(errorType, clickAction, impactText, errorObj) {
       var errData = {
@@ -2578,24 +2761,25 @@ function renderTxnHistoryTable() {
     var tbody = document.getElementById("txnHistoryTableBody");
     if(!tbody) return;
     if(!globalTxnHistory || globalTxnHistory.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="9" class="text-center text-muted py-2">Koi transaction entry nahi mili.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="10" class="text-center text-muted py-2">Koi transaction entry nahi mili.</td></tr>';
       return;
     }
     var html = "";
     globalTxnHistory.forEach(function(row, idx) {
       var userImg = fixDriveImageUrl(row.receiverPhoto);
       var displayDate = row.date || '-';
+      var isCredit = (row.type === 'Bank Cash Deposit' || row.type === 'UPI Received' || row.type === 'Deposit');
 
-      html += '<tr>' +
-        '<td class="text-center" style="padding:2px;"><img src="' + userImg + '" style="width:24px; height:28px; border-radius:50%; object-fit:cover; border:1px solid #cbd5e1;" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/847/847969.png\'" onclick="openTxnDetailsModal(' + idx + ')"></td>' +
-        '<td onclick="openTxnDetailsModal(' + idx + ')" style="cursor:pointer; white-space:nowrap;">' + escapeHtml(displayDate) + '</td>' +
-        '<td class="fw-bold" onclick="openTxnDetailsModal(' + idx + ')" style="cursor:pointer;">' + escapeHtml(row.name || '-') + '</td>' +
+      html += '<tr class="align-middle" onclick="openTxnDetailsModal(' + idx + ')" style="cursor:pointer;" title="Tap to view full receipt">' +
+        '<td class="text-center" style="padding:2px;"><img src="' + userImg + '" style="width:26px; height:26px; border-radius:50%; object-fit:cover; border:1px solid #cbd5e1;" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/847/847969.png\'"></td>' +
+        '<td style="white-space:nowrap;">' + escapeHtml(displayDate) + '</td>' +
+        '<td class="fw-bold text-dark">' + escapeHtml(row.name || '-') + '</td>' +
         '<td>' + escapeHtml(row.mobile || '-') + '</td>' +
-        '<td><span class="badge ' + (row.type==='Deposit' || row.type==='UPI Received'?'bg-success':'bg-danger') + '">' + escapeHtml(row.type || '-') + '</span></td>' +
-        '<td class="fw-bold text-primary">Rs.' + escapeHtml(row.amount || 0) + '</td>' +
+        '<td><span class="badge ' + (isCredit ? 'bg-success' : 'bg-danger') + '" style="font-size:8.5px;">' + escapeHtml(row.type || '-') + '</span></td>' +
+        '<td class="fw-bold ' + (isCredit ? 'text-success' : 'text-danger') + '">₹' + escapeHtml(row.amount || 0) + '</td>' +
         '<td>' + escapeHtml(row.gateway || '-') + '</td>' +
         '<td>' + escapeHtml(row.aadhaar || '-') + '</td>' +
-        '<td class="fw-bold text-success">' + escapeHtml(row.txnId || '-') + '</td>' +
+        '<td class="fw-bold text-primary">' + escapeHtml(row.txnId || '-') + '</td>' +
         '<td>' + escapeHtml(row.remark || '-') + '</td>' +
         '</tr>';
     });
@@ -2656,12 +2840,16 @@ function renderTxnHistoryTable() {
       } else {
         // यदि इनवॉइस बिल है तो असली A4 PDF जनरेट होकर शेयर होगा
         if (window.AndroidApp && typeof window.AndroidApp.sharePdfToWhatsApp === "function") {
-          generateInvoicePDFBase64(data, function(base64Pdf) {
-            window.AndroidApp.sharePdfToWhatsApp(base64Pdf, mob, msg);
-          });
-        } else {
-          window.open("https://api.whatsapp.com/send?phone=91" + mob + "&text=" + encodeURIComponent(msg), "_blank");
-        }
+            try {
+              generateInvoicePDFBase64(data, function(base64Pdf) {
+                window.AndroidApp.sharePdfToWhatsApp(base64Pdf, mob, msg);
+              });
+            } catch(e) {
+              window.open("https://api.whatsapp.com/send?phone=91" + mob + "&text=" + encodeURIComponent(msg), "_blank");
+            }
+          } else {
+            window.open("https://api.whatsapp.com/send?phone=91" + mob + "&text=" + encodeURIComponent(msg), "_blank");
+          }
       }
     }
 
@@ -2720,15 +2908,21 @@ function renderTxnHistoryTable() {
     // Modal Close Helper Function
     function closeModalPopup() {
       var modalEl = document.getElementById('detailsModal');
-      if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-        var myModal = bootstrap.Modal.getInstance(modalEl);
-        if (myModal) myModal.hide();
+      if (modalEl) {
+        if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+          var myModal = bootstrap.Modal.getInstance(modalEl);
+          if (myModal) myModal.hide();
+        }
+        modalEl.style.display = 'none';
+        modalEl.classList.remove('show');
+        modalEl.setAttribute('aria-hidden', 'true');
       }
-      modalEl.style.display = 'none';
-      modalEl.classList.remove('show');
-      modalEl.setAttribute('aria-hidden', 'true');
-      var backdrop = document.getElementById('customModalBackdrop');
-      if (backdrop) backdrop.remove();
+      // Sabhi lingering backdrops safely hatayein
+      var backdrops = document.querySelectorAll('.modal-backdrop, #customModalBackdrop');
+      backdrops.forEach(function(b) { b.remove(); });
+      document.body.classList.remove('modal-open');
+      document.body.style.removeProperty('padding-right');
+      document.body.style.removeProperty('overflow');
     }
 
     // Click to Zoom Full Image Modal Preview Helper
@@ -2743,41 +2937,41 @@ function viewFullImageZoom(imgUrl, titleText) {
 
 function openTxnDetailsModal(index) {
     var item = globalTxnHistory[index];
-    if(!item) return;
+    if (!item) return;
 
-    // सही फील्ड्स के अनुसार लिंक फिक्स करना
     var profileImgSrc = fixDriveImageUrl(item.receiverPhoto);
     var slipImgSrc = fixDriveImageUrl(item.slipPhoto);
     var sigImgSrc = fixDriveImageUrl(item.signature);
+    var cName = (item.name || 'Customer').replace(/'/g, "");
 
     var slipHtml = (item.slipPhoto && item.slipPhoto.length > 20) 
-      ? '<img src="' + slipImgSrc + '" class="modal-doc-img mt-1 cursor-pointer" onclick="viewFullImageZoom(\'' + slipImgSrc + '\', \'Transaction Slip\')" title="टैप करके बड़ा देखें" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/847/847969.png\'">' 
+      ? '<img src="' + slipImgSrc + '" class="modal-doc-img mt-1 cursor-pointer" onclick="viewFullImageZoom(\'' + slipImgSrc + '\', \'Transaction Slip\')" title="Tap to Zoom" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/847/847969.png\'">' 
       : '<small class="text-muted d-block mt-1">Not Uploaded</small>';
 
     var sigHtml = (item.signature && item.signature.length > 20) 
-      ? '<img src="' + sigImgSrc + '" class="modal-doc-img mt-1 cursor-pointer" style="background:#fff;" onclick="viewFullImageZoom(\'' + sigImgSrc + '\', \'Customer Signature\')" title="टैप करके बड़ा देखें" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/847/847969.png\'">' 
+      ? '<img src="' + sigImgSrc + '" class="modal-doc-img mt-1 cursor-pointer" style="background:#fff;" onclick="viewFullImageZoom(\'' + sigImgSrc + '\', \'Customer Signature\')" title="Tap to Zoom" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/847/847969.png\'">' 
       : '<small class="text-muted d-block mt-1">No Signature</small>';
 
-    // नया Remark फ़ील्ड उठाना
     var remarkText = item.remark || item.remarks || item.method || item.type || 'General Transaction';
     var entryUser = item.entryDoneBy || item.entrydoneby || (currentLoggedInUser && currentLoggedInUser.name ? currentLoggedInUser.name : "Anurag Shakya");
+    var isCredit = (item.type === 'Bank Cash Deposit' || item.type === 'UPI Received' || item.type === 'Deposit');
 
     var html = '<div class="text-center mb-3">' +
-      '<img src="' + profileImgSrc + '" class="modal-profile-img mb-1 cursor-pointer" onclick="viewFullImageZoom(\'' + profileImgSrc + '\', \'' + (escapeHtml(item.name) || 'Customer') + '\')" title="टैप करके बड़ा देखें" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/847/847969.png\'">' +
-      '<h6 class="fw-bold text-dark m-0">' + (escapeHtml(item.name) || 'Customer Name') + '</h6>' +
-      '<small class="text-primary fw-bold d-block mb-0.5">📱 Mo: ' + (escapeHtml(item.mobile) || '-') + '</small>' +
-      '<small class="text-muted">' + (escapeHtml(item.date) || '-') + '</small>' +
+      '<img src="' + profileImgSrc + '" class="modal-profile-img mb-1 cursor-pointer" onclick="viewFullImageZoom(\'' + profileImgSrc + '\', \'' + cName + '\')" title="Tap to Zoom" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/847/847969.png\'">' +
+      '<h6 class="fw-bold text-dark m-0">' + escapeHtml(item.name || 'Customer Name') + '</h6>' +
+      '<small class="text-primary fw-bold d-block mb-0.5">📱 Mo: ' + escapeHtml(item.mobile || '-') + '</small>' +
+      '<small class="text-muted">' + escapeHtml(item.date || '-') + '</small>' +
     '</div>' +
     '<div class="card p-2 border-0 bg-white shadow-sm" style="font-size:12px;">' +
-      '<div class="d-flex justify-content-between border-bottom pb-1 mb-2"><span class="text-muted">Transaction Type:</span><span class="badge ' + (item.type==='Deposit' || item.type==='UPI Received'?'bg-success':'bg-danger') + '">' + escapeHtml(item.type) + '</span></div>' +
-      '<div class="d-flex justify-content-between border-bottom pb-1 mb-2"><span class="text-muted">Amount:</span><strong class="text-primary fs-6">Rs. ' + (item.amount || 0) + '</strong></div>' +
+      '<div class="d-flex justify-content-between border-bottom pb-1 mb-2"><span class="text-muted">Transaction Type:</span><span class="badge ' + (isCredit ? 'bg-success' : 'bg-danger') + '">' + escapeHtml(item.type || '-') + '</span></div>' +
+      '<div class="d-flex justify-content-between border-bottom pb-1 mb-2"><span class="text-muted">Amount:</span><strong class="' + (isCredit ? 'text-success' : 'text-danger') + ' fs-6">₹' + escapeHtml(item.amount || 0) + '</strong></div>' +
       '<div class="d-flex justify-content-between border-bottom pb-1 mb-2"><span class="text-muted">Gateway:</span><strong>' + escapeHtml(item.gateway || '-') + '</strong></div>' +
-      '<div class="d-flex justify-content-between border-bottom pb-1 mb-2"><span class="text-muted">Txn / UTR ID:</span><strong class="text-success">' + escapeHtml(item.txnId || '-') + '</strong></div>' +
+      '<div class="d-flex justify-content-between border-bottom pb-1 mb-2"><span class="text-muted">Txn / UTR ID:</span><strong class="text-primary">' + escapeHtml(item.txnId || '-') + '</strong></div>' +
       '<div class="d-flex justify-content-between border-bottom pb-1 mb-2"><span class="text-muted">Respond By:</span><strong class="text-dark">' + escapeHtml(entryUser) + '</strong></div>' +
       '<div class="border-bottom pb-2 mb-2"><span class="text-muted d-block mb-1">💬 Remark / Details:</span><div class="p-2 bg-light rounded text-dark fw-bold" style="font-size:11px;">' + escapeHtml(remarkText) + '</div></div>' +
       '<div class="row text-center mt-2">' +
-        '<div class="col-6 border-end"><strong>📄 Transaction Slip</strong><br>' + slipHtml + '<small class="d-block text-muted" style="font-size:8px;">🔍 टैप करके बड़ा देखें</small></div>' +
-        '<div class="col-6"><strong>✍️ Customer Signature</strong><br>' + sigHtml + '<small class="d-block text-muted" style="font-size:8px;">🔍 टैप करके बड़ा देखें</small></div>' +
+        '<div class="col-6 border-end"><strong>📄 Transaction Slip</strong><br>' + slipHtml + '<small class="d-block text-muted" style="font-size:8px;">🔍 Tap karke bada dekhein</small></div>' +
+        '<div class="col-6"><strong>✍️ Customer Signature</strong><br>' + sigHtml + '<small class="d-block text-muted" style="font-size:8px;">🔍 Tap karke bada dekhein</small></div>' +
       '</div>' +
     '</div>';
 
@@ -3294,6 +3488,21 @@ function downloadTxnReceiptPDF(index) {
       if(document.getElementById("statTodayTotal")) document.getElementById("statTodayTotal").innerText = "₹" + todaySales.toFixed(2);
       if(document.getElementById("statPendingCount")) document.getElementById("statPendingCount").innerText = "₹" + invBalance.toFixed(2);
 
+      // Asli Munafa Chip Update
+      if (document.getElementById("statHomeProfitChip") && typeof calculateTodayProfit === "function") {
+        document.getElementById("statHomeProfitChip").innerText = "मुनाफा: ₹" + calculateTodayProfit();
+      }
+
+      // Pending Documents & Repair Counters Sync
+      var docPending = (globalDocHistory || []).filter(function(d){ return d.status === 'Pending' || !d.status; }).length;
+      if (document.getElementById("homePendingDocsCount")) {
+        document.getElementById("homePendingDocsCount").innerText = docPending + " कार्य बाकी";
+      }
+      var repPending = (globalRepairHistory || []).filter(function(r){ return (r.status || '').indexOf('Done') === -1; }).length;
+      if (document.getElementById("homePendingRepairCount")) {
+        document.getElementById("homePendingRepairCount").innerText = repPending + " रिपेयरिंग बाकी";
+      }
+
       // 3. DOCUMENTS TAB CALCULATION
       var docTotalCount = (globalDocHistory || []).length;
       var docPendingCount = (globalDocHistory || []).filter(function(d) { return d.status === 'Pending' || d.status === undefined; }).length;
@@ -3506,6 +3715,9 @@ function downloadTxnReceiptPDF(index) {
       var savedUser = localStorage.getItem("mg_csc_user_session");
       var isTxnCameraActive = sessionStorage.getItem("txn_camera_active_flag");
       var isUserAvatarActive = sessionStorage.getItem("user_avatar_camera_flag");
+      
+      // ✅ FIX: Agar Transaction draft mojood hai to section restore karo (chahe flag ho ya na ho)
+      var hasTxnDraft = sessionStorage.getItem("txn_form_draft_data");
 
       if (savedUser) {
         try {
@@ -3515,30 +3727,32 @@ function downloadTxnReceiptPDF(index) {
             applyLoggedInUserUI(currentLoggedInUser.name);
           }
 
-          // 1. अगर Transaction में Receiver की फोटो खींची गई थी
+          // 1. Agar camera active tha toh hi draft ke hisaab se tab restore karein, varna seedhe Home kholein
           if (isTxnCameraActive === "true") {
             sessionStorage.removeItem("txn_camera_active_flag");
-            document.getElementById("appLoginOverlay").style.display = "none";
+            var overlay = document.getElementById("appLoginOverlay");
+            if (overlay) overlay.style.display = "none";
             initApp();
             setTimeout(function() {
               openAppSection('transaction-sec');
               if (typeof restoreTxnFormDraft === 'function') restoreTxnFormDraft();
-            }, 300);
+              var savedReceiverImg = sessionStorage.getItem("txn_receiver_photo_cache");
+              if (savedReceiverImg && savedReceiverImg.length > 50) {
+                receiverImageBase64 = savedReceiverImg;
+                var previewImg = document.getElementById("nativePreviewImg");
+                if (previewImg) previewImg.src = savedReceiverImg;
+              }
+            }, 400);
           } 
-          // 2. अगर User ने अपनी प्रोफाइल अवतार फोटो खींची थी
-          else if (isUserAvatarActive === "true") {
-            sessionStorage.removeItem("user_avatar_camera_flag");
-            document.getElementById("appLoginOverlay").style.display = "none";
-            initApp();
-            setTimeout(function() {
-              openAppSection('dashboard-home-sec');
-            }, 300);
-          } 
-          // 3. सामान्य ऐप ओपन - सीधे ऐप लोड करें (बिना बार-बार PIN मांगे)
+          // 2. Normal App Open / Restart — Hamesha Home Dashboard khulega
           else {
+            sessionStorage.removeItem("user_avatar_camera_flag");
             var overlay = document.getElementById("appLoginOverlay");
             if (overlay) overlay.style.display = "none";
             initApp();
+            setTimeout(function() {
+              openAppSection('dashboard-home-sec');
+            }, 200);
           }
         } catch(e) {
           showLoginScreen();
@@ -4259,47 +4473,77 @@ function downloadTxnReceiptPDF(index) {
         }
 
         try {
-          var jsPdfLib = window.jspdf ? window.jspdf.jsPDF : window.jsPDF;
-          if (!jsPdfLib) return alert("⚠️ PDF लाइब्रेरी लोड नहीं है, कृपया पेज रीफ़्रेश करें!");
+          var jsPdfClass = null;
+          if (window.jspdf && window.jspdf.jsPDF) {
+            jsPdfClass = window.jspdf.jsPDF;
+          } else if (window.jsPDF) {
+            jsPdfClass = window.jsPDF;
+          }
 
-          var doc = new jsPdfLib({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+          if (!jsPdfClass) {
+            return alert("⚠️ PDF library sahi se load nahi ho saki, kripya page refresh karein!");
+          }
+
+          var doc = new jsPdfClass({ orientation: 'landscape', unit: 'mm', format: 'a4' });
           var now = new Date();
           var dateStr = String(now.getDate()).padStart(2, '0') + "-" + String(now.getMonth() + 1).padStart(2, '0') + "-" + now.getFullYear();
           var timeStr = String(now.getHours()).padStart(2, '0') + "-" + String(now.getMinutes()).padStart(2, '0') + "-" + String(now.getSeconds()).padStart(2, '0');
           var fileName = reportName + "_" + dateStr + "_" + timeStr + ".pdf";
 
-          doc.setFontSize(15);
+          doc.setFontSize(14);
           doc.setTextColor(15, 23, 42);
-          doc.text("Maa Ganga Jan Seva Kendra & Electronics", 14, 15);
+          doc.text("Maa Ganga Jan Seva Kendra & Electronics", 14, 14);
 
           doc.setFontSize(10);
           doc.setTextColor(37, 99, 235);
-          doc.text("LIVE REPORT: " + reportName.replace(/_/g, ' ').toUpperCase(), 14, 21);
+          doc.text("REPORT: " + reportName.replace(/_/g, ' ').toUpperCase(), 14, 20);
 
           doc.setFontSize(8);
           doc.setTextColor(100, 116, 139);
-          doc.text("Generated: " + now.toLocaleString('en-IN') + " (Total Records: " + rows.length + ")", 14, 26);
+          doc.text("Generated: " + now.toLocaleString('en-IN') + " (Records: " + rows.length + ")", 14, 25);
 
-          doc.autoTable({
-            head: [headers],
-            body: rows,
-            startY: 30,
-            theme: 'grid',
-            headStyles: { fillColor: [15, 23, 42], textColor: [255, 255, 255], fontSize: 9, fontStyle: 'bold' },
-            bodyStyles: { fontSize: 8, textColor: [0, 0, 0] },
-            alternateRowStyles: { fillColor: [248, 250, 252] },
-            margin: { top: 30, left: 14, right: 14 }
-          });
+          // Check if autoTable function exists on instance
+          if (typeof doc.autoTable === "function") {
+            doc.autoTable({
+              head: [headers],
+              body: rows,
+              startY: 28,
+              theme: 'grid',
+              headStyles: { fillColor: [15, 23, 42], textColor: [255, 255, 255], fontSize: 8.5, fontStyle: 'bold' },
+              bodyStyles: { fontSize: 7.5, textColor: [0, 0, 0] },
+              alternateRowStyles: { fillColor: [248, 250, 252] },
+              margin: { top: 28, left: 14, right: 14 }
+            });
+          } else {
+            // HTML Table fallback
+            var startY = 32;
+            rows.slice(0, 40).forEach(function(r) {
+              doc.text(r.slice(0, 5).join(" | "), 14, startY);
+              startY += 6;
+            });
+          }
 
           if (window.AndroidApp && typeof window.AndroidApp.savePdfFile === "function") {
             var pdfBase64 = doc.output('datauristring');
             window.AndroidApp.savePdfFile(pdfBase64, fileName);
+            alert("✅ PDF download ho gaya!");
           } else {
-            doc.save(fileName);
+            var pdfBlob = doc.output('blob');
+            var blobUrl = window.URL.createObjectURL(pdfBlob);
+            var dlAnchor = document.createElement("a");
+            dlAnchor.style.display = "none";
+            dlAnchor.href = blobUrl;
+            dlAnchor.download = fileName;
+            document.body.appendChild(dlAnchor);
+            dlAnchor.click();
+            setTimeout(function() {
+              window.URL.revokeObjectURL(blobUrl);
+              dlAnchor.remove();
+            }, 800);
+            alert("✅ PDF download shuru ho gaya!");
           }
-          alert("✅ PDF डाउनलोड हो गया!");
         } catch (err) {
-          alert("❌ PDF बनाने में त्रुटि: " + err.message);
+          alert("❌ PDF download error: " + err.message);
         }
       });
     }
@@ -4363,8 +4607,8 @@ function downloadModalAsImage() {
       '<div style="display:flex; align-items:center; gap:10px;">' +
         '<img src="https://lh3.googleusercontent.com/d/1AVhGGj41J973HK0KgI1im5JJwJZsKhJR" style="width:48px; height:48px; border-radius:50%; border:2px solid #0f172a; object-fit:cover;">' +
         '<div>' +
-          '<h2 style="margin:0; color:#0f172a; font-size:15px; font-weight:800; text-transform:uppercase;">Maa Ganga Jan Seva Kendra</h2>' +
-          '<small style="color:#475569; font-size:9.5px; font-weight:600;">Pro: Anurag Shakya | Mo: 9761414105</small>' +
+          '<h2 style="margin:0; color:#0f172a; font-size:15px; font-weight:800;">माँ गंगा जन सेवा केंद्र</h2>' +
+          '<small style="color:#475569; font-size:9.5px; font-weight:600;">Pro: अनुराग शाक्य | Mo: 9761414105</small>' +
         '</div>' +
       '</div>' +
       '<div style="text-align:right;">' +
@@ -4379,51 +4623,64 @@ function downloadModalAsImage() {
 
   html2canvas(container, { scale: 2, useCORS: true, allowTaint: true, backgroundColor: '#ffffff' }).then(function(canvas) {
     container.remove();
-    var imgData = canvas.toDataURL('image/jpeg', 0.95);
-
-    // 1. Android APK Native Environment
-    if (window.AndroidApp && typeof window.AndroidApp.savePdfFile === "function") {
-      window.AndroidApp.savePdfFile(imgData, fileName);
-    } 
-    // 2. Browser Web Share API Support
-    else {
-      fetch(imgData)
-        .then(function(res){ return res.blob(); })
-        .then(function(blob){
-          var file = new File([blob], fileName, { type: "image/jpeg" });
-          if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-            navigator.share({
-              files: [file],
-              title: 'Transaction Receipt',
-              text: '*Maa Ganga Jan Seva Kendra* - Receipt'
-            }).catch(function(e){});
-          } else {
-            var link = document.createElement('a');
-            link.href = imgData;
-            link.download = fileName;
-            link.target = "_self";
-            document.body.appendChild(link);
-            setTimeout(function() {
-              link.click();
-              document.body.removeChild(link);
-            }, 100);
+    
+    // 🔥 FIX: Blob use karein taaki download mobile me bhi kaam kare
+    canvas.toBlob(function(blob) {
+      // 1. Agar Android App (APK) me hai
+      if (window.AndroidApp) {
+        var reader = new FileReader();
+        reader.onloadend = function() {
+          var base64data = reader.result;
+          // Agar aapke Android code me saveImage function hai:
+          if (typeof window.AndroidApp.saveImageToGallery === "function") {
+            window.AndroidApp.saveImageToGallery(base64data, fileName);
+          } else if (typeof window.AndroidApp.savePdfFile === "function") {
+            window.AndroidApp.savePdfFile(base64data, fileName); // Fallback
           }
-        }).catch(function() {
-          var link = document.createElement('a');
-          link.href = imgData;
-          link.download = fileName;
-          link.target = "_self";
-          document.body.appendChild(link);
-          setTimeout(function() {
-            link.click();
-            document.body.removeChild(link);
-          }, 100);
+        };
+        reader.readAsDataURL(blob);
+        alert("✅ इमेज गैलरी में सेव हो गई है!");
+        return;
+      }
+
+      // 2. Agar Web Browser (Chrome/Mobile) me hai
+      var file = new File([blob], fileName, { type: "image/jpeg" });
+      
+      // Web Share API (Best for Mobile)
+      if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+        navigator.share({
+          files: [file],
+          title: 'Receipt',
+          text: 'Maa Ganga Jan Seva Kendra - Receipt'
+        }).catch(function(e){
+          // Agar share cancel ho jaye toh fallback download
+          downloadBlob(blob, fileName);
         });
-    }
+      } else {
+        // Direct Blob Download (Works on Mobile Chrome)
+        downloadBlob(blob, fileName);
+      }
+
+    }, 'image/jpeg', 0.95);
+
   }).catch(function(err) {
     if (document.body.contains(container)) container.remove();
     alert("❌ इमेज डाउनलोड में त्रुटि: " + err);
   });
+
+  // Helper Function for Downloading Blob
+  function downloadBlob(blob, fileName) {
+    var url = window.URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.style.display = "none";
+    a.href = url;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+    alert("✅ इमेज डाउनलोड हो गई है!");
+  }
 }
 function sendModalDetailsToWhatsApp() {
   var modalBody = document.getElementById("modalBodyContent");
@@ -4565,20 +4822,25 @@ function sendModalDetailsToWhatsApp() {
 
       if (window.AndroidApp && typeof window.AndroidApp.saveCsvFile === "function") {
         window.AndroidApp.saveCsvFile(csvData, fullFileName);
-        alert("📥 " + fullFileName + " डाउनलोड फ़ोल्डर में सेव हो गई है!");
+        alert("📥 " + fullFileName + " download folder me save ho gaya!");
       } else {
         var blob = new Blob([csvData], { type: "text/csv;charset=utf-8;" });
+        var blobUrl = window.URL.createObjectURL(blob);
         var link = document.createElement("a");
-        var url = URL.createObjectURL(blob);
-        link.href = url;
+        link.href = blobUrl;
         link.setAttribute("download", fullFileName);
         link.style.display = "none";
         document.body.appendChild(link);
-        link.click();
+        
+        // Mobile browsers ke liye explicit click trigger
+        var clickEvent = new MouseEvent("click", { bubbles: true, cancelable: true, view: window });
+        link.dispatchEvent(clickEvent);
+
         setTimeout(function() {
-          document.body.removeChild(link);
-          window.URL.revokeObjectURL(url);
-        }, 300);
+          link.remove();
+          window.URL.revokeObjectURL(blobUrl);
+        }, 1000);
+        alert("✅ Excel file download shuru ho gayi!");
       }
     }
 
@@ -5064,25 +5326,38 @@ function sendModalDetailsToWhatsApp() {
       document.body.appendChild(reportWrapper);
 
       var opt = {
-        margin:       0.3,
+        margin:       [0.3, 0.3, 0.3, 0.3],
         filename:     'Khata_Statement_' + name.replace(/[^a-zA-Z0-9]/g, '_') + '.pdf',
         image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2, useCORS: true, scrollY: 0 },
+        html2canvas:  { scale: 2, useCORS: true, scrollY: 0, logging: false },
         jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
       };
 
-      if (window.AndroidApp && typeof window.AndroidApp.savePdfFile === "function") {
-        html2pdf().set(opt).from(reportWrapper).outputPdf('datauristring').then(function(pdfBase64) {
+      setTimeout(function() {
+        if (typeof html2pdf !== 'undefined') {
+          if (window.AndroidApp && typeof window.AndroidApp.savePdfFile === "function") {
+            html2pdf().set(opt).from(reportWrapper).outputPdf('datauristring').then(function(pdfBase64) {
+              reportWrapper.remove();
+              window.AndroidApp.savePdfFile(pdfBase64, 'Khata_Statement_' + name.replace(/[^a-zA-Z0-9]/g, '_'));
+              alert("✅ Statement download ho gaya!");
+            }).catch(function(err) {
+              reportWrapper.remove();
+              alert("❌ PDF error: " + err);
+            });
+          } else {
+            html2pdf().set(opt).from(reportWrapper).save().then(function() {
+              reportWrapper.remove();
+              alert("✅ Statement PDF download shuru ho gayi!");
+            }).catch(function(err) {
+              reportWrapper.remove();
+              alert("❌ PDF error: " + err);
+            });
+          }
+        } else {
           reportWrapper.remove();
-          window.AndroidApp.savePdfFile(pdfBase64, 'Khata_Statement_' + name.replace(/[^a-zA-Z0-9]/g, '_'));
-        }).catch(function() { reportWrapper.remove(); });
-      } else if (typeof html2pdf !== 'undefined') {
-        html2pdf().set(opt).from(reportWrapper).save().then(function() {
-          reportWrapper.remove();
-        }).catch(function() { reportWrapper.remove(); });
-      } else {
-        reportWrapper.remove();
-      }
+          alert("⚠️ html2pdf library ready nahi hai!");
+        }
+      }, 350);
     }
 
     function sendPassbookWhatsApp() {
@@ -5284,18 +5559,47 @@ function sendModalDetailsToWhatsApp() {
 
     function openAppSection(targetSectionId, isHardwareBack) {
       if (typeof isHardwareBack === 'undefined') isHardwareBack = false;
-      var panes = document.querySelectorAll('.tab-pane');
-      panes.forEach(function(p) { p.classList.remove('active'); });
+
+      // App ke sabhi sections ki list
+      var sectionIds = [
+        'dashboard-home-sec',
+        'transaction-sec',
+        'invoice-sec',
+        'stock-sec',
+        'repairing-sec',
+        'quick-notes-sec',
+        'purchase-entry-sec',
+        'greeting-sec',
+        'doc-hub-sec',
+        'doc-receive-sec',
+        'udhar-khata-sec'
+      ];
+
+      // Sabhi sections ko safely hide karein
+      sectionIds.forEach(function(secId) {
+        var el = document.getElementById(secId);
+        if (el) {
+          el.classList.remove('active');
+          el.style.display = 'none';
+        }
+      });
+
+      // Sirf chune gaye section ko dikhayein
       var target = document.getElementById(targetSectionId);
-      if (target) target.classList.add('active');
+      if (target) {
+        target.classList.add('active');
+        target.style.display = 'block';
+      }
       window.scrollTo(0, 0);
 
-      var navBtns = document.querySelectorAll('.nav-btn');
+      // Bottom Navigation Buttons active class update (5 tabs support)
+      var navBtns = document.querySelectorAll('.app-bottom-nav .nav-btn');
       navBtns.forEach(function(btn) { btn.classList.remove('active'); });
       if (targetSectionId === 'dashboard-home-sec' && navBtns[0]) navBtns[0].classList.add('active');
       if (targetSectionId === 'transaction-sec' && navBtns[1]) navBtns[1].classList.add('active');
       if (targetSectionId === 'invoice-sec' && navBtns[2]) navBtns[2].classList.add('active');
-      if (targetSectionId === 'udhar-khata-sec' && navBtns[3]) navBtns[3].classList.add('active');
+      if (targetSectionId === 'stock-sec' && navBtns[3]) navBtns[3].classList.add('active');
+      if (targetSectionId === 'udhar-khata-sec' && navBtns[4]) navBtns[4].classList.add('active');
 
       if (targetSectionId === 'transaction-sec') {
         autoSyncLocation();
@@ -5425,17 +5729,14 @@ function autoSyncLocation(callback) {
           if (data && data.address) {
             var a = data.address;
 
-            // गाँव / कस्बा / शहर
-            var place = a.village || a.suburb || a.town || a.hamlet || a.city_district || a.city || "Kerawali";
+            // 🔥 EXACT LOCATION LOGIC
+            var place = a.road || a.neighbourhood || a.amenity || a.building || a.village || a.town || a.suburb || a.city || "Unknown Location";
             var state = a.state || "Uttar Pradesh";
             var country = a.country || "India";
             var postcode = a.postcode ? " " + a.postcode : "";
-            var district = a.state_district || a.county || "Mainpuri";
+            var district = a.state_district || a.county || a.city || "Mainpuri";
 
-            // GPS Map Camera Style Main Line (e.g. Kerawali, Uttar Pradesh, India)
             mainLocation = place + ", " + state + ", " + country;
-
-            // GPS Map Camera Style Sub-line (e.g. Kerawali, Mainpuri, Uttar Pradesh 205261, India)
             subAddress = place + ", " + district + ", " + state + postcode + ", " + country;
           }
 
@@ -5590,28 +5891,28 @@ function autoSyncLocation(callback) {
         var numActPrice = parseFloat(String(row.actualPrice || row.buyPrice || '0').replace(/[^0-9.]/g, '')) || 0;
         var itemImg = fixDriveImageUrl(row.photoUrl || row.imageUrl || row.img);
 
-        html += '<div class="card p-2.5 border-0 shadow-sm bg-white" style="border-radius: 16px !important; transition: transform 0.15s ease;">' +
+        html += '<div class="card p-3 border-0 shadow-sm bg-white stock-card-item mb-2" style="border-radius: 16px !important; min-height: 110px !important; height: auto !important; display: flex !important; flex-direction: column !important; justify-content: space-between !important;">' +
           '<div class="d-flex align-items-center gap-2.5">' +
             
-            '<div class="position-relative flex-shrink-0">' +
-              '<img id="stockImg_' + safeId + '" src="' + itemImg + '" class="cursor-pointer" style="width: 58px; height: 58px; border-radius: 12px; object-fit: cover; border: 1.5px solid #e2e8f0; background: #f8fafc;" onclick="viewFullImageZoom(\'' + itemImg + '\', \'' + safeName.replace(/'/g, "\\'") + '\')" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/1524/1524855.png\'" title="ज़ूम करके देखें">' +
+            '<div class="position-relative flex-shrink-0" style="width: 58px; height: 58px;">' +
+              '<img id="stockImg_' + safeId + '" src="' + itemImg + '" class="cursor-pointer" style="width: 58px; height: 58px; border-radius: 12px; object-fit: cover; border: 1.5px solid #e2e8f0; background: #f8fafc; display: block;" onclick="viewFullImageZoom(\'' + itemImg + '\', \'' + safeName.replace(/'/g, "\\'") + '\')" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/1524/1524855.png\'" title="ज़ूम करके देखें">' +
               '<span class="position-absolute bottom-0 end-0 bg-dark text-white rounded-circle d-flex align-items-center justify-content-center cursor-pointer shadow-sm" style="width: 22px; height: 22px; font-size: 10px; opacity: 0.95; z-index: 2;" onclick="document.getElementById(\'camInput_' + safeId + '\').click()" title="फोटो खींचें">📷</span>' +
               '<input type="file" id="camInput_' + safeId + '" accept="image/*" capture="environment" class="d-none" onchange="captureAndUploadStockPhoto(this, ' + origIdx + ')">' +
             '</div>' +
 
             '<div class="flex-grow-1 min-w-0">' +
-              '<div class="d-flex justify-content-between align-items-start gap-1">' +
-                '<h6 class="fw-bold text-dark m-0 text-truncate" style="font-size: 0.85rem; line-height:1.2;">' + safeName + '</h6>' +
+              '<div class="d-flex justify-content-between align-items-start gap-1 mb-1">' +
+                '<h6 class="fw-bold text-dark m-0 text-truncate" style="font-size: 0.88rem; line-height: 1.2;">' + safeName + '</h6>' +
                 badgeHtml +
               '</div>' +
-              '<small class="text-muted d-block text-truncate mt-0.5" style="font-size: 9.5px;">' + escapeHtml(row.otherDetails || row.group || 'General Stock') + '</small>' +
+              '<small class="text-muted d-block text-truncate mb-1.5" style="font-size: 9.5px;">' + escapeHtml(row.otherDetails || row.group || 'General Stock') + '</small>' +
 
-              '<div class="mt-1.5">' +
-                '<div class="d-flex justify-content-between align-items-center mb-0.5" style="font-size: 9px;">' +
+              '<div>' +
+                '<div class="d-flex justify-content-between align-items-center mb-1" style="font-size: 9.5px;">' +
                   '<span class="text-muted">बचा स्टॉक: <strong class="text-dark">' + rest + ' Pcs</strong></span>' +
                   '<span class="text-muted">कुल: ' + total + '</span>' +
                 '</div>' +
-                '<div class="progress" style="height: 4px; border-radius: 10px; background: #e2e8f0;">' +
+                '<div class="progress" style="height: 5px; border-radius: 10px; background: #e2e8f0;">' +
                   '<div class="progress-bar ' + progressColor + '" style="width: ' + (pct || 100) + '%;"></div>' +
                 '</div>' +
               '</div>' +
@@ -5619,8 +5920,8 @@ function autoSyncLocation(callback) {
 
           '</div>' +
 
-          // Bottom Footer Strip with Eye Icon Only
-          '<div class="d-flex justify-content-between align-items-center border-top mt-2 pt-2" style="font-size: 10px;">' +
+          // Bottom Footer Strip
+          '<div class="d-flex justify-content-between align-items-center border-top mt-2.5 pt-2" style="font-size: 11px;">' +
             '<div>' +
               '<div class="d-flex align-items-center gap-1.5">' +
                 '<strong class="text-success fs-6" title="बिक्री रेट">₹' + numPrice.toFixed(2) + '</strong>' +
@@ -5631,10 +5932,10 @@ function autoSyncLocation(callback) {
             '</div>' +
             
             '<div class="d-flex gap-1">' +
-              '<button type="button" class="btn btn-sm btn-success py-1 px-1.5 fw-bold text-white" style="font-size:9px; border-radius:8px; background:#10b981; border:none;" onclick="quickSellItem(' + origIdx + ')">⚡ सेल (Sell)</button>' +
-              '<button type="button" class="btn btn-sm btn-outline-warning text-dark py-1 px-1.5 fw-bold" style="font-size:9px; border-radius:8px;" onclick="openEditStockForm(' + origIdx + ')" title="एडिट करें">✏️</button>' +
-              '<button type="button" class="btn btn-sm btn-outline-dark py-1 px-1.5 fw-bold" style="font-size:9px; border-radius:8px;" onclick="printStockSticker(' + origIdx + ')" title="टैग प्रिंट">🏷️</button>' +
-              '<button type="button" class="btn btn-sm btn-primary py-1 px-1.5 fw-bold" style="font-size:9px; border-radius:8px;" onclick="quickBillFromStockByIdx(' + origIdx + ')" title="नया बिल बनाएँ">🧾</button>' +
+              '<button type="button" class="btn btn-sm fw-bold text-white" style="font-size:9.5px; border-radius:8px; background:linear-gradient(135deg,#10b981,#059669); border:none; padding:5px 9px;" onclick="quickSellItem(' + origIdx + ')">⚡ सेल</button>' +
+              '<button type="button" class="btn btn-sm fw-bold" style="font-size:9.5px; border-radius:8px; background:#fef3c7; color:#92400e; border:1px solid #fde68a; padding:5px 8px;" onclick="openEditStockForm(' + origIdx + ')" title="एडिट करें">✏️</button>' +
+              '<button type="button" class="btn btn-sm fw-bold" style="font-size:9.5px; border-radius:8px; background:#f1f5f9; color:#475569; border:1px solid #cbd5e1; padding:5px 8px;" onclick="printStockSticker(' + origIdx + ')" title="टैग प्रिंट">🏷️</button>' +
+              '<button type="button" class="btn btn-sm fw-bold text-white" style="font-size:9.5px; border-radius:8px; background:linear-gradient(135deg,#2563eb,#1d4ed8); border:none; padding:5px 9px;" onclick="quickBillFromStockByIdx(' + origIdx + ')" title="नया बिल">🧾</button>' +
             '</div>' +
           '</div>' +
 
@@ -6269,11 +6570,23 @@ function autoSyncLocation(callback) {
         name: document.getElementById('txnName') ? document.getElementById('txnName').value : '',
         amount: document.getElementById('txnAmount') ? document.getElementById('txnAmount').value : '',
         gateway: document.getElementById('txnGateway') ? document.getElementById('txnGateway').value : '',
+        gatewayOther: document.getElementById('txnGatewayOtherInput') ? document.getElementById('txnGatewayOtherInput').value : '',
         aadhaar: document.getElementById('txnAadhaar') ? document.getElementById('txnAadhaar').value : '',
         txnId: document.getElementById('txnId') ? document.getElementById('txnId').value : '',
-        remark: document.getElementById('txnRemark') ? document.getElementById('txnRemark').value : ''
+        remark: document.getElementById('txnRemark') ? document.getElementById('txnRemark').value : '',
+        consent: document.getElementById('txnLegalConsent') ? document.getElementById('txnLegalConsent').checked : true,
+        // Pill selection bhi save karo
+        activePillText: (function() {
+          var btn = document.querySelector('#txnPillContainer .btn-primary');
+          return btn ? btn.innerText.trim() : '';
+        })(),
+        savedAt: Date.now()
       };
-      sessionStorage.setItem("txn_form_draft_data", JSON.stringify(draft));
+      try {
+        sessionStorage.setItem("txn_form_draft_data", JSON.stringify(draft));
+      } catch(e) {
+        console.warn("Draft save failed:", e);
+      }
     }
 
     // 🔄 कैमरे से वापस आने पर ड्राफ्ट डेटा ऑटोमैटिक वापस भरने का फ़ंक्शन
@@ -6282,6 +6595,13 @@ function autoSyncLocation(callback) {
       if (!savedDraft) return;
       try {
         var draft = JSON.parse(savedDraft);
+
+        // ✅ FIX: 24 ghante se purana draft ignore karo (stale data)
+        if (draft.savedAt && (Date.now() - draft.savedAt) > (24 * 60 * 60 * 1000)) {
+          sessionStorage.removeItem("txn_form_draft_data");
+          return;
+        }
+
         if (draft.type && document.getElementById('txnType')) document.getElementById('txnType').value = draft.type;
         if (draft.mobile && document.getElementById('txnMobile')) document.getElementById('txnMobile').value = draft.mobile;
         if (draft.name && document.getElementById('txnName')) document.getElementById('txnName').value = draft.name;
@@ -6290,8 +6610,40 @@ function autoSyncLocation(callback) {
         if (draft.aadhaar && document.getElementById('txnAadhaar')) document.getElementById('txnAadhaar').value = draft.aadhaar;
         if (draft.txnId && document.getElementById('txnId')) document.getElementById('txnId').value = draft.txnId;
         if (draft.remark && document.getElementById('txnRemark')) document.getElementById('txnRemark').value = draft.remark;
+
+        // ✅ FIX: Other gateway input bhi restore karo
+        if (draft.gatewayOther && document.getElementById('txnGatewayOtherInput')) {
+          document.getElementById('txnGatewayOtherInput').value = draft.gatewayOther;
+        }
+        if (typeof toggleOtherGatewayInput === 'function') toggleOtherGatewayInput();
+
+        // ✅ FIX: Consent checkbox restore
+        if (draft.consent !== undefined && document.getElementById('txnLegalConsent')) {
+          document.getElementById('txnLegalConsent').checked = draft.consent;
+        }
+
+        // ✅ FIX: Pill active state restore karo (agar type match kare)
+        if (draft.activePillText && draft.type) {
+          var pills = document.querySelectorAll('#txnPillContainer button');
+          pills.forEach(function(b) {
+            var pillMap = {
+              'AePS Withdrawal': '💵 AePS',
+              'Bank Cash Deposit': '🏦 जमा',
+              'UPI Received': '📲 UPI इन',
+              'UPI Sent': '↗️ UPI आउट'
+            };
+            if (pillMap[draft.type] && b.innerText.trim() === pillMap[draft.type]) {
+              selectTxnTypePill(draft.type, b);
+            }
+          });
+        }
+
         if (typeof toggleAadhaarField === 'function') toggleAadhaarField();
-      } catch(e) {}
+
+        console.log("✅ Transaction draft restored successfully");
+      } catch(e) {
+        console.warn("Draft restore failed:", e);
+      }
     }
 
     // 🧹 फ़ॉर्म सफलतापूर्वक सेव होने पर ड्राफ्ट साफ़ करने का फ़ंक्शन
@@ -6301,11 +6653,16 @@ function autoSyncLocation(callback) {
 
 // Camera vs Gallery Selector Popup
     function triggerFileInputClick(inputId) {
+      // ✅ FIX: Har file-input click se pehle draft save karo
+      if (typeof saveTxnFormDraft === 'function' && (inputId === 'nativeCameraInput' || inputId === 'nativeGalleryInput')) {
+        saveTxnFormDraft();
+        sessionStorage.setItem("txn_camera_active_flag", "true");
+      }
       closeModalPopup();
       setTimeout(function() {
         var el = document.getElementById(inputId);
         if (el) {
-          el.value = ""; // Reset value taaki same photo dubara choose ho sake
+          el.value = "";
           el.click();
         } else {
           alert("⚠️ File input element nahi mila!");
@@ -6314,18 +6671,48 @@ function autoSyncLocation(callback) {
     }
 
     function selectPhotoSource() {
+      // ✅ FIX: Camera/Gallery kholne se PEHLE draft save + reload-protection flag set karein
       if (typeof saveTxnFormDraft === 'function') saveTxnFormDraft();
       if (typeof autoSyncLocation === 'function') autoSyncLocation();
+
+      // 🔒 Dobara photo lene par form wapas lock kar dein (taaki user pehle nayi photo le)
+      var restWrapper = document.getElementById("txnFormRestWrapper");
+      if (restWrapper) {
+        restWrapper.classList.add("pe-none", "opacity-50");
+        restWrapper.style.opacity = "0.5";
+      }
 
       var html = '<div class="text-center p-2">' +
         '<small class="fw-bold text-muted d-block mb-3" style="font-size:11px;">कृपया फोटो अपलोड करने का माध्यम चुनें:</small>' +
         '<div class="d-flex flex-column gap-2">' +
-          '<button type="button" class="btn btn-primary fw-bold py-2.5" style="font-size:12px; border-radius:10px;" onclick="triggerFileInputClick(\'nativeCameraInput\')">📷 कैमरे से खींचे (Camera)</button>' +
-          '<button type="button" class="btn btn-outline-primary fw-bold py-2.5" style="font-size:12px; border-radius:10px;" onclick="triggerFileInputClick(\'nativeGalleryInput\')">🖼️ गैलरी से चुनें (Gallery)</button>' +
+          '<button type="button" class="btn btn-primary fw-bold py-2.5" style="font-size:12px; border-radius:10px;" onclick="openTxnCameraSafe()">📷 कैमरे से खींचे (Camera)</button>' +
+          '<button type="button" class="btn btn-outline-primary fw-bold py-2.5" style="font-size:12px; border-radius:10px;" onclick="openTxnGallerySafe()">🖼️ गैलरी से चुनें (Gallery)</button>' +
         '</div>' +
       '</div>';
 
       showModalPopup("📸 Choose Photo Option", html);
+    }
+
+    // ✅ NEW HELPER: Draft save karke camera open karo (reload ke baad restore hoga)
+    function openTxnCameraSafe() {
+      saveTxnFormDraft();
+      sessionStorage.setItem("txn_camera_active_flag", "true");
+      closeModalPopup();
+      setTimeout(function() {
+        var el = document.getElementById("nativeCameraInput");
+        if (el) { el.value = ""; el.click(); }
+      }, 250);
+    }
+
+    // ✅ NEW HELPER: Draft save karke gallery open karo
+    function openTxnGallerySafe() {
+      saveTxnFormDraft();
+      sessionStorage.setItem("txn_camera_active_flag", "true");
+      closeModalPopup();
+      setTimeout(function() {
+        var el = document.getElementById("nativeGalleryInput");
+        if (el) { el.value = ""; el.click(); }
+      }, 250);
     }
 
     var liveGpsData = {
@@ -6336,50 +6723,62 @@ function autoSyncLocation(callback) {
     };
 
     function handleNativeCamera(input) {
-      if (input.files && input.files[0]) {
-        var file = input.files[0];
-        sessionStorage.setItem("txn_camera_active_flag", "true");
+      if (!input.files || !input.files[0]) return;
 
-        if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition(
-            function(pos) {
-              var lat = pos.coords.latitude;
-              var lng = pos.coords.longitude;
+      var file = input.files[0];
 
-              liveGpsData.latStr = lat.toFixed(6) + "°";
-              liveGpsData.lngStr = lng.toFixed(6) + "°";
+      // ✅ FIX 1: Camera flag + draft save (reload protection)
+      sessionStorage.setItem("txn_camera_active_flag", "true");
+      if (typeof saveTxnFormDraft === 'function') saveTxnFormDraft();
 
-              var osmUrl = "https://nominatim.openstreetmap.org/reverse?lat=" + lat + "&lon=" + lng + "&format=json&addressdetails=1";
+      // ✅ FIX 2: Photo processing ko IMMEDIATELY start karo (geolocation wait NAHI karo)
+      // Isse main thread pehle free hoga aur reload ka risk zero hoga
+      var photoAlreadyProcessed = false;
+      var processNow = function() {
+        if (photoAlreadyProcessed) return;
+        photoAlreadyProcessed = true;
+        processImageWithWatermark(file);
+      };
 
-              fetch(osmUrl, { headers: { 'User-Agent': 'MaaGangaCSCApp/2.0' } })
-                .then(function(res) { return res.json(); })
-                .then(function(data) {
-                  if (data && data.address) {
-                    var a = data.address;
-                    var place = a.village || a.town || a.suburb || a.city || "Kerawali";
-                    var state = a.state || "Uttar Pradesh";
-                    var country = a.country || "India";
-                    var postcode = a.postcode ? " " + a.postcode : " 205261";
+      // ✅ FIX 3: Fast photo processing — 200ms me start
+      setTimeout(processNow, 200);
 
-                    liveGpsData.line1 = place + ", " + state + ", " + country + " 🇮🇳";
-                    liveGpsData.line2 = "4w52+ch4, " + place + ", " + state + postcode + ", " + country;
-                  }
-                  currentLocation = liveGpsData.line1 + " | " + liveGpsData.line2 + " | Lat " + liveGpsData.latStr + " Long " + liveGpsData.lngStr;
-                  processImageWithWatermark(file);
-                })
-                .catch(function() {
-                  currentLocation = liveGpsData.line1 + " | Lat " + liveGpsData.latStr + " Long " + liveGpsData.lngStr;
-                  processImageWithWatermark(file);
-                });
-            },
-            function() {
-              processImageWithWatermark(file);
-            },
-            { enableHighAccuracy: true, timeout: 6000, maximumAge: 0 }
-          );
-        } else {
-          processImageWithWatermark(file);
-        }
+      // ✅ FIX 4: Geolocation BACKGROUND me (non-blocking) — sirf location update ke liye
+      if (navigator.geolocation) {
+        // Cached location pehle use karo (turant response)
+        navigator.geolocation.getCurrentPosition(
+          function(pos) {
+            var lat = pos.coords.latitude;
+            var lng = pos.coords.longitude;
+            liveGpsData.latStr = lat.toFixed(6) + "°";
+            liveGpsData.lngStr = lng.toFixed(6) + "°";
+
+            var osmUrl = "https://nominatim.openstreetmap.org/reverse?lat=" + lat + "&lon=" + lng + "&format=json&addressdetails=1";
+            fetch(osmUrl, { headers: { 'User-Agent': 'MaaGangaCSCApp/2.0' } })
+              .then(function(res) { return res.json(); })
+              .then(function(data) {
+                if (data && data.address) {
+                  var a = data.address;
+                  
+                  // 🔥 EXACT LOCATION LOGIC (Road/Building/Neighbourhood ko priority)
+                  var exactPlace = a.road || a.neighbourhood || a.amenity || a.building || a.house_number || a.village || a.town || a.suburb || a.city || "Unknown Location";
+                  var district = a.state_district || a.county || a.city || "Mainpuri";
+                  var state = a.state || "Uttar Pradesh";
+                  var country = a.country || "India";
+                  var postcode = a.postcode ? " " + a.postcode : "";
+
+                  liveGpsData.line1 = exactPlace + ", " + state + ", " + country + " 🇮🇳";
+                  liveGpsData.line2 = exactPlace + ", " + district + ", " + state + postcode + ", " + country;
+                }
+                currentLocation = liveGpsData.line1 + " | " + liveGpsData.line2 + " | Lat " + liveGpsData.latStr + " Long " + liveGpsData.lngStr;
+              })
+              .catch(function() {
+                currentLocation = liveGpsData.line1 + " | Lat " + liveGpsData.latStr + " Long " + liveGpsData.lngStr;
+              });
+          },
+          function() { /* silent fail — photo already processing */ },
+          { enableHighAccuracy: false, timeout: 3000, maximumAge: 120000 } // ✅ 2-min cached location
+        );
       }
     }
     // 🚨 100% अनिवार्य GPS ऑन चेकर
@@ -6423,7 +6822,8 @@ function verifyGpsMandatory(onSuccess) {
         img.onload = function() {
           var width = img.width;
           var height = img.height;
-          var maxDim = 1200;
+          // ✅ FIX: 1200 → 900 px (memory-safe, faster, still sharp)
+          var maxDim = 900;
 
           if (width > maxDim || height > maxDim) {
             if (width > height) {
@@ -6537,24 +6937,29 @@ function verifyGpsMandatory(onSuccess) {
           ctx.fillText("Google", mapX + mapSize / 2, mapY + mapSize - 5);
           ctx.restore();
 
-          // 5. Text Data on Right Side of Map
+          // 5. Text Data on Right Side of Map (Same Layout, Updated Text)
           var textStartX = mapX + mapSize + 14;
           ctx.textAlign = "left";
 
-          // Line 1: Main Location Title
+          // Line 1: Main Location Title (Exact Place Name)
           ctx.fillStyle = "#ffffff";
           ctx.font = "bold 15px Arial";
-          ctx.fillText(liveGpsData.line1 || "Kerawali, Uttar Pradesh, India 🇮🇳", textStartX, boxY + 38);
+          var mainLocText = liveGpsData.line1 || "Location Unavailable";
+          if (mainLocText.length > 38) mainLocText = mainLocText.substring(0, 36) + "..."; // Long text truncate
+          ctx.fillText(mainLocText, textStartX, boxY + 38);
 
-          // Line 2: Full Address / Plus Code
+          // Line 2: Full Address (Exact Place + District + State + Pincode)
           ctx.fillStyle = "#e2e8f0";
           ctx.font = "normal 10.5px Arial";
-          ctx.fillText(liveGpsData.line2 || "4w52+ch4, Kerawali, Uttar Pradesh 205261, India", textStartX, boxY + 58);
+          var fullAddrText = liveGpsData.line2 || "Full address not found";
+          if (fullAddrText.length > 55) fullAddrText = fullAddrText.substring(0, 53) + "..."; // Long text truncate
+          ctx.fillText(fullAddrText, textStartX, boxY + 58);
 
           // Line 3: Lat Long
           ctx.fillStyle = "#cbd5e1";
           ctx.font = "normal 10.5px Arial";
-          ctx.fillText("Lat " + (liveGpsData.latStr || "27.108043°") + " Long " + (liveGpsData.lngStr || "78.901857°"), textStartX, boxY + 76);
+          var latLongText = "Lat " + (liveGpsData.latStr || "N/A") + " Long " + (liveGpsData.lngStr || "N/A");
+          ctx.fillText(latLongText, textStartX, boxY + 76);
 
           // Line 4: Date & GMT Time
           ctx.fillStyle = "#ffffff";
@@ -6562,13 +6967,42 @@ function verifyGpsMandatory(onSuccess) {
           ctx.fillText(fullDateLine, textStartX, boxY + 95);
 
           // Final Base64 Output
-          receiverImageBase64 = canvas.toDataURL('image/jpeg', 0.85);
+          // ✅ FIX: 0.85 → 0.75 quality (≈ 40% smaller, still readable)
+          receiverImageBase64 = canvas.toDataURL('image/jpeg', 0.75);
+          
+          // ✅ FIX: Compressed image ko sessionStorage me bhi cache karo (reload ke baad restore ke liye)
+          try {
+            sessionStorage.setItem("txn_receiver_photo_cache", receiverImageBase64);
+          } catch(e) {
+            console.warn("Photo cache storage full — skip");
+          }
+          
           var previewImg = document.getElementById("nativePreviewImg");
           if (previewImg) previewImg.src = receiverImageBase64;
 
+          // 🔓 PHOTO CAPTURE SUCCESS: Baaki form ko unlock kar do
+          var restWrapper = document.getElementById("txnFormRestWrapper");
+          if (restWrapper) {
+            restWrapper.classList.remove("pe-none", "opacity-50");
+            restWrapper.style.opacity = "1";
+          }
+          var successAlert = document.getElementById("photoCapturedAlert");
+          if (successAlert) {
+            successAlert.classList.remove("d-none");
+            // 3 second baad alert hide kar do taaki screen clean rahe
+            setTimeout(function() {
+              successAlert.classList.add("d-none");
+            }, 3000);
+          }
+
+          // ✅ FIX: Canvas memory release karo taaki Android WebView crash/reload na kare
+          canvas.width = 0;
+          canvas.height = 0;
+
+          // Flag 1.5s tak rakho taaki restore ho sake
           setTimeout(function() {
             sessionStorage.removeItem("txn_camera_active_flag");
-          }, 1000);
+          }, 1500);
         };
         img.src = e.target.result;
       };
@@ -6867,7 +7301,21 @@ function verifyGpsMandatory(onSuccess) {
 
       clearForm('transaction-sec');
       clearSignature();
+
+      // 🔒 Form ko wapas lock kar do (next entry ke liye)
+      var restWrapper = document.getElementById("txnFormRestWrapper");
+      if (restWrapper) {
+        restWrapper.classList.add("pe-none", "opacity-50");
+        restWrapper.style.opacity = "0.5";
+      }
+      var successAlert = document.getElementById("photoCapturedAlert");
+      if (successAlert) successAlert.classList.add("d-none");
       if (typeof clearTxnFormDraft === 'function') clearTxnFormDraft();
+      // ✅ FIX: Receiver photo cache + flag bhi clear karo (next transaction ke liye fresh)
+      try {
+        sessionStorage.removeItem("txn_receiver_photo_cache");
+        sessionStorage.removeItem("txn_camera_active_flag");
+      } catch(e) {}
       slipImageBase64 = null;
       receiverImageBase64 = null;
       toggleOtherGatewayInput(); // Other वाले बॉक्स को वापस डिफ़ॉल्ट रूप से छिपाने के लिए
@@ -7426,10 +7874,22 @@ function saveNewStockItem() {
     alert("✅ नया आइटम लोकल मोड में जुड़ गया है!");
   }
 }
-// 🏷️ Product Price & QR Sticker Print
-function printStockSticker(itemName, price) {
+// 🏷️ Product Price & QR Sticker Print (Index ya Direct name/price dono support)
+function printStockSticker(arg1, arg2) {
+  var itemName = "";
+  var price = 0;
+  if (typeof arg1 === 'number' && globalStockData && globalStockData[arg1]) {
+    var item = globalStockData[arg1];
+    itemName = item.name || "-";
+    var rawPrice = String(item.sellingPrice || item.price || '0').replace(/[^0-9.]/g, '');
+    price = parseFloat(rawPrice) || 0;
+  } else {
+    itemName = arg1 || "-";
+    price = parseFloat(arg2) || 0;
+  }
+
   var printWin = window.open('', '_blank', 'width=350,height=350');
-  if (!printWin) return alert("Pop-up allow करें!");
+  if (!printWin) return alert("Pop-up allow karein!");
 
   var stickerContent = 
     '<html><head><style>' +
@@ -7438,11 +7898,11 @@ function printStockSticker(itemName, price) {
     '</style></head><body>' +
     '<div class="box">' +
       '<strong style="font-size:12px; display:block;">Maa Ganga CSC & Electronics</strong>' +
-      '<span style="font-size:11px; font-weight:bold; display:block; margin:4px 0;">' + itemName + '</span>' +
+      '<span style="font-size:11px; font-weight:bold; display:block; margin:4px 0;">' + escapeHtml(itemName) + '</span>' +
       '<img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=' + encodeURIComponent(itemName) + '" style="width:70px; height:70px;" />' +
-      '<div style="font-size:14px; font-weight:bold; color:#000; margin-top:3px;">M.R.P: ₹' + price + '</div>' +
+      '<div style="font-size:14px; font-weight:bold; color:#000; margin-top:3px;">M.R.P: ₹' + price.toFixed(2) + '</div>' +
     '</div>' +
-    '<script>window.onload = function(){ window.print(); window.close(); }<' + '/script>' +
+    '<script>window.onload = function(){ window.print(); window.close(); }<\/script>' +
     '</body></html>';
 
   printWin.document.write(stickerContent);
@@ -9275,6 +9735,20 @@ function sendCustomGreeting(sendMode) {
         '</div>';
       });
       container.innerHTML = html;
+    }
+    function openCounterPaymentQrModal() {
+      var upi = (typeof globalShopSettings !== 'undefined' && globalShopSettings.upiId) ? globalShopSettings.upiId : "anuragkumarshakya@ptaxis";
+      var upiUrl = "upi://pay?pa=" + encodeURIComponent(upi) + "&pn=Maa%20Ganga%20CSC&cu=INR";
+      var qrLink = "https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=" + encodeURIComponent(upiUrl);
+
+      var html = '<div class="text-center p-3">' +
+        '<strong class="d-block text-dark fs-6 mb-1">माँ गंगा जन सेवा केंद्र</strong>' +
+        '<small class="text-muted d-block mb-3" style="font-size:11px;">किसी भी UPI ऐप (GPay, PhonePe, Paytm) से स्कैन करें</small>' +
+        '<img src="' + qrLink + '" style="width:200px; height:200px; border-radius:14px; border:2px solid #0f172a; padding:6px; background:#fff;" alt="QR Code">' +
+        '<div class="mt-3 p-2 bg-light rounded-3 border"><small class="text-muted d-block" style="font-size:9.5px;">UPI ID:</small><strong class="text-primary">' + upi + '</strong></div>' +
+        '</div>';
+
+      showModalPopup("📲 काउंटर पेमेंट QR", html);
     }
   </script>
 </body>
