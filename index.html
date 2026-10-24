@@ -4388,7 +4388,7 @@ function downloadTxnReceiptPDF(index) {
 }
 
     function exportTableToPDF(tbodyId, reportName) {
-      alert("⏳ Google Sheet से लाइव डेटा फेच हो रहा है...");
+      alert("⏳ सर्वर से डेटा फेच किया जा रहा है...");
 
       var fetchDirectData = function(callback) {
         var actionName = "";
@@ -4427,14 +4427,18 @@ function downloadTxnReceiptPDF(index) {
 
       fetchDirectData(function(sheetData) {
         if (!sheetData || sheetData.length === 0) {
-          return alert("⚠️ डाउनलोड करने के लिए Google Sheet में कोई डेटा नहीं मिला!");
+          return alert("⚠️ डाउनलोड करने के लिए सर्वर पर कोई डेटा नहीं मिला!");
         }
 
         var headers = [];
         var rows = [];
+        var cleanReportTitle = "REPORT";
+        var headerColor = [15, 23, 42]; // Default Dark Navy
 
         if (tbodyId === 'txnHistoryTableBody') {
-          headers = ["Date & Time", "Name", "Mobile", "Type", "Amount", "Gateway", "Txn ID / UTR", "Remark"];
+          headers = ["Date & Time", "Customer Name", "Mobile", "Type", "Amount", "Gateway", "Txn ID / UTR", "Remark"];
+          cleanReportTitle = "BANKING TRANSACTIONS REPORT";
+          headerColor = [37, 99, 235]; // Royal Blue for Transactions
           sheetData.forEach(function(item) {
             rows.push([
               item.date || '-',
@@ -4448,7 +4452,9 @@ function downloadTxnReceiptPDF(index) {
             ]);
           });
         } else if (tbodyId === 'invoiceHistoryTableBody' || tbodyId === 'udharKhataTableBody') {
-          headers = ["Inv No", "Client Name", "Mobile", "Total", "Paid", "Balance"];
+          headers = ["Inv No", "Client Name", "Mobile", "Total Amt", "Paid", "Balance Due"];
+          cleanReportTitle = "INVOICES & KHATA REPORT";
+          headerColor = [16, 185, 129]; // Emerald Green for Invoices/Khata
           sheetData.forEach(function(item) {
             rows.push([
               item.invNo || '-',
@@ -4460,7 +4466,9 @@ function downloadTxnReceiptPDF(index) {
             ]);
           });
         } else if (tbodyId === 'docHistoryTableBody') {
-          headers = ["Date", "Customer Name", "Doc Type", "Charge", "Remarks"];
+          headers = ["Date", "Customer Name", "Doc Type", "Service Charge", "Remarks"];
+          cleanReportTitle = "CSC DOCUMENTS REPORT";
+          headerColor = [217, 119, 6]; // Amber / Gold for Documents
           sheetData.forEach(function(item) {
             rows.push([
               item.date || '-',
@@ -4481,7 +4489,7 @@ function downloadTxnReceiptPDF(index) {
           }
 
           if (!jsPdfClass) {
-            return alert("⚠️ PDF library sahi se load nahi ho saki, kripya page refresh karein!");
+            return alert("⚠️ PDF लाइब्रेरी लोड नहीं हो पाई है!");
           }
 
           var doc = new jsPdfClass({ orientation: 'landscape', unit: 'mm', format: 'a4' });
@@ -4490,43 +4498,45 @@ function downloadTxnReceiptPDF(index) {
           var timeStr = String(now.getHours()).padStart(2, '0') + "-" + String(now.getMinutes()).padStart(2, '0') + "-" + String(now.getSeconds()).padStart(2, '0');
           var fileName = reportName + "_" + dateStr + "_" + timeStr + ".pdf";
 
-          doc.setFontSize(14);
+          // Header Branding Title
+          doc.setFontSize(16);
           doc.setTextColor(15, 23, 42);
-          doc.text("Maa Ganga Jan Seva Kendra & Electronics", 14, 14);
+          doc.text("माँ गंगा जन सेवा केंद्र व इलेक्ट्रॉनिक्स", 14, 14);
 
-          doc.setFontSize(10);
-          doc.setTextColor(37, 99, 235);
-          doc.text("REPORT: " + reportName.replace(/_/g, ' ').toUpperCase(), 14, 20);
+          doc.setFontSize(11);
+          doc.setTextColor(headerColor[0], headerColor[1], headerColor[2]);
+          doc.text(cleanReportTitle, 14, 21);
 
-          doc.setFontSize(8);
+          doc.setFontSize(8.5);
           doc.setTextColor(100, 116, 139);
-          doc.text("Generated: " + now.toLocaleString('en-IN') + " (Records: " + rows.length + ")", 14, 25);
+          doc.text("तारीख व समय: " + now.toLocaleString('en-IN') + " | कुल रिकॉर्ड: " + rows.length, 14, 26);
 
-          // Check if autoTable function exists on instance
           if (typeof doc.autoTable === "function") {
             doc.autoTable({
               head: [headers],
               body: rows,
-              startY: 28,
+              startY: 30,
               theme: 'grid',
-              headStyles: { fillColor: [15, 23, 42], textColor: [255, 255, 255], fontSize: 8.5, fontStyle: 'bold' },
-              bodyStyles: { fontSize: 7.5, textColor: [0, 0, 0] },
+              // Font size 9 set kiya gaya hai yahan
+              headStyles: { fillColor: headerColor, textColor: [255, 255, 255], fontSize: 9, fontStyle: 'bold', halign: 'center' },
+              bodyStyles: { fontSize: 9, textColor: [30, 41, 59], halign: 'left' },
               alternateRowStyles: { fillColor: [248, 250, 252] },
-              margin: { top: 28, left: 14, right: 14 }
-            });
-          } else {
-            // HTML Table fallback
-            var startY = 32;
-            rows.slice(0, 40).forEach(function(r) {
-              doc.text(r.slice(0, 5).join(" | "), 14, startY);
-              startY += 6;
+              // Column auto-fit enable karne ke liye
+              columnStyles: { 0: { cellWidth: 'auto' } },
+              didDrawPage: function (data) {
+                // Har page ke upar filter applied indicator dikhane ke liye
+                doc.setFontSize(8);
+                doc.setTextColor(148, 163, 184);
+                doc.text("Filter: Active (All Records)", data.settings.margin.left, 29);
+              },
+              margin: { top: 32, left: 14, right: 14 }
             });
           }
 
           if (window.AndroidApp && typeof window.AndroidApp.savePdfFile === "function") {
             var pdfBase64 = doc.output('datauristring');
             window.AndroidApp.savePdfFile(pdfBase64, fileName);
-            alert("✅ PDF download ho gaya!");
+            alert("✅ PDF डाउनलोड हो गया!");
           } else {
             var pdfBlob = doc.output('blob');
             var blobUrl = window.URL.createObjectURL(pdfBlob);
@@ -4540,10 +4550,10 @@ function downloadTxnReceiptPDF(index) {
               window.URL.revokeObjectURL(blobUrl);
               dlAnchor.remove();
             }, 800);
-            alert("✅ PDF download shuru ho gaya!");
+            alert("✅ PDF डाउनलोड शुरू हो गया!");
           }
         } catch (err) {
-          alert("❌ PDF download error: " + err.message);
+          alert("❌ PDF जनरेट करने में त्रुटि: " + err.message);
         }
       });
     }
@@ -4820,10 +4830,28 @@ function sendModalDetailsToWhatsApp() {
       var timeStr = String(now.getHours()).padStart(2, '0') + "-" + String(now.getMinutes()).padStart(2, '0') + "-" + String(now.getSeconds()).padStart(2, '0');
       var fullFileName = reportName + "_" + dateStr + "_" + timeStr + ".csv";
 
+      alert("⏳ सर्वर से एक्सेल रिपोर्ट तैयार की जा रही है...");
       if (window.AndroidApp && typeof window.AndroidApp.saveCsvFile === "function") {
         window.AndroidApp.saveCsvFile(csvData, fullFileName);
-        alert("📥 " + fullFileName + " download folder me save ho gaya!");
+        alert("📥 " + fullFileName + " डाउनलोड फ़ोल्डर में सेव हो गई है!");
       } else {
+        var blob = new Blob([csvData], { type: "text/csv;charset=utf-8;" });
+        var blobUrl = window.URL.createObjectURL(blob);
+        var link = document.createElement("a");
+        link.href = blobUrl;
+        link.setAttribute("download", fullFileName);
+        link.style.display = "none";
+        document.body.appendChild(link);
+        
+        var clickEvent = new MouseEvent("click", { bubbles: true, cancelable: true, view: window });
+        link.dispatchEvent(clickEvent);
+
+        setTimeout(function() {
+          link.remove();
+          window.URL.revokeObjectURL(blobUrl);
+        }, 1000);
+        alert("✅ एक्सेल फाइल डाउनलोड शुरू हो गई है!");
+      }
         var blob = new Blob([csvData], { type: "text/csv;charset=utf-8;" });
         var blobUrl = window.URL.createObjectURL(blob);
         var link = document.createElement("a");
