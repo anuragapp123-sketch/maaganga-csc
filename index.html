@@ -4616,18 +4616,18 @@ function downloadTxnReceiptPDF(index) {
           var timeStr = String(now.getHours()).padStart(2, '0') + "-" + String(now.getMinutes()).padStart(2, '0') + "-" + String(now.getSeconds()).padStart(2, '0');
           var fileName = reportName + "_" + dateStr + "_" + timeStr + ".pdf";
 
-          // Header Branding Title
-          doc.setFontSize(16);
+          // Header Branding Title (English Font Safe)
+          doc.setFontSize(15);
           doc.setTextColor(15, 23, 42);
-          doc.text("माँ गंगा जन सेवा केंद्र व इलेक्ट्रॉनिक्स", 14, 14);
+          doc.text("MAA GANGA JAN SEVA KENDRA & ELECTRONICS", 14, 14);
 
-          doc.setFontSize(11);
+          doc.setFontSize(10.5);
           doc.setTextColor(headerColor[0], headerColor[1], headerColor[2]);
           doc.text(cleanReportTitle, 14, 21);
 
           doc.setFontSize(8.5);
           doc.setTextColor(100, 116, 139);
-          doc.text("तारीख व समय: " + now.toLocaleString('en-IN') + " | कुल रिकॉर्ड: " + rows.length, 14, 26);
+          doc.text("Date & Time: " + now.toLocaleString('en-IN') + " | Total Records: " + rows.length, 14, 26);
 
           if (typeof doc.autoTable === "function") {
             doc.autoTable({
@@ -5513,8 +5513,8 @@ function sendModalDetailsToWhatsApp() {
       '</div>' +
 
       '<div style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px; padding:10px; margin-bottom:15px; display:flex; justify-content:space-between;">' +
-        '<span>कुल बकाया (Net Balance):</span>' +
-        '<strong style="font-size:14px; color:' + (totalBal > 0 ? '#dc2626' : '#16a34a') + ';">' + (totalBal > 0 ? 'You Will Get: ₹' : 'You Will Give: ₹') + Math.abs(totalBal).toLocaleString('en-IN') + '</strong>' +
+        '<span>Net Balance Due:</span>' +
+        '<strong style="font-size:14px; color:' + (totalBal > 0 ? '#dc2626' : '#16a34a') + ';">' + (totalBal > 0 ? 'You Will Get: Rs. ' : 'You Will Give: Rs. ') + Math.abs(totalBal).toLocaleString('en-IN') + '</strong>' +
       '</div>' +
 
       '<table style="width:100%; border-collapse:collapse; text-align:left;">' +
@@ -5523,8 +5523,8 @@ function sendModalDetailsToWhatsApp() {
             '<th style="padding:6px; width:4%;">#</th>' +
             '<th style="padding:6px; width:22%; white-space:nowrap;">Date & Time</th>' +
             '<th style="padding:6px; width:34%;">Details / Bill</th>' +
-            '<th style="padding:6px; text-align:right; width:13%;">You Gave (उधार)</th>' +
-            '<th style="padding:6px; text-align:right; width:13%;">You Got (मिला)</th>' +
+            '<th style="padding:6px; text-align:right; width:13%;">You Gave (Debit)</th>' +
+            '<th style="padding:6px; text-align:right; width:13%;">You Got (Credit)</th>' +
             '<th style="padding:6px; text-align:right; width:14%;">Balance</th>' +
           '</tr>' +
         '</thead>' +
@@ -8230,8 +8230,9 @@ function generateInvoicePDFBase64(data, callback) {
       });
 
       try {
-        var { jsPDF } = window.jspdf;
-        var doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+        var jsPdfClass = (window.jspdf && window.jspdf.jsPDF) ? window.jspdf.jsPDF : window.jsPDF;
+        if (!jsPdfClass) return alert("PDF library ready nahi hai!");
+        var doc = new jsPdfClass({ orientation: 'portrait', unit: 'mm', format: 'a4' });
 
         doc.setFontSize(15);
         doc.setTextColor(15, 23, 42);
