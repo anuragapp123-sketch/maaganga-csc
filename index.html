@@ -1187,9 +1187,9 @@
           <button class="btn btn-sm text-white p-0 me-1" style="font-size: 22px; line-height: 1;" onclick="openSideMenu()">☰</button>
           <img src="https://lh3.googleusercontent.com/d/1AVhGGj41J973HK0KgI1im5JJwJZsKhJR" alt="Logo" class="header-logo">
           <div>
-            <h1 class="header-title">माँ गंगा जन सेवा केंद्र</h1>
-<p class="header-subtitle">डिजिटल सेवा व इलेक्ट्रॉनिक्स केंद्र</p>
-          </div>
+  <h1 class="header-title">माँ गंगा जन सेवा केंद्र</h1>
+  <p class="header-subtitle">डिजिटल सेवा व इलेक्ट्रॉनिक्स केंद्र</p>
+</div>
         </div>
         <div class="d-flex align-items-center gap-1.5">
           <!-- 🔒 Quick Lock Icon in Header -->
@@ -1536,7 +1536,10 @@
           <!-- Transaction Recent Entries History List with Search -->
           <div class="card p-3 shadow-sm border-0 mt-3">
             <div class="d-flex justify-content-between align-items-center mb-2 border-bottom pb-2">
-              <h6 class="fw-bold text-dark m-0">📋 Pichli Sabhi Transactions</h6>
+              <div class="d-flex align-items-center gap-2">
+                <h6 class="fw-bold text-dark m-0">📋 Pichli Sabhi Transactions</h6>
+                <span class="badge bg-primary bg-opacity-10 text-primary fw-bold px-2 py-0.5 rounded-pill" id="totalTxnCountBadge" style="font-size: 10px;">0</span>
+              </div>
               <div class="d-flex gap-1">
                 <button type="button" class="btn btn-sm btn-outline-danger p-0 px-1.5 fw-bold" style="font-size:9px; border-radius:4px;" onclick="exportTableToPDF('txnHistoryTableBody', 'Transaction_History')" title="PDF">📄 PDF</button>
                 <button type="button" class="btn btn-sm btn-outline-success p-0 px-1.5 fw-bold" style="font-size:9px; border-radius:4px;" onclick="exportTableToExcel('txnHistoryTableBody', 'Transaction_History')" title="Excel">📊 Excel</button>
@@ -1655,9 +1658,12 @@
           <!-- Saved Invoices History Card with Search -->
           <div class="card p-3 shadow-sm border-0 mt-3">
             <div class="d-flex justify-content-between align-items-center mb-2 border-bottom pb-2">
-              <h6 class="fw-bold mb-0 text-dark d-flex align-items-center gap-1" style="font-size: 0.85rem;">
-                <span>📜</span> Invoices History
-              </h6>
+              <div class="d-flex align-items-center gap-2">
+                <h6 class="fw-bold mb-0 text-dark d-flex align-items-center gap-1" style="font-size: 0.85rem;">
+                  <span>📜</span> Invoices History
+                </h6>
+                <span class="badge bg-primary bg-opacity-10 text-primary fw-bold px-2 py-0.5 rounded-pill" id="totalInvCountBadge" style="font-size: 10px;">0</span>
+              </div>
               <div class="d-flex gap-1">
                 <button type="button" class="btn btn-sm btn-outline-danger p-0 px-1.5 fw-bold" style="font-size:9px; border-radius:4px;" onclick="exportTableToPDF('invoiceHistoryTableBody', 'Invoice_History')" title="PDF">📄 PDF</button>
                 <button type="button" class="btn btn-sm btn-outline-success p-0 px-1.5 fw-bold" style="font-size:9px; border-radius:4px;" onclick="exportTableToExcel('invoiceHistoryTableBody', 'Invoice_History')" title="Excel">📊 Excel</button>
@@ -1684,6 +1690,12 @@
                   <tr><td colspan="8" class="text-center text-muted py-2">Koi invoice history nahi hai.</td></tr>
                 </tbody>
               </table>
+            </div>
+            <!-- ⬇️ Load More Invoice Button -->
+            <div class="text-center mt-2">
+              <button type="button" class="btn btn-sm btn-outline-primary fw-bold w-100 py-1.5" id="loadMoreInvBtn" onclick="loadMoreInvoiceHistory()" style="font-size: 11px; border-radius: 10px;">
+                ⬇️ और पुराने बिल लोड करें (Load Older Invoices)
+              </button>
             </div>
           </div>
         </div> <!-- invoice-sec end -->
@@ -2261,7 +2273,7 @@
 
             <!-- ⚡ Quick Horizontal Scrollable Filter Chips -->
             <div class="d-flex gap-1.5 overflow-x-auto pb-2 mb-2 no-scrollbar">
-              <button type="button" class="btn btn-sm btn-dark fw-bold py-1 px-3 text-nowrap" style="font-size:10px; border-radius:14px;" onclick="loadUdharKhataData()">👥 सभी (All)</button>
+              <button type="button" class="btn btn-sm btn-dark fw-bold py-1 px-3 text-nowrap" style="font-size:10px; border-radius:14px;" onclick="loadUdharKhataData()">👥 सभी (<span id="totalKhataCountBadge">0</span>)</button>
               <button type="button" class="btn btn-sm btn-outline-danger fw-bold py-1 px-3 text-nowrap" style="font-size:10px; border-radius:14px;" onclick="filterKhataByStatus('due')">⚠️ बाकी उधार (Pending)</button>
               <button type="button" class="btn btn-sm btn-outline-success fw-bold py-1 px-3 text-nowrap" style="font-size:10px; border-radius:14px;" onclick="filterKhataByStatus('settled')">✅ बेबाक (Settled)</button>
             </div>
@@ -2313,7 +2325,12 @@
                   </div>
                 </div>
               </div>
-              <a id="pbCallBtn" href="tel:" class="btn btn-sm btn-light rounded-circle text-primary p-1" style="width:30px; height:30px; line-height:1;"><span style="font-size:14px;">📞</span></a>
+              <div class="d-flex align-items-center gap-1.5">
+                <a id="pbCallBtn" href="tel:" class="btn btn-sm btn-light rounded-circle text-primary p-1" style="width:30px; height:30px; line-height:1;"><span style="font-size:14px;">📞</span></a>
+                <button type="button" class="btn btn-sm btn-danger rounded-circle p-1" style="width:30px; height:30px; line-height:1; border:none;" onclick="deleteCustomerEntireKhata()" title="कस्टमर का खाता डिलीट करें">
+                  <span style="font-size:13px;">🗑️</span>
+                </button>
+              </div>
             </div>
 
             <!-- Summary Balance Banner -->
@@ -2759,6 +2776,8 @@ function fixDriveImageUrl(url) {
 
 function renderTxnHistoryTable() {
     var tbody = document.getElementById("txnHistoryTableBody");
+    var badge = document.getElementById("totalTxnCountBadge");
+    if (badge) badge.innerText = (globalTxnHistory ? globalTxnHistory.length : 0);
     if(!tbody) return;
     if(!globalTxnHistory || globalTxnHistory.length === 0) {
       tbody.innerHTML = '<tr><td colspan="10" class="text-center text-muted py-2">Koi transaction entry nahi mili.</td></tr>';
@@ -2788,6 +2807,8 @@ function renderTxnHistoryTable() {
 
     function renderInvoiceHistoryTable() {
       var tbody = document.getElementById("invoiceHistoryTableBody");
+      var badge = document.getElementById("totalInvCountBadge");
+      if (badge) badge.innerText = (globalInvoiceHistory ? globalInvoiceHistory.length : 0);
       if(!tbody) return;
       if(globalInvoiceHistory.length === 0) {
         tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted py-2">Koi invoice history nahi hai.</td></tr>';
@@ -3183,6 +3204,91 @@ function downloadTxnReceiptPDF(index) {
     }
 
     // --- LIVE HISTORY SEARCH FILTERING FUNCTIONS ---
+    // ⬇️ पुराना ट्रांजैक्शन डेटा लोड करने का फ़ंक्शन
+    function loadMoreTxnHistory() {
+      var btn = document.getElementById("loadMoreTxnBtn");
+      if (btn) {
+        btn.innerText = "⏳ पुराना डेटा लोड हो रहा है...";
+        btn.disabled = true;
+      }
+
+      var handleTxnSuccess = function(jsonString) {
+        try {
+          var olderData = typeof jsonString === 'string' ? JSON.parse(jsonString || "[]") : jsonString;
+          if (olderData && olderData.length > 0) {
+            globalTxnHistory = globalTxnHistory.concat(olderData);
+            txnPaginationOffset += olderData.length;
+            renderTxnHistoryTable();
+            if (btn) {
+              btn.innerText = "⬇️ और पुराना डेटा लोड करें (" + globalTxnHistory.length + "+)";
+              btn.disabled = false;
+            }
+          } else {
+            if (btn) {
+              btn.innerText = "✅ सभी पुराना रिकॉर्ड लोड हो चुका है";
+              btn.disabled = true;
+            }
+          }
+        } catch(e) {
+          if (btn) { btn.innerText = "❌ लोड करने में त्रुटि"; btn.disabled = false; }
+        }
+      };
+
+      if (typeof google !== 'undefined' && google.script && google.script.run) {
+        google.script.run.withSuccessHandler(handleTxnSuccess).getTxnHistory(txnPaginationOffset);
+      } else if (SCRIPT_WEB_APP_URL && SCRIPT_WEB_APP_URL.indexOf("http") === 0) {
+        fetch(SCRIPT_WEB_APP_URL + "?action=getTxnHistory&offset=" + txnPaginationOffset)
+          .then(function(r) { return r.json(); })
+          .then(handleTxnSuccess)
+          .catch(function() {
+            if (btn) { btn.innerText = "❌ लोड करने में त्रुटि"; btn.disabled = false; }
+          });
+      }
+    }
+
+    // ⬇️ पुराना इनवॉइस डेटा लोड करने का फ़ंक्शन
+    function loadMoreInvoiceHistory() {
+      var btn = document.getElementById("loadMoreInvBtn");
+      if (btn) {
+        btn.innerText = "⏳ पुराने बिल लोड हो रहे हैं...";
+        btn.disabled = true;
+      }
+
+      var handleInvSuccess = function(jsonString) {
+        try {
+          var olderData = typeof jsonString === 'string' ? JSON.parse(jsonString || "[]") : jsonString;
+          if (olderData && olderData.length > 0) {
+            globalInvoiceHistory = globalInvoiceHistory.concat(olderData);
+            invPaginationOffset += olderData.length;
+            renderInvoiceHistoryTable();
+            loadUdharKhataData();
+            if (btn) {
+              btn.innerText = "⬇️ और पुराने बिल लोड करें (" + globalInvoiceHistory.length + "+)";
+              btn.disabled = false;
+            }
+          } else {
+            if (btn) {
+              btn.innerText = "✅ सभी पुराने बिल लोड हो चुके हैं";
+              btn.disabled = true;
+            }
+          }
+        } catch(e) {
+          if (btn) { btn.innerText = "❌ लोड करने में त्रुटि"; btn.disabled = false; }
+        }
+      };
+
+      if (typeof google !== 'undefined' && google.script && google.script.run) {
+        google.script.run.withSuccessHandler(handleInvSuccess).getInvoiceHistory(invPaginationOffset);
+      } else if (SCRIPT_WEB_APP_URL && SCRIPT_WEB_APP_URL.indexOf("http") === 0) {
+        fetch(SCRIPT_WEB_APP_URL + "?action=getInvoiceHistory&offset=" + invPaginationOffset)
+          .then(function(r) { return r.json(); })
+          .then(handleInvSuccess)
+          .catch(function() {
+            if (btn) { btn.innerText = "❌ लोड करने में त्रुटि"; btn.disabled = false; }
+          });
+      }
+    }
+
     function filterTxnHistoryTable() {
       var query = document.getElementById("txnSearchInput").value.toLowerCase();
       var filtered = globalTxnHistory.filter(function(row) {
@@ -3195,6 +3301,8 @@ function downloadTxnReceiptPDF(index) {
 
     function renderCustomTxnHistoryTable(dataList) {
       var tbody = document.getElementById("txnHistoryTableBody");
+      var badge = document.getElementById("totalTxnCountBadge");
+      if (badge) badge.innerText = (dataList ? dataList.length : 0);
       if(!tbody) return;
       if(dataList.length === 0) {
         tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">Koi matching transaction nahi mili.</td></tr>';
@@ -3227,6 +3335,8 @@ function downloadTxnReceiptPDF(index) {
 
     function renderCustomInvoiceHistoryTable(dataList) {
       var tbody = document.getElementById("invoiceHistoryTableBody");
+      var badge = document.getElementById("totalInvCountBadge");
+      if (badge) badge.innerText = (dataList ? dataList.length : 0);
       if(!tbody) return;
       if(dataList.length === 0) {
         tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted py-2">Koi matching invoice nahi mila.</td></tr>';
@@ -3300,7 +3410,13 @@ function downloadTxnReceiptPDF(index) {
       }, 1000);
     }
 
+    var txnPaginationOffset = 0;
+    var invPaginationOffset = 0;
+
     function fetchAllHistoryFromSheet() {
+      txnPaginationOffset = 0;
+      invPaginationOffset = 0;
+
       // ⚡ INSTANT LOAD: सबसे पहले लोकल स्टोरेज से कैश्ड डेटा लोड करें
       var cTxn = localStorage.getItem("cache_txn_history");
       var cInv = localStorage.getItem("cache_inv_history");
@@ -3310,29 +3426,31 @@ function downloadTxnReceiptPDF(index) {
       if (cInv) { try { globalInvoiceHistory = JSON.parse(cInv); renderInvoiceHistoryTable(); loadUdharKhataData(); updateAllTabsOverview(); calculateDayEndCash(); } catch(e){} }
       if (cDoc) { try { globalDocHistory = JSON.parse(cDoc); renderDocHistoryTable(); } catch(e){} }
 
-      // 🔄 BACKGROUND SYNC: गूगल शीट से सिंक करके स्टोरेज अपडेट करें
+      // 🔄 BACKGROUND SYNC: पहले 100 रिकॉर्ड्स लाना
       if (typeof google !== 'undefined' && google.script && google.script.run) {
         google.script.run.withSuccessHandler(function(jsonString) {
           try {
             var data = typeof jsonString === 'string' ? JSON.parse(jsonString || "[]") : jsonString;
             if (data && data.length > 0) { 
               globalTxnHistory = data; 
+              txnPaginationOffset = data.length;
               localStorage.setItem("cache_txn_history", JSON.stringify(data));
               renderTxnHistoryTable(); 
             }
           } catch(e) {}
-        }).getTxnHistory();
+        }).getTxnHistory(0);
 
         google.script.run.withSuccessHandler(function(jsonString) {
           try {
             var data = typeof jsonString === 'string' ? JSON.parse(jsonString || "[]") : jsonString;
             if (data && data.length > 0) { 
               globalInvoiceHistory = data; 
+              invPaginationOffset = data.length;
               localStorage.setItem("cache_inv_history", JSON.stringify(data));
               renderInvoiceHistoryTable(); loadUdharKhataData(); updateAllTabsOverview(); calculateDayEndCash(); 
             }
           } catch(e) {}
-        }).getInvoiceHistory();
+        }).getInvoiceHistory(0);
 
         google.script.run.withSuccessHandler(function(jsonString) {
           try {
@@ -4323,11 +4441,11 @@ function downloadTxnReceiptPDF(index) {
                 upiIntent + "\n\n" +
                 "💳 *UPI ID:* `" + upi + "`\n" +
                 "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" +
-                "👤 *Pro:* अनुराग शाक्य (Anurag Shakya)\n" +
+                "👤 *Pro:* अनुराग शाक्य \n" +
                 "📞 *संपर्क/WhatsApp:* 9761414105\n\n" +
                 "धन्यवाद! 🙏";
 
-      window.open("https://wa.me/91" + mobile + "?text=" + encodeURIComponent(msg), "_blank");
+      openWhatsAppDirect(mobile, msg);
     }
     function downloadModalAsPDF() {
   var modalBody = document.getElementById("modalBodyContent");
@@ -4999,6 +5117,41 @@ function sendModalDetailsToWhatsApp() {
 
     // === KHATABOOK APP MATCHING LOGIC ===
     var currentActiveKhataCust = null;
+    // 📲 Unified WhatsApp Helper (APK Intent & Direct Web API Fallback)
+    function openWhatsAppDirect(mobile, message) {
+      if (!mobile) return alert("⚠️ वैध मोबाइल नंबर नहीं है!");
+      var cleanMob = String(mobile).replace(/\D/g, '').slice(-10);
+      var encoded = encodeURIComponent(message);
+
+      if (window.AndroidApp && typeof window.AndroidApp.shareImageToWhatsApp === "function") {
+        window.open("https://api.whatsapp.com/send?phone=91" + cleanMob + "&text=" + encoded, "_blank");
+      } else {
+        var isAndroid = /Android/i.test(navigator.userAgent);
+        if (isAndroid) {
+          window.location.href = "intent://send?phone=91" + cleanMob + "&text=" + encoded + "#Intent;scheme=whatsapp;package=com.whatsapp;end";
+          setTimeout(function() {
+            window.open("https://api.whatsapp.com/send?phone=91" + cleanMob + "&text=" + encoded, "_blank");
+          }, 600);
+        } else {
+          window.open("https://api.whatsapp.com/send?phone=91" + cleanMob + "&text=" + encoded, "_blank");
+        }
+      }
+    }
+
+    // 🔊 Smart Voice Soundbox Alert System (Hindi Speech with Auto-Resume)
+    function speakHindiAlert(textMessage) {
+      if ('speechSynthesis' in window) {
+        if (window.speechSynthesis.paused) {
+          window.speechSynthesis.resume();
+        }
+        window.speechSynthesis.cancel();
+        var msg = new SpeechSynthesisUtterance(textMessage);
+        msg.lang = 'hi-IN';
+        msg.rate = 0.95;
+        msg.pitch = 1.0;
+        window.speechSynthesis.speak(msg);
+      }
+    }
     // 🔊 Smart Voice Soundbox Alert System (Hindi Speech)
     function speakHindiAlert(textMessage) {
       if ('speechSynthesis' in window) {
@@ -5102,6 +5255,8 @@ function sendModalDetailsToWhatsApp() {
       });
 
       var customerList = Object.values(customerMap);
+      var khataBadge = document.getElementById("totalKhataCountBadge");
+      if (khataBadge) khataBadge.innerText = customerList.length;
 
       if (customerList.length === 0) {
         container.innerHTML = '<div class="text-center text-muted py-5">कोई कस्टमर रिकॉर्ड नहीं मिला।<br><small>नीचे + ADD CUSTOMER दबाएँ।</small></div>';
@@ -5258,6 +5413,50 @@ function sendModalDetailsToWhatsApp() {
       document.getElementById("khataCustomerPassbookView").classList.add("d-none");
       document.getElementById("khataCustomerListView").classList.remove("d-none");
       loadUdharKhataData();
+    }
+
+    // 🗑️ कस्टमर का पूरा खाता हमेशा के लिए हटाने का फ़ंक्शन
+    function deleteCustomerEntireKhata() {
+      if (!currentActiveKhataCust) return alert("⚠️ कोई कस्टमर सिलेक्ट नहीं है!");
+
+      var targetMobile = String(currentActiveKhataCust.mobile || '').trim();
+      var targetName = currentActiveKhataCust.name || 'कस्टमर';
+
+      var confirmDelete = confirm("⚠️ क्या आप निश्चित रूप से " + targetName + " का पूरा खाता और सभी लेन-देन डिलीट करना चाहते हैं?\n\nयह डेटा ऐप और हिस्ट्री से पूरी तरह हट जाएगा।");
+      if (!confirmDelete) return;
+
+      // 1. लोकल मेमोरी (globalInvoiceHistory) से इस कस्टमर के सभी रिकॉर्ड हटाएं
+      globalInvoiceHistory = (globalInvoiceHistory || []).filter(function(inv) {
+        var mob = String(inv.mobile || '').trim();
+        var name = String(inv.name || '').trim().toLowerCase();
+        if (targetMobile && targetMobile !== 'NOMOB' && targetMobile !== '-') {
+          return mob !== targetMobile;
+        } else {
+          return name !== targetName.toLowerCase();
+        }
+      });
+
+      // 2. लोकल कैश अपडेट करें
+      localStorage.setItem("cache_inv_history", JSON.stringify(globalInvoiceHistory));
+
+      // 3. Google Sheet / Backend Sync
+      if (typeof google !== 'undefined' && google.script && google.script.run) {
+        google.script.run.deleteCustomerKhata(targetMobile, targetName);
+      } else if (typeof SCRIPT_WEB_APP_URL !== 'undefined' && SCRIPT_WEB_APP_URL) {
+        fetch(SCRIPT_WEB_APP_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain" },
+          body: JSON.stringify({ action: "deleteCustomerKhata", mobile: targetMobile, name: targetName })
+        }).catch(function(){});
+      }
+
+      alert("✅ " + targetName + " का खाता सफलतापूर्वक डिलीट कर दिया गया है!");
+
+      // 4. व्यू बंद करें और लिस्ट रिफ्रेश करें
+      currentActiveKhataCust = null;
+      closeCustomerPassbookView();
+      if (typeof renderInvoiceHistoryTable === 'function') renderInvoiceHistoryTable();
+      if (typeof updateAllTabsOverview === 'function') updateAllTabsOverview();
     }
 
     function openKhataEntryDrawer(entryType) {
@@ -6681,26 +6880,43 @@ function autoSyncLocation(callback) {
     }
 
     function selectPhotoSource() {
-      // ✅ FIX: Camera/Gallery kholne se PEHLE draft save + reload-protection flag set karein
+      // ✅ Camera/Gallery खोलने से पहले ड्राफ्ट सुरक्षित करें
       if (typeof saveTxnFormDraft === 'function') saveTxnFormDraft();
       if (typeof autoSyncLocation === 'function') autoSyncLocation();
 
-      // 🔒 Dobara photo lene par form wapas lock kar dein (taaki user pehle nayi photo le)
       var restWrapper = document.getElementById("txnFormRestWrapper");
       if (restWrapper) {
         restWrapper.classList.add("pe-none", "opacity-50");
         restWrapper.style.opacity = "0.5";
       }
 
-      var html = '<div class="text-center p-2">' +
-        '<small class="fw-bold text-muted d-block mb-3" style="font-size:11px;">कृपया फोटो अपलोड करने का माध्यम चुनें:</small>' +
-        '<div class="d-flex flex-column gap-2">' +
-          '<button type="button" class="btn btn-primary fw-bold py-2.5" style="font-size:12px; border-radius:10px;" onclick="openTxnCameraSafe()">📷 कैमरे से खींचे (Camera)</button>' +
-          '<button type="button" class="btn btn-outline-primary fw-bold py-2.5" style="font-size:12px; border-radius:10px;" onclick="openTxnGallerySafe()">🖼️ गैलरी से चुनें (Gallery)</button>' +
+      var html = '<div class="p-2 text-center">' +
+        '<small class="text-muted fw-bold d-block mb-3" style="font-size:11px;">फोटो लेने या चुनने का विकल्प चुनें:</small>' +
+        '<div class="row g-2 justify-content-center">' +
+          '<!-- 📷 Camera Card -->' +
+          '<div class="col-6">' +
+            '<button type="button" class="btn w-100 p-3 card border-0 shadow-sm text-center d-flex flex-column align-items-center justify-content-center m-0" style="background: linear-gradient(145deg, #eff6ff, #dbeafe); border: 1.5px solid #bfdbfe !important; border-radius: 18px; transition: transform 0.15s ease;" onclick="openTxnCameraSafe()">' +
+              '<div class="rounded-circle d-flex align-items-center justify-content-center shadow-sm mb-2" style="width: 52px; height: 52px; background: #2563eb; color: #ffffff; font-size: 26px;">' +
+                '📷' +
+              '</div>' +
+              '<strong class="text-dark d-block" style="font-size: 13px;">कैमरा</strong>' +
+              '<small class="text-primary fw-semibold" style="font-size: 9.5px;">Camera</small>' +
+            '</button>' +
+          '</div>' +
+          '<!-- 🖼️ Gallery Card -->' +
+          '<div class="col-6">' +
+            '<button type="button" class="btn w-100 p-3 card border-0 shadow-sm text-center d-flex flex-column align-items-center justify-content-center m-0" style="background: linear-gradient(145deg, #f0fdf4, #dcfce7); border: 1.5px solid #bbf7d0 !important; border-radius: 18px; transition: transform 0.15s ease;" onclick="openTxnGallerySafe()">' +
+              '<div class="rounded-circle d-flex align-items-center justify-content-center shadow-sm mb-2" style="width: 52px; height: 52px; background: #16a34a; color: #ffffff; font-size: 26px;">' +
+                '🖼️' +
+              '</div>' +
+              '<strong class="text-dark d-block" style="font-size: 13px;">गैलरी</strong>' +
+              '<small class="text-success fw-semibold" style="font-size: 9.5px;">Gallery</small>' +
+            '</button>' +
+          '</div>' +
         '</div>' +
       '</div>';
 
-      showModalPopup("📸 Choose Photo Option", html);
+      showModalPopup("📸 फोटो माध्यम चुनें", html);
     }
 
     // ✅ NEW HELPER: Draft save karke camera open karo (reload ke baad restore hoga)
@@ -7099,6 +7315,11 @@ function verifyGpsMandatory(onSuccess) {
     var fullCtx = null;
     var isFullDrawing = false;
 
+    function closeFullScreenSignatureModal() {
+      var overlay = document.getElementById("fullSigOverlay");
+      if (overlay) overlay.remove();
+    }
+
     function openFullScreenSignatureModal() {
       var oldOverlay = document.getElementById("fullSigOverlay");
       if (oldOverlay) oldOverlay.remove();
@@ -7109,21 +7330,57 @@ function verifyGpsMandatory(onSuccess) {
 
       overlay.innerHTML = 
         '<div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-1">' +
-          '<h6 class="fw-bold m-0 text-dark" style="font-size:15px;">✍️ ग्राहक के हस्ताक्षर (Customer Signature)</h6>' +
-          '<span class="badge bg-primary" style="font-size:10px;">उंगली से साइन करें</span>' +
+          '<div class="d-flex align-items-center gap-2">' +
+            '<button type="button" class="btn btn-sm btn-light border py-1 px-2 fw-bold rounded-circle text-muted" onclick="closeFullScreenSignatureModal()" title="बंद करें">✕</button>' +
+            '<h6 class="fw-bold m-0 text-dark" style="font-size:14px;">✍️ ग्राहक के हस्ताक्षर</h6>' +
+          '</div>' +
+          '<span class="badge bg-primary px-2 py-1" style="font-size:10px;">उंगली से साइन करें</span>' +
         '</div>' +
         '<div style="flex: 1; width: 100%; border: 2px dashed #2563eb; border-radius: 14px; overflow: hidden; background: #f8fafc; margin: 10px 0; position: relative; touch-action: none;">' +
           '<canvas id="fullSigCanvas" style="width: 100%; height: 100%; touch-action: none !important; display: block; cursor: crosshair;"></canvas>' +
         '</div>' +
         '<div class="d-flex gap-2 pb-2">' +
-          '<button type="button" class="btn btn-outline-danger w-50 fw-bold py-2.5" style="font-size:14px; border-radius:10px;" onclick="clearFullCanvas()">❌ मिटाएं (Clear)</button>' +
-          '<button type="button" class="btn btn-success w-50 fw-bold py-2.5" style="font-size:14px; border-radius:10px; background:#10b981;" onclick="saveFullScreenSignature()">✅ ओके (Done)</button>' +
+          '<button type="button" class="btn btn-outline-danger w-50 fw-bold py-2.5" style="font-size:13px; border-radius:10px;" onclick="clearFullCanvas()">❌ मिटाएं (Clear)</button>' +
+          '<button type="button" class="btn btn-success w-50 fw-bold py-2.5" style="font-size:13px; border-radius:10px; background:#10b981; border:none;" onclick="saveFullScreenSignature()">✅ ओके (Done)</button>' +
         '</div>';
 
       document.body.appendChild(overlay);
       setTimeout(initFullCanvasEvents, 120);
     }
 
+    function saveFullScreenSignature() {
+      if (!fullCanvas) return;
+      var dataUrl = fullCanvas.toDataURL("image/png");
+
+      // Preview Image सेट करें और उसे साफ दिखने लायक स्टाइल दें
+      var previewImg = document.getElementById("sigPreviewImg");
+      var placeholder = document.getElementById("sigPlaceholder");
+      if (previewImg && placeholder) {
+        previewImg.src = dataUrl;
+        previewImg.style.display = "block";
+        previewImg.style.height = "38px";
+        previewImg.style.width = "auto";
+        previewImg.style.margin = "0 auto";
+        previewImg.style.objectFit = "contain";
+        previewImg.classList.remove("d-none");
+        placeholder.classList.add("d-none");
+      }
+
+      // बैकग्राउंड कैनवास को सुरक्षित रूप से अपडेट करें (बिना व्हाइट किए)
+      if (sigCanvas && sigCtx) {
+        if (!sigCanvas.width || sigCanvas.width === 0) sigCanvas.width = 300;
+        if (!sigCanvas.height || sigCanvas.height === 0) sigCanvas.height = 100;
+        var img = new Image();
+        img.onload = function() {
+          sigCtx.clearRect(0, 0, sigCanvas.width, sigCanvas.height);
+          sigCtx.drawImage(img, 0, 0, sigCanvas.width, sigCanvas.height);
+        };
+        img.src = dataUrl;
+      }
+
+      // ओवरले बंद करें
+      closeFullScreenSignatureModal();
+    }
     function initFullCanvasEvents() {
       fullCanvas = document.getElementById("fullSigCanvas");
       if (!fullCanvas) return;
@@ -7186,33 +7443,7 @@ function verifyGpsMandatory(onSuccess) {
       if (fullCtx && fullCanvas) fullCtx.clearRect(0, 0, fullCanvas.width, fullCanvas.height);
     }
 
-    function saveFullScreenSignature() {
-      if (!fullCanvas) return;
-      var dataUrl = fullCanvas.toDataURL("image/png");
-
-      // Set Preview Image in Main Form
-      var previewImg = document.getElementById("sigPreviewImg");
-      var placeholder = document.getElementById("sigPlaceholder");
-      if (previewImg && placeholder) {
-        previewImg.src = dataUrl;
-        previewImg.classList.remove("d-none");
-        placeholder.classList.add("d-none");
-      }
-
-      // Copy Data to Main Form Canvas
-      if (sigCanvas && sigCtx) {
-        var img = new Image();
-        img.onload = function() {
-          sigCtx.clearRect(0, 0, sigCanvas.width, sigCanvas.height);
-          sigCtx.drawImage(img, 0, 0, sigCanvas.width, sigCanvas.height);
-        };
-        img.src = dataUrl;
-      }
-
-      // Close Standalone Overlay
-      var overlay = document.getElementById("fullSigOverlay");
-      if (overlay) overlay.remove();
-    }
+    
 
     function processTransaction() {
       var sigPreviewEl = document.getElementById('sigPreviewImg');
@@ -8875,21 +9106,28 @@ function sendCustomGreeting(sendMode) {
     }
 
     // === 📡 OFFLINE QUEUE & BACKGROUND SYNC SYSTEM ===
-    function safeLocalStorageSet(key, valueString) {
+    // ⚡ LocalStorage Quota Safe Helper: भारी Base64 को हटाकर सिर्फ़ ज़रूरी डेटा स्टोर करता है
+    function safeLocalStorageSet(key, value) {
       try {
-        localStorage.setItem(key, valueString);
-      } catch (e) {
-        if (e.name === 'QuotaExceededError' || e.code === 22) {
-          console.warn('LocalStorage limit reached. Purging old cache...');
-          // Clear non-critical caches
-          localStorage.removeItem("cache_doc_history");
-          localStorage.removeItem("cache_stock_data");
-          try {
-            localStorage.setItem(key, valueString);
-          } catch (retryErr) {
-            console.error('LocalStorage write completely failed:', retryErr);
-          }
+        var sanitizedData = value;
+        if (Array.isArray(value)) {
+          sanitizedData = value.map(function(item) {
+            var copy = Object.assign({}, item);
+            // अगर फोटो Base64 है (Drive Link नहीं), तो उसे लोकल कैश से हटाएँ
+            if (copy.slipPhoto && copy.slipPhoto.indexOf("data:") === 0) copy.slipPhoto = "";
+            if (copy.receiverPhoto && copy.receiverPhoto.indexOf("data:") === 0) copy.receiverPhoto = "";
+            if (copy.signature && copy.signature.indexOf("data:") === 0) copy.signature = "";
+            if (copy.billPhoto && copy.billPhoto.indexOf("data:") === 0) copy.billPhoto = "";
+            return copy;
+          });
         }
+        var stringified = typeof sanitizedData === "string" ? sanitizedData : JSON.stringify(sanitizedData);
+        localStorage.setItem(key, stringified);
+      } catch (e) {
+        console.warn("Storage Quota Exceeded. Clearing secondary caches...");
+        localStorage.removeItem("cache_doc_history");
+        localStorage.removeItem("cache_purchase_history");
+        localStorage.removeItem("cache_repair_history");
       }
     }
 
@@ -8982,16 +9220,21 @@ function sendCustomGreeting(sendMode) {
     });
 
     // 🔒 ऑटो-लॉक बंद: अब ऐप केवल तभी लॉक होगा जब यूजर साइड मेन्यू या हेडर के 🔒 आइकन पर क्लिक करेगा
+    var inactivityTimer = null;
+    var isCameraOrPickerActive = false;
+
     function resetInactivityTimer() {
       // Automatic timer disabled
     }
 
-    // कैमरा/गैलरी इनपुट खोलते समय टाइमर को रोकने व ऐप रीलोड प्रोटेक्शन फ़्लैग सेट करने का फ़ंक्शन
+    // कैमरा/गैलरी इनपुट खोलते समय ऐप रीलोड प्रोटेक्शन फ़्लैग सेट करने का फ़ंक्शन
     document.addEventListener("click", function(e) {
       if (e.target && e.target.tagName === "INPUT" && e.target.type === "file") {
         isCameraOrPickerActive = true;
         sessionStorage.setItem("camera_active_flag", "true");
-        clearTimeout(inactivityTimer);
+        if (typeof inactivityTimer !== 'undefined' && inactivityTimer) {
+          clearTimeout(inactivityTimer);
+        }
       }
     });
 
